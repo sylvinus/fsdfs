@@ -55,3 +55,6 @@ positive, ideally greater than 1 (in which case all the files would have one mor
 
 min(K-N) will naturally decrease when adding new files. min(K-N) becoming <1 or negative should be the signal that new nodes are needed.
 
+h2. How to test
+
+python tests/basic.py
