@@ -31,10 +31,9 @@ The master has a list of all the nodes with their status, which includes :
 * cpu/network load
 * list of all the files replicated on the node
 * free disk quota
-* max(K-N)
  
 The free disk quota will always tend to zero because each nodes tries to replicate as many files as it can. 
-Hence, max(K-N) is an interesting number for a node, because it measures the extent of "over-replication".
+Hence, max(K-N) is a more interesting number for a node, because it measures the extent of "over-replication".
 If max(K-N)>0, some copies on the server are not strictly necessary and could be deleted. 
 If max(K-N)<=0, every copy is needed and the server should be considered "full".
 

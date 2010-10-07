@@ -1,11 +1,20 @@
 import os,sys,shutil,re,time
 
+try:
+    import simplejson as json
+except:
+    import json
+
 import threading, shutil
 import BaseHTTPServer, urllib2, urllib, urlparse
 from hashlib import sha1
 
 from SocketServer import ThreadingMixIn
 
+from replicator import Replicator
+
+sys.path.insert(0, os.path.dirname(__file__))
+from filedb import loadFileDb
 
 class Filesystem:
     
@@ -15,9 +24,11 @@ class Filesystem:
         
         self.host = self.config["host"]
         
-        self.filedb = {}
+        self.filedb = loadFileDb("memory",self)
         
         self.nodedb = {}
+        
+        self.ismaster = (self.config["master"]==self.config["host"])
     
     def getReplicationRules(self,filepath):
         return {
@@ -27,78 +38,16 @@ class Filesystem:
     def getLocalFilePath(self,filepath):
         return os.path.join(self.config["datadir"],filepath)
     
-
-    def sortFilesByReplicationNeeds(self,fileList):
-        
-        knownNeeds = []
-        
-        for f in fileList:
-            copies = self.searchFile(f)
-            rules = self.getReplicationRules(f)
-            
-            knownNeeds.append((f,rules["n"] - len(copies),copies))
-            
-        knownNeeds.sort(cmp=lambda x,y:cmp(x[1],y[1]),reverse=True)
-    
-        return knownNeeds
-
-    def watchReplication(self,maxOperations=100):
-        
-        knownNeeds = self.sortFilesByReplicationNeeds(self.getKnownFiles())
-        
-        self.suggestFiles(knownNeeds[:maxOperations])
-
-
-    def getLocalFiles(self):
-        return self.filedb.keys()
-    
-    #
-    # Get the highest replication factor of any local file
-    #
-    def getMaxLocalReplicationFactor(self):
-        
-        knownNeeds = self.sortFilesByReplicationNeeds(self.getLocalFiles())
-        
-        if len(knownNeeds)==0:
-            return None
-        else:
-            return knownNeeds[0][1]
-            
-    
     
     def getLocalFreeDisk(self):
         
         #test
-        r = subprocess.Popen("/bin/df",["-kP","./"]).read()
+        r = subprocess.Popen("/bin/df",["-kP",self.config["datadir"]]).read()
         return int(re.split("\s+",o.split("\n")[1])[3])
         
         
     
-    #
-    # suggestList elements are (filepath,known need,known copies)
-    #
-    def suggestFiles(self,suggestList):
-        
-        knownNodes = self.getKnownNodes()
-        
-        if self.host in knownNodes:
-            knownNodes.remove(self.host)
-        
-        for (f,n,copies) in suggestList:
-            
-            newnodes = []
-            for node in knownNodes:
-                if node not in copies:
-                    newnodes.append(node)
-                    
-            #todo ceil?
-            for y in range(min(len(newnodes),int(n+0.99999))):
-                self.nodeRPC(newnodes[y],"SUGGEST",{"filepath":f}).read()
-            
-                
-    
-    
-    def addFileToNode(self,src,filepath,mode="copy"):
+    def importFile(self,src,filepath,mode="copy"):
         
         destpath = self.getLocalFilePath(filepath)
         
@@ -114,14 +63,9 @@ class Filesystem:
             shutil.copyfileobj(src,f)
             f.close()
         
-        self.filedb[filepath]=True
+        self.filedb.update(filepath,{"nodes":set([self.host]),"t":int(time.time())})
         
         self.report()
-    
-    
-    def report(self):
-        
-        self.reportFiles(self.getLocalFiles())
     
     def start(self):
         
@@ -131,6 +75,10 @@ class Filesystem:
         
         self.report()
         
+        if self.ismaster:
+            self.replicator = Replicator(self)
+            self.replicator.start()
+        
         
     def stop(self):
         #print "stopping %s" % self.host
@@ -138,35 +86,34 @@ class Filesystem:
         
         #self.httpinterface.join()
     
+        if self.ismaster:
+            self.replicator.shutdown()
     
-    def nodeRPC(self,host,method,params):
+    
+    def searchFile(self,file):
+        
+        nodes = self.nodeRPC(self.config["master"],"SEARCH",{"filepath":file},parse=True)
+        
+        return nodes
+    
+    def nodeRPC(self,host,method,params,parse=False):
         
         params["_time"]=int(time.time())
         
-        query = urllib.urlencode(params)
-        
+        query = json.dumps(params)
+
         #print "http://%s/%s" % (host,method)
-        return urllib2.urlopen("http://%s/%s" % (host,method),"_h="+self.hashQuery(query)+"&"+query)
+        ret = urllib2.urlopen("http://%s/%s" % (host,method),"h="+self.hashQuery(query)+"&p="+urllib.quote(query))
+    
+        if parse:
+            return json.loads(ret.read())
+        else:
+            return ret
     
     def hashQuery(self,query):
         return sha1(sha1(query).hexdigest()+self.config["secret"]).hexdigest()
     
-    def importFile(self,localpath,filepath):
-        
-        #1. import file in the current node
-        
-        self.addFileToNode(localpath,filepath,mode="copy")
-        
-        #2. start its replication
-        
-        rules = self.getReplicationRules(filepath)
-        
-        self.suggestFiles([(filepath,rules["n"]-1,[])])
-        
-        return True
-    
-       
-    def fetchFile(self,filepath):
+    def downloadFile(self,filepath):
         
         hosts = self.searchFile(filepath)
         
@@ -179,7 +126,7 @@ class Filesystem:
                 continue
             
             #We don't need checksumming here... we're using TCP
-            self.addFileToNode(remote,filepath,mode="copyobj")
+            self.importFile(remote,filepath,mode="copyobj")
             
             remote.close()
             
@@ -187,6 +134,20 @@ class Filesystem:
             
         
         return False
+    
+    def report(self):
+        self.nodeRPC(self.config["master"],"REPORT",self.getStatus())
+        
+    def getStatus(self):
+        return {
+            "node":self.host,
+            #"df":self.getLocalFreeDisk(),
+            "load":0
+        }
+        #"files":self.filedb.listAll()
+        
+    def getKnownNodes(self):
+        return self.nodedb.keys()
         
   
 class HTTPInterface(threading.Thread):
@@ -226,7 +187,7 @@ class myHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         
         if p[1]=="DOWNLOAD":
                 
-            local = self.server.fs.getLocalFilePath(params["filepath"][0])
+            local = self.server.fs.getLocalFilePath(params["filepath"])
             
             if not os.path.isfile(local):
                 self.send_response(404)
@@ -242,42 +203,38 @@ class myHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         
         elif p[1]=="SUGGEST":
             
-            self.send_response(200,"ok")
-            self.connection.shutdown(1)
+            
+            #local = self.server.fs.getLocalFilePath(params["filepath"])
+            
+            downloaded = self.server.fs.downloadFile(params["filepath"])
         
-            
-            
-            local = self.server.fs.getLocalFilePath(params["filepath"][0])
-            
-            #print "local is %s" % local
-            
-            if not os.path.isfile(local):
-                
-                #print "fetch!!"
-                
-                #fetch it
-                self.server.fs.fetchFile(params["filepath"][0])
+            self.simpleResponse(200,"ok" if downloaded else "nok")
         
         
-        elif p[2]=="STATUS":
+        elif p[1]=="STATUS":
             
-            self.send_response(200,"ok")
-            self.connection.shutdown(1)
+            self.simpleResponse(200,json.dumps(self.server.fs.getStatus()))
         
+        elif p[1]=="SEARCH":
             
+            nodes = self.server.fs.filedb.getNodes(params["filepath"])
             
-            local = self.server.fs.getLocalFilePath(params["filepath"][0])
+            self.simpleResponse(200,json.dumps(list(nodes)))
+        
+        
+        elif p[1]=="REPORT":
             
-            #print "local is %s" % local
+            params["lastReport"] = time.time()
+            self.server.fs.nodedb[params["node"]]=params
             
-            if not os.path.isfile(local):
-                
-                #print "fetch!!"
-                
-                #fetch it
-                self.server.fs.fetchFile(params["filepath"][0])
-                
+            self.simpleResponse(200,"ok")
     
+    
+    def simpleResponse(self,code,content):
+        self.send_response(code)
+        self.end_headers()
+        self.wfile.write(content)
+        self.connection.shutdown(1)
     
     def _getPostParams(self):
         
@@ -291,19 +248,22 @@ class myHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             size_remaining -= len(L[-1])
         data = ''.join(L)
         
-
-        #make sure the hash matches
-        calcHash = self.server.fs.hashQuery(data[44:])
+        qs = urlparse.parse_qs(data)
         
-        if calcHash!=data[3:43]:
+        #make sure the hash matches
+        query = qs["p"][0]
+        
+        calcHash = self.server.fs.hashQuery(query)
+
+        if calcHash!=qs["h"][0]:
             self.send_response(401)
             self.connection.shutdown(1)
             return False
         
-        params = urlparse.parse_qs(data[44:])
+        params = json.loads(query)
         
         #more than 1 day time diff, request is considered expired...
-        if abs(int(params.get("_time",[0])[0])-time.time())>3600*24:
+        if abs(int(params.get("_time",0))-time.time())>3600*24:
             self.send_response(401)
             self.connection.shutdown(1)
             return False
