@@ -57,3 +57,10 @@ min(K-N) will naturally decrease when adding new files. min(K-N) becoming <1 or 
 h2. How to test
 
 python tests/basic.py
+
+
+h2. Todo
+
+ - Disk quota
+ - Admin command (watch replication)
+ - Test crashes/disconnects/...

@@ -8,7 +8,7 @@ class FileDb(FileDbBase):
         self.files = {}
     
     def update(self,file,data):
-        
+
         if file in self.files:
             self.files[file].update(data)
         else:
@@ -21,9 +21,15 @@ class FileDb(FileDbBase):
     
     def addFileToNode(self,file,node):
         self.files[file]["nodes"].add(node)
-        
+    
+    def removeFileFromNode(self,file,node):
+        self.files[file]["nodes"].discard(node)
+          
     def getNodes(self,file):
         return self.files[file]["nodes"]
+    
+    def getSize(self,file):
+        return self.files[file]["size"]
     
     def listAll(self):
         return self.files.keys()
@@ -31,9 +37,10 @@ class FileDb(FileDbBase):
     def listInNode(self,node):
         
         innode=[]
-        
+
         for f in self.files:
-            if node in f["nodes"]:
+            if node in self.getNodes(f):
                 innode.append(f)
     
         return innode
+    

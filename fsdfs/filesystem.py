@@ -28,8 +28,17 @@ class Filesystem:
         
         self.nodedb = {}
         
-        self.ismaster = (self.config["master"]==self.config["host"])
+        self.ismaster = (self.config["master"]==self.config["host"]) or (self.config["master"] is True)
     
+        if not self.config.get("maxstorage",False):
+            self.maxstorage=10*1024*1024*1024 #default 10G
+        elif type(self.config["maxstorage"])==int:
+            self.maxstorage=self.config["maxstorage"]
+        elif re.match("[0-9]+G",self.config["maxstorage"]):
+             self.maxstorage=int(self.config["maxstorage"][0:-1])*1024*1024*1024
+        else:
+            raise Exception, "Unknown maxstorage format"
+        
     def getReplicationRules(self,filepath):
         return {
             "n":3
@@ -38,15 +47,21 @@ class Filesystem:
     def getLocalFilePath(self,filepath):
         return os.path.join(self.config["datadir"],filepath)
     
-    
-    def getLocalFreeDisk(self):
+    def deleteFile(self,src,filepath,mode="copy"):
         
-        #test
-        r = subprocess.Popen("/bin/df",["-kP",self.config["datadir"]]).read()
-        return int(re.split("\s+",o.split("\n")[1])[3])
+        destpath = self.getLocalFilePath(filepath)
         
+        if not os.path.isfile(destpath):
+            return True
         
-    
+        try:
+            os.unlink(destpath)
+            self.filedb.removeFileFromNode(filepath,self.host)
+            self.report()
+            return True
+        except:
+            return False
+            
     def importFile(self,src,filepath,mode="copy"):
         
         destpath = self.getLocalFilePath(filepath)
@@ -63,7 +78,9 @@ class Filesystem:
             shutil.copyfileobj(src,f)
             f.close()
         
-        self.filedb.update(filepath,{"nodes":set([self.host]),"t":int(time.time())})
+        size = os.stat(destpath).st_size
+        
+        self.filedb.update(filepath,{"nodes":set([self.host]),"t":int(time.time()),"size":size})
         
         self.report()
     
@@ -141,7 +158,7 @@ class Filesystem:
     def getStatus(self):
         return {
             "node":self.host,
-            #"df":self.getLocalFreeDisk(),
+            "df":self.maxstorage-self.filedb.getSizeInNode(self.host),
             "load":0
         }
         #"files":self.filedb.listAll()
@@ -200,6 +217,14 @@ class myHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                 f.close()
             
             self.connection.shutdown(1)
+        
+        
+        elif p[1]=="DELETE":
+                
+            deleted = self.server.fs.deleteFile(params["filepath"])
+            
+            self.simpleResponse(200,"ok" if deleted else "nok")
+            
         
         elif p[1]=="SUGGEST":
             

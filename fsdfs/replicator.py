@@ -1,5 +1,4 @@
-import threading,time
-    
+import threading,time,random
     
     
 class Replicator(threading.Thread):
@@ -54,6 +53,12 @@ class Replicator(threading.Thread):
         # 1. filter nodes already having the file
         alreadyNodes = self.fs.filedb.getNodes(file)
         
+        size = self.fs.filedb.getSize(file)
+        
+        #don't risk deleting everything on a node just to make space
+        if size>10*1024*1024*1024:
+            return False
+        
         #all the nodes already have the file!
         if len(knownNodes)<=len(alreadyNodes):
             return False
@@ -66,9 +71,34 @@ class Replicator(threading.Thread):
         
         # 2. pick a node depending on load, available size and max(kn)
         
-        #currently just the first one...
-        node = newnodes[0]
+        foundHost=False
         
+        while not foundHost:
+                
+            #order by free disk desc
+            newnodes.sort(cmp=lambda x,y:cmp(self.fs.nodedb[x]["df"],self.fs.nodedb[y]["df"]),reverse=True)
+            
+            #if the node with the most free disk has a place for the file, store it there
+            if self.fs.nodedb[newnodes[0]]["df"]>=size:
+                node=newnodes[0]
+                foundHost=True
+                
+            #no more space anywhere. not a problem, pick the node with max(k-n) and delete that copy
+            else:
+                newnodes.sort(cmp=lambda x,y:cmp(self.fs.filedb.getKn(self.fs.filedb.getMaxKnInNode(x)[0]),self.fs.filedb.getKn(self.fs.filedb.getMaxKnInNode(y)[0])),reverse=True)
+                
+                node = newnodes[0]
+                
+                file_to_remove = self.fs.filedb.getMaxKnInNode(node)[0]
+                
+                
+                self.fs.nodedb[x]["df"]-=self.fs.filedb.getSize(file_to_remove)
+                
+                deleted = ("ok"==self.fs.nodeRPC(node,"DELETE",{"filepath":file}).read())
+                
+                if deleted:
+                    self.fs.filedb.removeFileFromNode(file_to_remove,node)
+            
         
         # 3. make the node replicate it
         downloaded = ("ok"==self.fs.nodeRPC(node,"SUGGEST",{"filepath":file}).read())

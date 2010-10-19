@@ -33,7 +33,13 @@ class FileDbBase:
     def getNodes(self,file):
         pass
     
+    def getSize(self,file):
+        pass
+    
     def addFileToNode(self,file,node):
+        pass
+    
+    def removeFileFromNode(self,file,node):
         pass
     
     def getMaxKnInNode(self,node,num=1):
@@ -55,4 +61,9 @@ class FileDbBase:
         files.sort(lambda x,y:cmp(self.getKn(x),self.getKn(y)),reverse=True)
         
         return files[0:num]
+        
+        
+    def getSizeInNode(self,node):
+        
+        return sum([self.getSize(f) for f in self.listInNode(node)])
         
