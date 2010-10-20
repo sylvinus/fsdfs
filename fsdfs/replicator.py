@@ -65,8 +65,13 @@ class Replicator(threading.Thread):
         
         newnodes = []
         for node in knownNodes:
+            
+            #only target nodes which don't have the file
             if node not in alreadyNodes:
-                newnodes.append(node)
+                
+                #only target nodes with enough free disk or with some files to delete to make space
+                if (self.fs.filedb.getCountInNode(node)>0 or self.fs.nodedb[node]["df"]>=size):
+                    newnodes.append(node)
         
         
         # 2. pick a node depending on load, available size and max(kn)
@@ -74,6 +79,9 @@ class Replicator(threading.Thread):
         foundHost=False
         
         while not foundHost:
+            
+            if len(newnodes)==0:
+                break
                 
             #order by free disk desc
             newnodes.sort(cmp=lambda x,y:cmp(self.fs.nodedb[x]["df"],self.fs.nodedb[y]["df"]),reverse=True)
@@ -85,6 +93,9 @@ class Replicator(threading.Thread):
                 
             #no more space anywhere. not a problem, pick the node with max(k-n) and delete that copy
             else:
+                
+                
+                
                 newnodes.sort(cmp=lambda x,y:cmp(self.fs.filedb.getKn(self.fs.filedb.getMaxKnInNode(x)[0]),self.fs.filedb.getKn(self.fs.filedb.getMaxKnInNode(y)[0])),reverse=True)
                 
                 node = newnodes[0]
@@ -92,19 +103,25 @@ class Replicator(threading.Thread):
                 file_to_remove = self.fs.filedb.getMaxKnInNode(node)[0]
                 
                 
-                self.fs.nodedb[x]["df"]-=self.fs.filedb.getSize(file_to_remove)
+                self.fs.nodedb[node]["df"]-=self.fs.filedb.getSize(file_to_remove)
                 
                 deleted = ("ok"==self.fs.nodeRPC(node,"DELETE",{"filepath":file}).read())
                 
                 if deleted:
                     self.fs.filedb.removeFileFromNode(file_to_remove,node)
+                    
+                #if we have deleted all the files on this node and there's still not space, don't consider it anymore
+                if self.fs.filedb.getCountInNode(node)==0 and self.fs.nodedb[node]["df"]<size:
+                    newnodes.remove(node)
             
         
-        # 3. make the node replicate it
-        downloaded = ("ok"==self.fs.nodeRPC(node,"SUGGEST",{"filepath":file}).read())
-        
-        #add it directly to filedb
-        if downloaded:
-            self.fs.filedb.addFileToNode(file,node)
-        
+        if foundHost:
+            
+            # 3. make the node replicate it
+            downloaded = ("ok"==self.fs.nodeRPC(node,"SUGGEST",{"filepath":file}).read())
+            
+            #add it directly to filedb
+            if downloaded:
+                self.fs.filedb.addFileToNode(file,node)
+            
         

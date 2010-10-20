@@ -29,13 +29,8 @@ class TestFS(Filesystem):
 class basicTests(unittest.TestCase):
     def setUp(self):
         
-        global FILEAVAILABILITY,KNOWNNODES
-        
         shutil.rmtree("./tests/datadirs")
         os.makedirs("./tests/datadirs")
-        
-        FILEAVAILABILITY={}
-        KNOWNNODES = set()  
         
     def testTwoNodes(self):
         

@@ -47,7 +47,7 @@ class Filesystem:
     def getLocalFilePath(self,filepath):
         return os.path.join(self.config["datadir"],filepath)
     
-    def deleteFile(self,src,filepath,mode="copy"):
+    def deleteFile(self,filepath):
         
         destpath = self.getLocalFilePath(filepath)
         

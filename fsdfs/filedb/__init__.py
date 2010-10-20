@@ -67,3 +67,6 @@ class FileDbBase:
         
         return sum([self.getSize(f) for f in self.listInNode(node)])
         
+    def getCountInNode(self,node):
+        return len(self.listInNode(node))
+        
