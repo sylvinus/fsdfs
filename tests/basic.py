@@ -82,7 +82,6 @@ class basicTests(unittest.TestCase):
                 "secret":secret,
                 "master":"localhost:%s"%(42362+2*0)
             }))
-            nodes[i]._rules["n"]=42
             nodes[i].start()
             
         

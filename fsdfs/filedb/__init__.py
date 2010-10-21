@@ -48,7 +48,7 @@ class FileDbBase:
         
         if len(files)==0: return []
         
-        files.sort(lambda x,y:cmp(self.getKn(x),self.getKn(y)))
+        files.sort(lambda x,y:cmp(self.getKn(x),self.getKn(y)),reverse=True)
         
         return files[0:num]
         
@@ -58,7 +58,7 @@ class FileDbBase:
         
         if len(files)==0: return []
         
-        files.sort(lambda x,y:cmp(self.getKn(x),self.getKn(y)),reverse=True)
+        files.sort(lambda x,y:cmp(self.getKn(x),self.getKn(y)))
         
         return files[0:num]
         

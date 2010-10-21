@@ -21,11 +21,13 @@ class FileDb(FileDbBase):
     
     def addFileToNode(self,file,node):
         self.files[file]["nodes"].add(node)
-    
+   
     def removeFileFromNode(self,file,node):
         self.files[file]["nodes"].discard(node)
           
     def getNodes(self,file):
+        if not file in self.files:
+            return set()
         return self.files[file]["nodes"]
     
     def getSize(self,file):

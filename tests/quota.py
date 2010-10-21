@@ -31,6 +31,81 @@ class quotaTests(unittest.TestCase):
         
         shutil.rmtree("./tests/datadirs")
         os.makedirs("./tests/datadirs")
+
+    
+    def testConflict(self):
+        
+        
+        
+        secret = "azpdoazrRR"
+        
+        nodeA = TestFS({
+            "host":"localhost:52342",
+            "datadir":"./tests/datadirs/A",
+            "secret":secret,
+            "master":"localhost:52342",
+            "maxstorage":10
+        })
+        
+        nodeB = TestFS({
+            "host":"localhost:52352",
+            "datadir":"./tests/datadirs/B",
+            "secret":secret,
+            "master":"localhost:52342",
+            "maxstorage":10
+        })
+        
+        nodeC = TestFS({
+            "host":"localhost:52362",
+            "datadir":"./tests/datadirs/C",
+            "secret":secret,
+            "master":"localhost:52342",
+            "maxstorage":10
+        })
+        
+        
+        nodeA.start()
+        nodeB.start()
+        nodeC.start()
+        
+        
+        
+        nodeA.importFile("tests/fixtures/10b.txt","tests/fixtures/10b.txt")
+        
+        sleep(4)
+        
+        self.assertHasFile(nodeA, "tests/fixtures/10b.txt")
+        self.assertHasFile(nodeB, "tests/fixtures/10b.txt")
+        self.assertHasFile(nodeC, "tests/fixtures/10b.txt")
+        self.assertEquals(0,nodeA.getStatus()["df"])
+        self.assertEquals(0,nodeB.getStatus()["df"])
+        self.assertEquals(0,nodeC.getStatus()["df"])
+        
+        
+        self.assertTrue(nodeA.deleteFile("tests/fixtures/10b.txt"))
+        
+        nodeA.importFile("tests/fixtures/10b.2.txt","tests/fixtures/10b.2.txt")
+        
+        sleep(3)
+        
+        for i in range(0,3):
+                
+            self.assertHasFile(nodeA, "tests/fixtures/10b.2.txt")
+            self.assertHasFile(nodeB, "tests/fixtures/10b.txt")
+            self.assertHasFile(nodeC, "tests/fixtures/10b.txt")
+            
+            self.assertEquals(0,nodeA.getStatus()["df"])
+            self.assertEquals(0,nodeB.getStatus()["df"])
+            self.assertEquals(0,nodeC.getStatus()["df"])
+                
+            sleep(1)
+        
+        
+        
+        nodeA.stop()
+        nodeB.stop()
+        nodeC.stop()
+        
         
     def testSimple(self):
         
@@ -57,7 +132,7 @@ class quotaTests(unittest.TestCase):
             "datadir":"./tests/datadirs/C",
             "secret":secret,
             "master":"localhost:42342",
-            "maxstorage":10
+            "maxstorage":12
         })
         
         nodeD = TestFS({
@@ -79,20 +154,58 @@ class quotaTests(unittest.TestCase):
         nodeA.importFile("tests/fixtures/2b.txt","tests/fixtures/2b.txt")
         nodeA.importFile("tests/fixtures/1b.txt","tests/fixtures/1b.txt")
         
-        sleep(7)
+        sleep(6)
         
         
-        self.assertHasFile(nodeA, "tests/fixtures/2b.txt")
-        self.assertHasFile(nodeA, "tests/fixtures/10b.txt")
-        self.assertHasFile(nodeA, "tests/fixtures/1b.txt")
+        for i in range(0,3):
+                
+            self.assertHasFile(nodeA, "tests/fixtures/2b.txt")
+            self.assertHasFile(nodeA, "tests/fixtures/10b.txt")
+            self.assertHasFile(nodeA, "tests/fixtures/1b.txt")
+            
+            self.assertHasFile(nodeB, "tests/fixtures/1b.txt")
+            self.assertHasFile(nodeB, "tests/fixtures/1b.txt")
+            self.assertHasFile(nodeB, "tests/fixtures/1b.txt")
+            
+            self.assertHasFile(nodeC, "tests/fixtures/10b.txt")
+            self.assertHasFile(nodeC, "tests/fixtures/2b.txt")
+            
+            self.assertHasFile(nodeD, "tests/fixtures/1b.txt")
+            
+            self.assertEquals(0,nodeA.getStatus()["df"])
+            self.assertEquals(0,nodeC.getStatus()["df"])
+            self.assertEquals(0,nodeD.getStatus()["df"])
+            
+            sleep(1)
         
-        self.assertHasFile(nodeB, "tests/fixtures/1b.txt")
-        self.assertHasFile(nodeB, "tests/fixtures/1b.txt")
-        self.assertHasFile(nodeB, "tests/fixtures/1b.txt")
+        self.assertTrue(nodeA.deleteFile("tests/fixtures/10b.txt"))
         
-        self.assertHasFile(nodeC, "tests/fixtures/10b.txt")
+        nodeA.importFile("tests/fixtures/10b.2.txt","tests/fixtures/10b.2.txt")
         
-        self.assertHasFile(nodeD, "tests/fixtures/1b.txt")
+        sleep(2)
+        
+        for i in range(0,3):
+                
+            self.assertHasFile(nodeA, "tests/fixtures/10b.2.txt")
+            self.assertHasFile(nodeA, "tests/fixtures/1b.txt")
+            self.assertHasFile(nodeA, "tests/fixtures/2b.txt")
+            
+            self.assertHasFile(nodeB, "tests/fixtures/1b.txt")
+            self.assertHasFile(nodeB, "tests/fixtures/2b.txt")
+            self.assertHasFile(nodeB, "tests/fixtures/10b.txt")
+            self.assertHasFile(nodeB, "tests/fixtures/10b.2.txt")
+            
+            self.assertHasFile(nodeC, "tests/fixtures/2b.txt")
+            self.assertHasFile(nodeC, "tests/fixtures/10b.txt")
+            
+            self.assertHasFile(nodeD, "tests/fixtures/1b.txt")
+            
+            self.assertEquals(0,nodeA.getStatus()["df"])
+            self.assertEquals(0,nodeC.getStatus()["df"])
+            self.assertEquals(0,nodeD.getStatus()["df"])
+            
+            sleep(1)
+            
         
         nodeA.stop()
         nodeB.stop()

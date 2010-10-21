@@ -80,7 +80,7 @@ class Filesystem:
         
         size = os.stat(destpath).st_size
         
-        self.filedb.update(filepath,{"nodes":set([self.host]),"t":int(time.time()),"size":size})
+        self.filedb.update(filepath,{"nodes":set([self.host]).union(self.filedb.getNodes(filepath)),"t":int(time.time()),"size":size})
         
         self.report()
     
@@ -101,10 +101,14 @@ class Filesystem:
         #print "stopping %s" % self.host
         self.httpinterface.server.shutdown()
         
+        self.httpinterface.server.server_close()
+            
         #self.httpinterface.join()
     
         if self.ismaster:
             self.replicator.shutdown()
+            
+            self.replicator.join()
     
     
     def searchFile(self,file):
@@ -159,7 +163,8 @@ class Filesystem:
         return {
             "node":self.host,
             "df":self.maxstorage-self.filedb.getSizeInNode(self.host),
-            "load":0
+            "load":0,
+            "size":self.filedb.getSizeInNode(self.host)
         }
         #"files":self.filedb.listAll()
         
@@ -177,11 +182,13 @@ class HTTPInterface(threading.Thread):
     def run(self):
         
         self.server.serve_forever(poll_interval=0.1)
+        
+        
             
 
 class ThreadingBaseHTTPServer(ThreadingMixIn,BaseHTTPServer.HTTPServer):
     daemon_threads=False
-    allow_reuse_address=True # ?
+    allow_reuse_address=1 # ?
     
     def setFS(self,fs):
         self.fs = fs
