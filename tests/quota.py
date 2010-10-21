@@ -63,6 +63,15 @@ class quotaTests(unittest.TestCase):
             "maxstorage":10
         })
         
+        nodeD = TestFS({
+            "host":"localhost:52372",
+            "datadir":"./tests/datadirs/D",
+            "secret":secret,
+            "master":"localhost:52342",
+            "maxstorage":10
+        })
+        
+        
         
         nodeA.start()
         nodeB.start()
@@ -101,10 +110,20 @@ class quotaTests(unittest.TestCase):
             sleep(1)
         
         
+        nodeD.start()
+        
+        sleep(2)
+        
+        self.assertHasFile(nodeA, "tests/fixtures/10b.2.txt")
+        self.assertHasFile(nodeB, "tests/fixtures/10b.txt")
+        self.assertHasFile(nodeC, "tests/fixtures/10b.txt")
+        self.assertHasFile(nodeD, "tests/fixtures/10b.2.txt")
+        
         
         nodeA.stop()
         nodeB.stop()
         nodeC.stop()
+        nodeD.stop()
         
         
     def testSimple(self):
