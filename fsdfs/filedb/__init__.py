@@ -6,8 +6,8 @@ def loadFileDb(id,*args,**kwargs):
         fp, pathname, description = imp.find_module(id,__path__)
         assert fp
         return imp.load_module(id.replace(".",""),fp, pathname, description).FileDb(*args,**kwargs)
-    except Exception, e:
-        print "error while loading filedb : %s" % e
+    except Exception, err:
+        print "error while loading filedb : %s" % err
         return False
 
 
@@ -15,11 +15,17 @@ def loadFileDb(id,*args,**kwargs):
 class FileDbBase:
     
     
-    def __init__(self,fs):
+    def __init__(self, fs):
         self.fs = fs
     
     def update(self,file):
-        pass
+		'''
+		Update file's data.
+		Data is a environment in a dictionnary which may contains:
+		nodes, size, date, replication level (n), time...
+		'''
+		
+		pass
     
     def listAll(self):
         pass
@@ -46,7 +52,8 @@ class FileDbBase:
         
         files = self.listInNode(node)
         
-        if len(files)==0: return []
+        if len(files) == 0:
+			return []
         
         files.sort(lambda x,y:cmp(self.getKn(x),self.getKn(y)),reverse=True)
         
@@ -56,7 +63,8 @@ class FileDbBase:
         
         files = self.listAll()
         
-        if len(files)==0: return []
+        if len(files) == 0:
+			return []
         
         files.sort(lambda x,y:cmp(self.getKn(x),self.getKn(y)))
         
@@ -64,7 +72,6 @@ class FileDbBase:
         
         
     def getSizeInNode(self,node):
-        
         return sum([self.getSize(f) for f in self.listInNode(node)])
         
     def getCountInNode(self,node):
