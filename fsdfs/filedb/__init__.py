@@ -18,7 +18,7 @@ class FileDbBase:
     def __init__(self,fs):
         self.fs = fs
     
-    def update(self,file):
+    def update(self,file,data):
         pass
     
     def listAll(self):
@@ -42,6 +42,9 @@ class FileDbBase:
     def removeFileFromNode(self,file,node):
         pass
     
+    def listNukes(self):
+        pass
+    
     def getMaxKnInNode(self,node,num=1):
         
         files = self.listInNode(node)
@@ -61,6 +64,7 @@ class FileDbBase:
         files.sort(lambda x,y:cmp(self.getKn(x),self.getKn(y)))
         
         return files[0:num]
+    
         
         
     def getSizeInNode(self,node):

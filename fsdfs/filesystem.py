@@ -61,6 +61,14 @@ class Filesystem:
             return True
         except:
             return False
+        
+    def nukeFile(self,filepath):
+        if not self.ismaster:
+            return False
+        else:
+            self.filedb.update(filepath,{"nuked":time.time()})
+            
+            return True
             
     def importFile(self,src,filepath,mode="copy"):
         
@@ -80,7 +88,7 @@ class Filesystem:
         
         size = os.stat(destpath).st_size
         
-        self.filedb.update(filepath,{"nodes":set([self.host]).union(self.filedb.getNodes(filepath)),"t":int(time.time()),"size":size})
+        self.filedb.update(filepath,{"nodes":set([self.host]).union(self.filedb.getNodes(filepath)),"t":int(time.time()),"size":size,"nuked":None})
         
         self.report()
     
@@ -231,6 +239,16 @@ class myHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             deleted = self.server.fs.deleteFile(params["filepath"])
             
             self.simpleResponse(200,"ok" if deleted else "nok")
+            
+            
+        elif p[1]=="NUKE":
+            
+            nuked = self.server.fs.nukeFile(params["filepath"])
+            
+            if not nuked:
+                self.simpleResponse(403,"can only nuke files on master")
+            else:
+                self.simpleResponse(200,"ok")
             
         
         elif p[1]=="SUGGEST":

@@ -20,9 +20,25 @@ class Replicator(threading.Thread):
             
             self.updateAllFileDb()
             
+            self.performNukes()
+            
             self.performReplication(10)
             time.sleep(1)
         
+    
+    def performNukes(self):
+        nukes = self.fs.filedb.listNukes()
+        
+        for file in nukes:
+            #do a set() because list may change while looping
+            nodes = set(self.fs.filedb.getNodes(file))
+            for node in nodes:
+                deleted = ("ok"==self.fs.nodeRPC(node,"DELETE",{"filepath":file}).read())
+                
+                if deleted:
+                    self.fs.filedb.removeFileFromNode(file,node)
+                
+    
     def performReplication(self,maxOperations=10):
         
         
