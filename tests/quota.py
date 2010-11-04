@@ -2,18 +2,14 @@
 # encoding: utf-8
 
 import os, sys, re
-from time import sleep
 import unittest
 import threading
 import shutil
-
-
 import logging
 logging.basicConfig(level=logging.DEBUG)
+from time import sleep
 
 sys.path.insert(0, os.path.join('.'))
-
-
 from fsdfs.filesystem import Filesystem
 
 
@@ -28,11 +24,11 @@ class TestFS(Filesystem):
    
 class quotaTests(unittest.TestCase):
     def setUp(self):
-        
-        shutil.rmtree("./tests/datadirs")
-        os.makedirs("./tests/datadirs")
+		
+		if os.path.exists("./tests/datadirs"):
+			shutil.rmtree("./tests/datadirs")
+		os.makedirs("./tests/datadirs")
 
-    
     def testConflict(self):
         
         

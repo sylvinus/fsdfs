@@ -12,8 +12,6 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 
 sys.path.insert(0, os.path.join('.'))
-
-
 from fsdfs.filesystem import Filesystem
 
 
@@ -28,8 +26,8 @@ class TestFS(Filesystem):
    
 class basicTests(unittest.TestCase):
     def setUp(self):
-        
-        shutil.rmtree("./tests/datadirs")
+        if os.path.exists("./tests/datadirs"):
+			shutil.rmtree("./tests/datadirs")
         os.makedirs("./tests/datadirs")
         
     def testTwoNodes(self):
