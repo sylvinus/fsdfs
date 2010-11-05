@@ -24,6 +24,8 @@ class Filesystem:
     
     def __init__(self, config):
     
+        self.startTime = time.time()
+    
         self.config = config
         
         self.host = self.config["host"]
@@ -134,7 +136,7 @@ class Filesystem:
         
         return nodes
     
-    def nodeRPC(self,host,method,params,parse=False):
+    def nodeRPC(self,host,method,params={},parse=False):
         
         params["_time"] = int(time.time())
         
@@ -174,12 +176,32 @@ class Filesystem:
     
     def report(self):
         self.nodeRPC(self.config["master"], "REPORT", self.getStatus())
+    
+    def getGlobalStatus(self):
+        if not self.ismaster:
+            return self.nodeRPC(self.config["master"], "GLOBALSTATUS", parse=True)
+        else:
         
+            status = self.getStatus()
+            
+            minKns = [(self.filedb.getKn(f),f) for f in self.filedb.getMinKnAll(num=1)]
+            
+            status["nodes"] = self.nodedb.keys()
+            status["sizeGlobal"] = self.filedb.getSizeAll()
+            status["countGlobal"] = self.filedb.getCountAll()
+            status["minKnGlobal"] = minKns
+            
+            #pass thru JSON to have the same exact returns as if in remote fetch
+            return json.loads(json.dumps(status))
+            
+    
+    
     def getStatus(self):
         return {
             "node": self.host,
             "df": self.maxstorage-self.filedb.getSizeInNode(self.host),
             "load": 0,
+            "uptime":int(time.time()-self.startTime),
             "size": self.filedb.getSizeInNode(self.host)
         }
         #"files":self.filedb.listAll()
@@ -214,6 +236,8 @@ class myHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 	
     def do_POST(self):
         
+        fs = self.server.fs
+        
         #print "got %s at %s" % (self.path,self.server.fs.host)
         
         params = self._getPostParams()
@@ -225,7 +249,7 @@ class myHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         
         if p[1] == "DOWNLOAD":
                 
-            local = self.server.fs.getLocalFilePath(params["filepath"])
+            local = fs.getLocalFilePath(params["filepath"])
             
             if not os.path.isfile(local):
                 self.send_response(404)
@@ -242,14 +266,14 @@ class myHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         
         elif p[1] == "DELETE":
                 
-            deleted = self.server.fs.deleteFile(params["filepath"])
+            deleted = fs.deleteFile(params["filepath"])
             
             self.simpleResponse(200, "ok" if deleted else "nok")
             
             
         elif p[1]=="NUKE":
             
-            nuked = self.server.fs.nukeFile(params["filepath"])
+            nuked = fs.nukeFile(params["filepath"])
             
             if not nuked:
                 self.simpleResponse(403,"can only nuke files on master")
@@ -259,20 +283,31 @@ class myHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         
         elif p[1] == "SUGGEST":
             
-            #local = self.server.fs.getLocalFilePath(params["filepath"])
+            #local = fs.getLocalFilePath(params["filepath"])
             
-            downloaded = self.server.fs.downloadFile(params["filepath"])
+            downloaded = fs.downloadFile(params["filepath"])
         
             self.simpleResponse(200,"ok" if downloaded else "nok")
         
         
         elif p[1] == "STATUS":
             
-            self.simpleResponse(200,json.dumps(self.server.fs.getStatus()))
+            self.simpleResponse(200,json.dumps(fs.getStatus()))
+        
+        elif p[1] == "GLOBALSTATUS":
+            
+            
+            if not fs.ismaster:
+                self.simpleResponse(403,"not on master")
+            else:
+                status = fs.getGlobalStatus()
+            
+                self.simpleResponse(200,json.dumps(status))
+        
         
         elif p[1] == "SEARCH":
             
-            nodes = self.server.fs.filedb.getNodes(params["filepath"])
+            nodes = fs.filedb.getNodes(params["filepath"])
             
             self.simpleResponse(200,json.dumps(list(nodes)))
         
@@ -280,7 +315,7 @@ class myHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         elif p[1] == "REPORT":
             
             params["lastReport"] = time.time()
-            self.server.fs.nodedb[params["node"]] = params
+            fs.nodedb[params["node"]] = params
             
             self.simpleResponse(200,"ok")
     

@@ -70,16 +70,7 @@ How to test
 	python tests/quota.py
 
 
-
-Todo
-----
-
- - Admin command (watch replication)
- - Test crashes/disconnects/...
- - Decide on how to manage file updates
- - SQLite or other persistent filedb backend
- - epydoc
- - performance tests
+.. include:: TODO.rst
 
 
 Installation

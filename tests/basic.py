@@ -16,12 +16,7 @@ from fsdfs.filesystem import Filesystem
 
 
 class TestFS(Filesystem):
-    
-    _rules = {"n":2}
-    
-    def getReplicationRules(self,file):
-        return self._rules
-    
+    pass
     
    
 class basicTests(unittest.TestCase):
@@ -62,11 +57,28 @@ class basicTests(unittest.TestCase):
         self.assertEquals(open(nodeB.getLocalFilePath("dir1/dir2/filename.ext")).read(),open("./tests/fixtures/test.txt").read())
         self.assertEquals(open(nodeA.getLocalFilePath("dir3/dir4/filename2.ext")).read(),open("./tests/fixtures/test2.txt").read())
         
+        globalStatusA=nodeA.getGlobalStatus()
+        globalStatusB=nodeB.getGlobalStatus()
+
+        self.assertEquals(5,globalStatusA["uptime"])
+        
+        del globalStatusA["uptime"]
+        del globalStatusB["uptime"]
+        
+        self.assertEquals(globalStatusA,globalStatusB)
+        
+        self.assertEquals(2,globalStatusA["countGlobal"])
+        self.assertEquals(-1,globalStatusA["minKnGlobal"][0][0])
+        self.assertEquals(2,len(globalStatusA["nodes"]))
+        self.assertEquals("localhost:42342",len(globalStatusA["node"]))
+        
+        
+        
         nodeA.stop()
         nodeB.stop()
         
     
-    def testManyNodes(self):
+    def _testManyNodes(self):
         
         secret = "azpdoazrRR"
         
