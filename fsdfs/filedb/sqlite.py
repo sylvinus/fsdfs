@@ -9,14 +9,14 @@ def dict_factory(cursor, row):
 
 class SqlLiteDb(FileDbBase):
 	'''
-	FileDb class for *sqlite*
+	FileDb class for SQLite
 
 	Table files has row:
-	filename (text),
-	nodes (text),
-	size (integer),
-	date (text),
-	n (integer)
+	* filename (text),
+	* nodes (text),
+	* size (integer),
+	* date (text),
+	* n (integer)
 	'''
 	
 	def __init__(self, fs):

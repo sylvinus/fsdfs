@@ -40,7 +40,7 @@ class FileDb(FileDbBase):
     def listNukes(self):
         n = set()
         for f in self.files:
-            if self.files[f].get("nuked",False) and len(self.files[f]["nodes"])>0:
+            if self.files[f].get("nuked", False) and len(self.files[f]["nodes"])>0:
                 n.add(f)
         return n
           
