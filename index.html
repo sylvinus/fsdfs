@@ -7,7 +7,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>fsdfs &mdash; fsdfs v0.1 documentation</title>
+    <title>fsdfs : f***ing simple distributed file system &mdash; fsdfs v0.1 documentation</title>
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
@@ -22,7 +22,8 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="fsdfs v0.1 documentation" href="#" /> 
+    <link rel="top" title="fsdfs v0.1 documentation" href="#" />
+    <link rel="next" title="API Reference" href="api.html" /> 
   </head>
   <body>
     <div class="related">
@@ -31,6 +32,12 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="api.html" title="API Reference"
+             accesskey="N">next</a> |</li>
         <li><a href="#">fsdfs v0.1 documentation</a> &raquo;</li> 
       </ul>
     </div>  
@@ -40,8 +47,80 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="fsdfs">
-<h1>fsdfs<a class="headerlink" href="#fsdfs" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="fsdfs-f-ing-simple-distributed-file-system">
+<h1>fsdfs : f***ing simple distributed file system<a class="headerlink" href="#fsdfs-f-ing-simple-distributed-file-system" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="goals">
+<h2>Goals<a class="headerlink" href="#goals" title="Permalink to this headline">¶</a></h2>
+<p>fsdfs was originally developed at Jamendo.com to manage the distribution of millions of MP3/OGG files.</p>
+<p>fsdfs aims to :
+* make a single virtual filesystem accessible from several nodes
+* be fully distributed (no single point of failure)
+* automatically manage sharding/replication : adding a new node takes 10 seconds
+* try to fill up its allowed disk quota to maximize redundancy
+* be extensible via simple python code
+* allow userland variables (like popularity) to boost a file&#8217;s replication/redundancy level
+* sit on top of any POSIX filesystem</p>
+</div>
+<div class="section" id="roadmap">
+<h2>Roadmap<a class="headerlink" href="#roadmap" title="Permalink to this headline">¶</a></h2>
+<p>For simplicity, fsdfs 1.0 will have a master/slaves design (slaves being readable even if the master is down).</p>
+<p>fsdfs 2.0 will remove the need of a master node, possibly using a DHT network like Kademlia. Code for 1.0 will
+already be structured to make its implementation easy.</p>
+</div>
+<div class="section" id="design-for-version-1-0">
+<h2>Design for version 1.0<a class="headerlink" href="#design-for-version-1-0" title="Permalink to this headline">¶</a></h2>
+<p>Each file has two important variables :
+* Its target replication count N. (N=3 by default, can be customized per-file by a user-defined python function)
+* Its current replication count K</p>
+<p>The master has a list of all the nodes with their status, which includes :
+* cpu/network load
+* list of all the files replicated on the node
+* free disk quota</p>
+<p>The free disk quota will always tend to zero because each nodes tries to replicate as many files as it can.
+Hence, max(K-N) is a more interesting number for a node, because it measures the extent of &#8220;over-replication&#8221;.
+If max(K-N)&gt;0, some copies on the server are not strictly necessary and could be deleted.
+If max(K-N)&lt;=0, every copy is needed and the server should be considered &#8220;full&#8221;.</p>
+<p>The primary job of the master is to manage file replication, making sure target replications counts are
+met or exceeded. In other words, it has to make min(K-N) accross all known files as high as it can.</p>
+<p>The algorithm used is very simple :</p>
+<ol class="arabic simple">
+<li>select the file having min(K-N)</li>
+<li>choose a node :</li>
+</ol>
+<blockquote>
+<ul class="simple">
+<li>not already having a copy of this file</li>
+<li>not too loaded</li>
+<li>with either free disk or a high max(K-N)</li>
+</ul>
+</blockquote>
+<ol class="arabic simple" start="3">
+<li>Have the file copied to this node (=&gt; K++)</li>
+<li>GOTO 1</li>
+</ol>
+<p>min(K-N) across all files is a good measure of the health and general disk usage of the filesystem. min(K-N) should be
+positive, ideally greater than 1 (in which case all the files would have one more copy than the target replication count)</p>
+<p>min(K-N) will naturally decrease when adding new files. min(K-N) becoming &lt;1 or negative should be the signal that new nodes are needed.</p>
+</div>
+<div class="section" id="how-to-test">
+<h2>How to test<a class="headerlink" href="#how-to-test" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+python tests/basic.py
+python tests/quota.py</blockquote>
+</div>
+<div class="section" id="todo">
+<h2>Todo<a class="headerlink" href="#todo" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<ul class="simple">
+<li>Admin command (watch replication)</li>
+<li>Test crashes/disconnects/...</li>
+<li>Decide on how to manage file updates</li>
+<li>SQLite or other persistent filedb backend</li>
+<li>epydoc</li>
+<li>performance tests</li>
+</ul>
+</blockquote>
+</div>
 <div class="section" id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
 <p>The easiest way to get fsdfs is if you have <a class="reference external" href="http://peak.telecommunity.com/DevCenter/EasyInstall">setuptools</a> installed:</p>
@@ -54,13 +133,16 @@
 <div class="section" id="help-and-development">
 <h3>Help and development<a class="headerlink" href="#help-and-development" title="Permalink to this headline">¶</a></h3>
 <p>If you&#8217;d like to help out, you can fork the project
-at <a class="reference external" href="http://github.com">http://github.com</a>/&lt;GITHUB USER NAME&gt;/fsdfs and report any bugs
-at <a class="reference external" href="http://github.com">http://github.com</a>/&lt;GITHUB USER NAME&gt;/fsdfs/issues.</p>
-<p>Contents:</p>
-<div class="toctree-wrapper compound">
-<ul class="simple">
-</ul>
+at <a class="reference external" href="http://github.com/sylvinus/fsdfs">http://github.com/sylvinus/fsdfs</a> and report any bugs
+at <a class="reference external" href="http://github.com/sylvinus/fsdfs/issues">http://github.com/sylvinus/fsdfs/issues</a>.</p>
 </div>
+</div>
+<div class="section" id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
+</ul>
 </div>
 <div class="section" id="indices-and-tables">
 <h3>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h3>
@@ -81,11 +163,17 @@ at <a class="reference external" href="http://github.com">http://github.com</a>/
         <div class="sphinxsidebarwrapper">
   <h3><a href="#">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">fsdfs</a><ul>
+<li><a class="reference internal" href="#">fsdfs : f***ing simple distributed file system</a><ul>
+<li><a class="reference internal" href="#goals">Goals</a></li>
+<li><a class="reference internal" href="#roadmap">Roadmap</a></li>
+<li><a class="reference internal" href="#design-for-version-1-0">Design for version 1.0</a></li>
+<li><a class="reference internal" href="#how-to-test">How to test</a></li>
+<li><a class="reference internal" href="#todo">Todo</a></li>
 <li><a class="reference internal" href="#installation">Installation</a><ul>
-<li><a class="reference internal" href="#help-and-development">Help and development</a><ul>
+<li><a class="reference internal" href="#help-and-development">Help and development</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#documentation">Documentation</a><ul>
 <li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
 </ul>
 </li>
@@ -93,6 +181,9 @@ at <a class="reference external" href="http://github.com">http://github.com</a>/
 </li>
 </ul>
 
+  <h4>Next topic</h4>
+  <p class="topless"><a href="api.html"
+                        title="next chapter">API Reference</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/index.txt"
@@ -121,6 +212,12 @@ at <a class="reference external" href="http://github.com">http://github.com</a>/
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="api.html" title="API Reference"
+             >next</a> |</li>
         <li><a href="#">fsdfs v0.1 documentation</a> &raquo;</li> 
       </ul>
     </div>
