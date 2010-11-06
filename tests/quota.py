@@ -87,7 +87,11 @@ class quotaTests(unittest.TestCase):
         self.assertEquals(0,nodeC.getStatus()["df"])
         
         
+        self.assertEquals(1,nodeA.filedb.getKn("tests/fixtures/10b.txt"))
+        
         self.assertTrue(nodeA.deleteFile("tests/fixtures/10b.txt"))
+        
+        self.assertEquals(0,nodeA.filedb.getKn("tests/fixtures/10b.txt"))
         
         nodeA.importFile("tests/fixtures/10b.2.txt","tests/fixtures/10b.2.txt")
         

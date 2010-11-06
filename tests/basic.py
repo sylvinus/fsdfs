@@ -70,7 +70,7 @@ class basicTests(unittest.TestCase):
         self.assertEquals(2,globalStatusA["countGlobal"])
         self.assertEquals(-1,globalStatusA["minKnGlobal"][0][0])
         self.assertEquals(2,len(globalStatusA["nodes"]))
-        self.assertEquals("localhost:42342",len(globalStatusA["node"]))
+        self.assertEquals("localhost:42342",globalStatusA["node"])
         
         
         
@@ -78,7 +78,7 @@ class basicTests(unittest.TestCase):
         nodeB.stop()
         
     
-    def _testManyNodes(self):
+    def testManyNodes(self):
         
         secret = "azpdoazrRR"
         

@@ -5,7 +5,14 @@ import logging as logger
 
     
 class Replicator(threading.Thread):
-    
+    '''
+	This is the Replicator class.
+	It manages files on every node.
+	
+	It takes a Filesystem instance in argument which is saved in self.fs. 
+
+	It's because a Replicator is also a Filesystem :-)
+    '''
     
     def __init__(self, fs):
         threading.Thread.__init__(self)
@@ -13,10 +20,19 @@ class Replicator(threading.Thread):
         self.stopnow = False
         
     def shutdown(self):
-        self.stopnow = True
+		'''
+		Shutdown the server by setting the variable self.stopnow to True.
+
+		It breaks the while which runs the Replicator.
+		'''
+
+		self.stopnow = True
         
     def run(self):
-        
+        '''
+		to write
+        '''
+
         while not self.stopnow:
             
             self.updateAllFileDb()
@@ -28,6 +44,10 @@ class Replicator(threading.Thread):
         
     
     def performNukes(self):
+	'''
+	to write.
+	'''
+
         nukes = self.fs.filedb.listNukes()
         
         for file in nukes:
@@ -41,17 +61,27 @@ class Replicator(threading.Thread):
                 
     
     def performReplication(self, maxOperations=10):
-        
+ 	'''
+	to write.
+	'''
+       
         knownNeeds = self.fs.filedb.getMinKnAll(num=maxOperations)
         for file in knownNeeds:
             self.replicateFile(file)
 
     def updateAllFileDb(self):
+	'''
+	to write.
+	'''
+
         for f in self.fs.filedb.listAll():
             self.updateFileDb(f)
             
     def updateFileDb(self, file):
-        
+ 	'''
+	to write.
+	'''
+       
         #no P2P search yet. master always knows where files are
         #nodes = set(self.fs.searchFile(file,p2p=True))
         
@@ -63,6 +93,9 @@ class Replicator(threading.Thread):
     # suggestList elements are (filepath,known need,known copies)
     #
     def replicateFile(self, file):
+	'''
+	Describe the algorithm...
+	'''
 
         knownNodes = self.fs.getKnownNodes()
         
