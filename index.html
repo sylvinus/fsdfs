@@ -52,14 +52,19 @@
 <div class="section" id="goals">
 <h2>Goals<a class="headerlink" href="#goals" title="Permalink to this headline">¶</a></h2>
 <p>fsdfs was originally developed at Jamendo.com to manage the distribution of millions of MP3/OGG files.</p>
-<p>fsdfs aims to :
-* make a single virtual filesystem accessible from several nodes
-* be fully distributed (no single point of failure)
-* automatically manage sharding/replication : adding a new node takes 10 seconds
-* try to fill up its allowed disk quota to maximize redundancy
-* be extensible via simple python code
-* allow userland variables (like popularity) to boost a file&#8217;s replication/redundancy level
-* sit on top of any POSIX filesystem</p>
+<dl class="docutils">
+<dt>fsdfs aims to :</dt>
+<dd><ul class="first last simple">
+<li>make a single virtual filesystem accessible from several nodes</li>
+<li>be fully distributed (no single point of failure)</li>
+<li>automatically manage sharding/replication : adding a new node takes 10 seconds</li>
+<li>try to fill up its allowed disk quota to maximize redundancy</li>
+<li>be extensible via simple python code</li>
+<li>allow userland variables (like popularity) to boost a file&#8217;s replication/redundancy level</li>
+<li>sit on top of any POSIX filesystem</li>
+</ul>
+</dd>
+</dl>
 </div>
 <div class="section" id="roadmap">
 <h2>Roadmap<a class="headerlink" href="#roadmap" title="Permalink to this headline">¶</a></h2>
@@ -110,16 +115,25 @@ python tests/quota.py</blockquote>
 </div>
 <div class="section" id="todo">
 <h2>Todo<a class="headerlink" href="#todo" title="Permalink to this headline">¶</a></h2>
-<blockquote>
 <ul class="simple">
 <li>Admin command (watch replication)</li>
 <li>Test crashes/disconnects/...</li>
-<li>Decide on how to manage file updates</li>
+<li>Decide on how to manage file updates. Either:
+- Nuke then insert
+- Append md5 to all filenames
+- Manage a file version system</li>
 <li>SQLite or other persistent filedb backend</li>
-<li>epydoc</li>
+<li>Complete Sphinx documentation</li>
+<li>Outreach to community
+- setup twitter account / polish website
+- do public talks / pycon / ...</li>
 <li>performance tests</li>
+<li>fsdfsd</li>
+<li>FUSE layer?</li>
+<li>Nagios plugin</li>
+<li>Error catching everywhere</li>
+<li>Solid python logging</li>
 </ul>
-</blockquote>
 </div>
 <div class="section" id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>

@@ -54,8 +54,8 @@
   <td width="33%" valign="top"><dl>
     <dt><a href="api.html#fsdfs.filedb.FileDbBase.addFileToNode">addFileToNode() (fsdfs.filedb.FileDbBase method)</a></dt>
     <dd><dl>
-      <dt><a href="api.html#fsdfs.filedb.memory.FileDb.addFileToNode">(fsdfs.filedb.memory.FileDb method)</a></dt>
-      <dt><a href="api.html#fsdfs.filedb.sqlite.SqlLiteDb.addFileToNode">(fsdfs.filedb.sqlite.SqlLiteDb method)</a></dt>
+      <dt><a href="api.html#fsdfs.filedb.memory.memoryFileDb.addFileToNode">(fsdfs.filedb.memory.memoryFileDb method)</a></dt>
+      <dt><a href="api.html#fsdfs.filedb.sqlite.sqliteFileDb.addFileToNode">(fsdfs.filedb.sqlite.sqliteFileDb method)</a></dt>
   </dl></dd>
 </dl></td>
   <td width="33%" valign="top"><dl>
@@ -97,7 +97,6 @@
 <h2 id="F">F</h2>
 <table width="100%" class="indextable genindextable"><tr>
   <td width="33%" valign="top"><dl>
-    <dt><a href="api.html#fsdfs.filedb.memory.FileDb">FileDb (class in fsdfs.filedb.memory)</a></dt>
     <dt><a href="api.html#fsdfs.filedb.FileDbBase">FileDbBase (class in fsdfs.filedb)</a></dt>
     <dt><a href="api.html#fsdfs.filesystem.ThreadingBaseHTTPServer.fileno">fileno() (fsdfs.filesystem.ThreadingBaseHTTPServer method)</a></dt>
     <dt><a href="api.html#fsdfs.filesystem.Filesystem">Filesystem (class in fsdfs.filesystem)</a></dt>
@@ -117,49 +116,60 @@
 <table width="100%" class="indextable genindextable"><tr>
   <td width="33%" valign="top"><dl>
     <dt><a href="api.html#fsdfs.filesystem.ThreadingBaseHTTPServer.get_request">get_request() (fsdfs.filesystem.ThreadingBaseHTTPServer method)</a></dt>
+    <dt><a href="api.html#fsdfs.filedb.FileDbBase.getCountAll">getCountAll() (fsdfs.filedb.FileDbBase method)</a></dt>
+    <dd><dl>
+      <dt><a href="api.html#fsdfs.filedb.memory.memoryFileDb.getCountAll">(fsdfs.filedb.memory.memoryFileDb method)</a></dt>
+      <dt><a href="api.html#fsdfs.filedb.sqlite.sqliteFileDb.getCountAll">(fsdfs.filedb.sqlite.sqliteFileDb method)</a></dt>
+  </dl></dd>
     <dt><a href="api.html#fsdfs.filedb.FileDbBase.getCountInNode">getCountInNode() (fsdfs.filedb.FileDbBase method)</a></dt>
     <dd><dl>
-      <dt><a href="api.html#fsdfs.filedb.memory.FileDb.getCountInNode">(fsdfs.filedb.memory.FileDb method)</a></dt>
-      <dt><a href="api.html#fsdfs.filedb.sqlite.SqlLiteDb.getCountInNode">(fsdfs.filedb.sqlite.SqlLiteDb method)</a></dt>
+      <dt><a href="api.html#fsdfs.filedb.memory.memoryFileDb.getCountInNode">(fsdfs.filedb.memory.memoryFileDb method)</a></dt>
+      <dt><a href="api.html#fsdfs.filedb.sqlite.sqliteFileDb.getCountInNode">(fsdfs.filedb.sqlite.sqliteFileDb method)</a></dt>
   </dl></dd>
+    <dt><a href="api.html#fsdfs.filesystem.Filesystem.getGlobalStatus">getGlobalStatus() (fsdfs.filesystem.Filesystem method)</a></dt>
     <dt><a href="api.html#fsdfs.filedb.FileDbBase.getKn">getKn() (fsdfs.filedb.FileDbBase method)</a></dt>
     <dd><dl>
-      <dt><a href="api.html#fsdfs.filedb.memory.FileDb.getKn">(fsdfs.filedb.memory.FileDb method)</a></dt>
-      <dt><a href="api.html#fsdfs.filedb.sqlite.SqlLiteDb.getKn">(fsdfs.filedb.sqlite.SqlLiteDb method)</a></dt>
+      <dt><a href="api.html#fsdfs.filedb.memory.memoryFileDb.getKn">(fsdfs.filedb.memory.memoryFileDb method)</a></dt>
+      <dt><a href="api.html#fsdfs.filedb.sqlite.sqliteFileDb.getKn">(fsdfs.filedb.sqlite.sqliteFileDb method)</a></dt>
   </dl></dd>
     <dt><a href="api.html#fsdfs.filesystem.Filesystem.getKnownNodes">getKnownNodes() (fsdfs.filesystem.Filesystem method)</a></dt>
     <dt><a href="api.html#fsdfs.filesystem.Filesystem.getLocalFilePath">getLocalFilePath() (fsdfs.filesystem.Filesystem method)</a></dt>
     <dt><a href="api.html#fsdfs.filedb.FileDbBase.getMaxKnInNode">getMaxKnInNode() (fsdfs.filedb.FileDbBase method)</a></dt>
     <dd><dl>
-      <dt><a href="api.html#fsdfs.filedb.memory.FileDb.getMaxKnInNode">(fsdfs.filedb.memory.FileDb method)</a></dt>
-      <dt><a href="api.html#fsdfs.filedb.sqlite.SqlLiteDb.getMaxKnInNode">(fsdfs.filedb.sqlite.SqlLiteDb method)</a></dt>
-  </dl></dd>
-    <dt><a href="api.html#fsdfs.filedb.FileDbBase.getMinKnAll">getMinKnAll() (fsdfs.filedb.FileDbBase method)</a></dt>
-    <dd><dl>
-      <dt><a href="api.html#fsdfs.filedb.memory.FileDb.getMinKnAll">(fsdfs.filedb.memory.FileDb method)</a></dt>
-      <dt><a href="api.html#fsdfs.filedb.sqlite.SqlLiteDb.getMinKnAll">(fsdfs.filedb.sqlite.SqlLiteDb method)</a></dt>
+      <dt><a href="api.html#fsdfs.filedb.memory.memoryFileDb.getMaxKnInNode">(fsdfs.filedb.memory.memoryFileDb method)</a></dt>
+      <dt><a href="api.html#fsdfs.filedb.sqlite.sqliteFileDb.getMaxKnInNode">(fsdfs.filedb.sqlite.sqliteFileDb method)</a></dt>
   </dl></dd>
 </dl></td>
   <td width="33%" valign="top"><dl>
+    <dt><a href="api.html#fsdfs.filedb.FileDbBase.getMinKnAll">getMinKnAll() (fsdfs.filedb.FileDbBase method)</a></dt>
+    <dd><dl>
+      <dt><a href="api.html#fsdfs.filedb.memory.memoryFileDb.getMinKnAll">(fsdfs.filedb.memory.memoryFileDb method)</a></dt>
+      <dt><a href="api.html#fsdfs.filedb.sqlite.sqliteFileDb.getMinKnAll">(fsdfs.filedb.sqlite.sqliteFileDb method)</a></dt>
+  </dl></dd>
     <dt><a href="api.html#fsdfs.filesystem.HTTPInterface.getName">getName() (fsdfs.filesystem.HTTPInterface method)</a></dt>
     <dd><dl>
       <dt><a href="api.html#fsdfs.replicator.Replicator.getName">(fsdfs.replicator.Replicator method)</a></dt>
   </dl></dd>
     <dt><a href="api.html#fsdfs.filedb.FileDbBase.getNodes">getNodes() (fsdfs.filedb.FileDbBase method)</a></dt>
     <dd><dl>
-      <dt><a href="api.html#fsdfs.filedb.memory.FileDb.getNodes">(fsdfs.filedb.memory.FileDb method)</a></dt>
-      <dt><a href="api.html#fsdfs.filedb.sqlite.SqlLiteDb.getNodes">(fsdfs.filedb.sqlite.SqlLiteDb method)</a></dt>
+      <dt><a href="api.html#fsdfs.filedb.memory.memoryFileDb.getNodes">(fsdfs.filedb.memory.memoryFileDb method)</a></dt>
+      <dt><a href="api.html#fsdfs.filedb.sqlite.sqliteFileDb.getNodes">(fsdfs.filedb.sqlite.sqliteFileDb method)</a></dt>
   </dl></dd>
     <dt><a href="api.html#fsdfs.filesystem.Filesystem.getReplicationRules">getReplicationRules() (fsdfs.filesystem.Filesystem method)</a></dt>
     <dt><a href="api.html#fsdfs.filedb.FileDbBase.getSize">getSize() (fsdfs.filedb.FileDbBase method)</a></dt>
     <dd><dl>
-      <dt><a href="api.html#fsdfs.filedb.memory.FileDb.getSize">(fsdfs.filedb.memory.FileDb method)</a></dt>
-      <dt><a href="api.html#fsdfs.filedb.sqlite.SqlLiteDb.getSize">(fsdfs.filedb.sqlite.SqlLiteDb method)</a></dt>
+      <dt><a href="api.html#fsdfs.filedb.memory.memoryFileDb.getSize">(fsdfs.filedb.memory.memoryFileDb method)</a></dt>
+      <dt><a href="api.html#fsdfs.filedb.sqlite.sqliteFileDb.getSize">(fsdfs.filedb.sqlite.sqliteFileDb method)</a></dt>
+  </dl></dd>
+    <dt><a href="api.html#fsdfs.filedb.FileDbBase.getSizeAll">getSizeAll() (fsdfs.filedb.FileDbBase method)</a></dt>
+    <dd><dl>
+      <dt><a href="api.html#fsdfs.filedb.memory.memoryFileDb.getSizeAll">(fsdfs.filedb.memory.memoryFileDb method)</a></dt>
+      <dt><a href="api.html#fsdfs.filedb.sqlite.sqliteFileDb.getSizeAll">(fsdfs.filedb.sqlite.sqliteFileDb method)</a></dt>
   </dl></dd>
     <dt><a href="api.html#fsdfs.filedb.FileDbBase.getSizeInNode">getSizeInNode() (fsdfs.filedb.FileDbBase method)</a></dt>
     <dd><dl>
-      <dt><a href="api.html#fsdfs.filedb.memory.FileDb.getSizeInNode">(fsdfs.filedb.memory.FileDb method)</a></dt>
-      <dt><a href="api.html#fsdfs.filedb.sqlite.SqlLiteDb.getSizeInNode">(fsdfs.filedb.sqlite.SqlLiteDb method)</a></dt>
+      <dt><a href="api.html#fsdfs.filedb.memory.memoryFileDb.getSizeInNode">(fsdfs.filedb.memory.memoryFileDb method)</a></dt>
+      <dt><a href="api.html#fsdfs.filedb.sqlite.sqliteFileDb.getSizeInNode">(fsdfs.filedb.sqlite.sqliteFileDb method)</a></dt>
   </dl></dd>
     <dt><a href="api.html#fsdfs.filesystem.Filesystem.getStatus">getStatus() (fsdfs.filesystem.Filesystem method)</a></dt>
 </dl></td>
@@ -220,18 +230,18 @@
   <td width="33%" valign="top"><dl>
     <dt><a href="api.html#fsdfs.filedb.FileDbBase.listAll">listAll() (fsdfs.filedb.FileDbBase method)</a></dt>
     <dd><dl>
-      <dt><a href="api.html#fsdfs.filedb.memory.FileDb.listAll">(fsdfs.filedb.memory.FileDb method)</a></dt>
-      <dt><a href="api.html#fsdfs.filedb.sqlite.SqlLiteDb.listAll">(fsdfs.filedb.sqlite.SqlLiteDb method)</a></dt>
+      <dt><a href="api.html#fsdfs.filedb.memory.memoryFileDb.listAll">(fsdfs.filedb.memory.memoryFileDb method)</a></dt>
+      <dt><a href="api.html#fsdfs.filedb.sqlite.sqliteFileDb.listAll">(fsdfs.filedb.sqlite.sqliteFileDb method)</a></dt>
   </dl></dd>
     <dt><a href="api.html#fsdfs.filedb.FileDbBase.listInNode">listInNode() (fsdfs.filedb.FileDbBase method)</a></dt>
     <dd><dl>
-      <dt><a href="api.html#fsdfs.filedb.memory.FileDb.listInNode">(fsdfs.filedb.memory.FileDb method)</a></dt>
-      <dt><a href="api.html#fsdfs.filedb.sqlite.SqlLiteDb.listInNode">(fsdfs.filedb.sqlite.SqlLiteDb method)</a></dt>
+      <dt><a href="api.html#fsdfs.filedb.memory.memoryFileDb.listInNode">(fsdfs.filedb.memory.memoryFileDb method)</a></dt>
+      <dt><a href="api.html#fsdfs.filedb.sqlite.sqliteFileDb.listInNode">(fsdfs.filedb.sqlite.sqliteFileDb method)</a></dt>
   </dl></dd>
     <dt><a href="api.html#fsdfs.filedb.FileDbBase.listNukes">listNukes() (fsdfs.filedb.FileDbBase method)</a></dt>
     <dd><dl>
-      <dt><a href="api.html#fsdfs.filedb.memory.FileDb.listNukes">(fsdfs.filedb.memory.FileDb method)</a></dt>
-      <dt><a href="api.html#fsdfs.filedb.sqlite.SqlLiteDb.listNukes">(fsdfs.filedb.sqlite.SqlLiteDb method)</a></dt>
+      <dt><a href="api.html#fsdfs.filedb.memory.memoryFileDb.listNukes">(fsdfs.filedb.memory.memoryFileDb method)</a></dt>
+      <dt><a href="api.html#fsdfs.filedb.sqlite.sqliteFileDb.listNukes">(fsdfs.filedb.sqlite.sqliteFileDb method)</a></dt>
   </dl></dd>
     <dt><a href="api.html#fsdfs.filedb.loadFileDb">loadFileDb() (in module fsdfs.filedb)</a></dt>
 </dl></td>
@@ -246,6 +256,7 @@
 <h2 id="M">M</h2>
 <table width="100%" class="indextable genindextable"><tr>
   <td width="33%" valign="top"><dl>
+    <dt><a href="api.html#fsdfs.filedb.memory.memoryFileDb">memoryFileDb (class in fsdfs.filedb.memory)</a></dt>
     <dt><a href="api.html#fsdfs.filesystem.myHandler.MessageClass">MessageClass (fsdfs.filesystem.myHandler attribute)</a></dt>
 </dl></td>
   <td width="33%" valign="top"><dl>
@@ -285,8 +296,8 @@
   <td width="33%" valign="top"><dl>
     <dt><a href="api.html#fsdfs.filedb.FileDbBase.removeFileFromNode">removeFileFromNode() (fsdfs.filedb.FileDbBase method)</a></dt>
     <dd><dl>
-      <dt><a href="api.html#fsdfs.filedb.memory.FileDb.removeFileFromNode">(fsdfs.filedb.memory.FileDb method)</a></dt>
-      <dt><a href="api.html#fsdfs.filedb.sqlite.SqlLiteDb.removeFileFromNode">(fsdfs.filedb.sqlite.SqlLiteDb method)</a></dt>
+      <dt><a href="api.html#fsdfs.filedb.memory.memoryFileDb.removeFileFromNode">(fsdfs.filedb.memory.memoryFileDb method)</a></dt>
+      <dt><a href="api.html#fsdfs.filedb.sqlite.sqliteFileDb.removeFileFromNode">(fsdfs.filedb.sqlite.sqliteFileDb method)</a></dt>
   </dl></dd>
     <dt><a href="api.html#fsdfs.replicator.Replicator.replicateFile">replicateFile() (fsdfs.replicator.Replicator method)</a></dt>
     <dt><a href="api.html#fsdfs.replicator.Replicator">Replicator (class in fsdfs.replicator)</a></dt>
@@ -328,7 +339,7 @@
       <dt><a href="api.html#fsdfs.replicator.Replicator.shutdown">(fsdfs.replicator.Replicator method)</a></dt>
   </dl></dd>
     <dt><a href="api.html#fsdfs.filesystem.myHandler.simpleResponse">simpleResponse() (fsdfs.filesystem.myHandler method)</a></dt>
-    <dt><a href="api.html#fsdfs.filedb.sqlite.SqlLiteDb">SqlLiteDb (class in fsdfs.filedb.sqlite)</a></dt>
+    <dt><a href="api.html#fsdfs.filedb.sqlite.sqliteFileDb">sqliteFileDb (class in fsdfs.filedb.sqlite)</a></dt>
     <dt><a href="api.html#fsdfs.filesystem.Filesystem.start">start() (fsdfs.filesystem.Filesystem method)</a></dt>
     <dd><dl>
       <dt><a href="api.html#fsdfs.filesystem.HTTPInterface.start">(fsdfs.filesystem.HTTPInterface method)</a></dt>
@@ -350,8 +361,8 @@
   <td width="33%" valign="top"><dl>
     <dt><a href="api.html#fsdfs.filedb.FileDbBase.update">update() (fsdfs.filedb.FileDbBase method)</a></dt>
     <dd><dl>
-      <dt><a href="api.html#fsdfs.filedb.memory.FileDb.update">(fsdfs.filedb.memory.FileDb method)</a></dt>
-      <dt><a href="api.html#fsdfs.filedb.sqlite.SqlLiteDb.update">(fsdfs.filedb.sqlite.SqlLiteDb method)</a></dt>
+      <dt><a href="api.html#fsdfs.filedb.memory.memoryFileDb.update">(fsdfs.filedb.memory.memoryFileDb method)</a></dt>
+      <dt><a href="api.html#fsdfs.filedb.sqlite.sqliteFileDb.update">(fsdfs.filedb.sqlite.sqliteFileDb method)</a></dt>
   </dl></dd>
     <dt><a href="api.html#fsdfs.replicator.Replicator.updateAllFileDb">updateAllFileDb() (fsdfs.replicator.Replicator method)</a></dt>
 </dl></td>
