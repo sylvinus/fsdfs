@@ -10,6 +10,7 @@ Goals
 fsdfs was originally developed at Jamendo.com to manage the distribution of millions of MP3/OGG files.
 
 fsdfs aims to :
+
  * make a single virtual filesystem accessible from several nodes
  * be fully distributed (no single point of failure)
  * automatically manage sharding/replication : adding a new node takes 10 seconds
@@ -31,13 +32,15 @@ Design for version 1.0
 ----------------------
 
 Each file has two important variables :
-* Its target replication count N. (N=3 by default, can be customized per-file by a user-defined python function)
-* Its current replication count K
+
+ * Its target replication count N. (N=3 by default, can be customized per-file by a user-defined python function)
+ * Its current replication count K
  
 The master has a list of all the nodes with their status, which includes :
-* cpu/network load
-* list of all the files replicated on the node
-* free disk quota
+
+ * cpu/network load
+ * list of all the files replicated on the node
+ * free disk quota
  
 The free disk quota will always tend to zero because each nodes tries to replicate as many files as it can. 
 Hence, max(K-N) is a more interesting number for a node, because it measures the extent of "over-replication".
@@ -51,9 +54,9 @@ The algorithm used is very simple :
 
 1. select the file having min(K-N)
 2. choose a node :
-  * not already having a copy of this file
-  * not too loaded
-  * with either free disk or a high max(K-N)
+ * not already having a copy of this file
+ * not too loaded
+ * with either free disk or a high max(K-N)
 3. Have the file copied to this node (=> K++)
 4. GOTO 1
 
@@ -66,8 +69,11 @@ min(K-N) will naturally decrease when adding new files. min(K-N) becoming <1 or 
 How to test
 -----------
 
+just run::
+
 	python tests/basic.py
 	python tests/quota.py
+	python tests/persist.py
 
 
 .. include:: TODO.rst
@@ -76,17 +82,7 @@ How to test
 Installation
 ------------
 
-The easiest way to get fsdfs is if you have setuptools_ installed::
-
-	easy_install fsdfs
-
-Without setuptools, it's still pretty easy. Download the fsdfs.tgz file from 
-`fsdfs's Cheeseshop page`_, untar it and run::
-
-	python setup.py install
-
-.. _fsdfs's Cheeseshop page: http://pypi.python.org/pypi/fsdfs/
-.. _setuptools: http://peak.telecommunity.com/DevCenter/EasyInstall
+There are no packages yet, just clone our github repo!
 
 
 Help and development
