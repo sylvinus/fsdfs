@@ -47,414 +47,127 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="module-fsdfs.filesystem">
-<span id="api-reference"></span><h1>API Reference<a class="headerlink" href="#module-fsdfs.filesystem" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="api-reference">
+<h1>API Reference<a class="headerlink" href="#api-reference" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="fsdfs.filesystem.Filesystem">
 <em class="property">class </em><tt class="descclassname">fsdfs.filesystem.</tt><tt class="descname">Filesystem</tt><big>(</big><em>config</em><big>)</big><a class="headerlink" href="#fsdfs.filesystem.Filesystem" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="method">
+<dd><p>This is the Filesystem class.</p>
+<p>It takes a dictionnary in parameter which contains the configuration of the pseudo-filesystem such as:</p>
+<ul class="simple">
+<li>host &#8211; IP:Port of the new node (ie: localhost:4242)</li>
+<li>datadir &#8211; path of the folder where the files are to be stored</li>
+<li>secret &#8211; password for joining the distributed filesystem</li>
+<li>master &#8211; the IP:Port of the master Filesystem server. If it&#8217;s the same as host, then this server is the master</li>
+<li>maxstorage &#8211; A number of bytes (or a string like &#8220;10G&#8221;) that are available for fsdfs</li>
+</ul>
+<dl class="method">
 <dt id="fsdfs.filesystem.Filesystem.deleteFile">
 <tt class="descname">deleteFile</tt><big>(</big><em>filepath</em><big>)</big><a class="headerlink" href="#fsdfs.filesystem.Filesystem.deleteFile" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Delete a file from the database.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="fsdfs.filesystem.Filesystem.downloadFile">
 <tt class="descname">downloadFile</tt><big>(</big><em>filepath</em><big>)</big><a class="headerlink" href="#fsdfs.filesystem.Filesystem.downloadFile" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Downloads a file from the global filesystem to the local server</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fsdfs.filesystem.Filesystem.getGlobalStatus">
+<tt class="descname">getGlobalStatus</tt><big>(</big><big>)</big><a class="headerlink" href="#fsdfs.filesystem.Filesystem.getGlobalStatus" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the global status of the distributed filesystem</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="fsdfs.filesystem.Filesystem.getKnownNodes">
 <tt class="descname">getKnownNodes</tt><big>(</big><big>)</big><a class="headerlink" href="#fsdfs.filesystem.Filesystem.getKnownNodes" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>to write.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="fsdfs.filesystem.Filesystem.getLocalFilePath">
 <tt class="descname">getLocalFilePath</tt><big>(</big><em>filepath</em><big>)</big><a class="headerlink" href="#fsdfs.filesystem.Filesystem.getLocalFilePath" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Return the absolute local path of a file.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="fsdfs.filesystem.Filesystem.getReplicationRules">
 <tt class="descname">getReplicationRules</tt><big>(</big><em>filepath</em><big>)</big><a class="headerlink" href="#fsdfs.filesystem.Filesystem.getReplicationRules" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Return the replication level.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="fsdfs.filesystem.Filesystem.getStatus">
 <tt class="descname">getStatus</tt><big>(</big><big>)</big><a class="headerlink" href="#fsdfs.filesystem.Filesystem.getStatus" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Return the status of a Filesystem server.</p>
+<p>It&#8217;s a dictionnary which these informations:
+* node &#8211; the host
+* df &#8211; the free space left
+* load &#8211; system load
+* uptime &#8211; program&#8217;s uptime in seconds
+* size &#8211; the size of the node (sum of the files)</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="fsdfs.filesystem.Filesystem.hashQuery">
 <tt class="descname">hashQuery</tt><big>(</big><em>query</em><big>)</big><a class="headerlink" href="#fsdfs.filesystem.Filesystem.hashQuery" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>to write.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="fsdfs.filesystem.Filesystem.importFile">
 <tt class="descname">importFile</tt><big>(</big><em>src</em>, <em>filepath</em>, <em>mode='copy'</em><big>)</big><a class="headerlink" href="#fsdfs.filesystem.Filesystem.importFile" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Adds a file to the global filesystem</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="fsdfs.filesystem.Filesystem.nodeRPC">
-<tt class="descname">nodeRPC</tt><big>(</big><em>host</em>, <em>method</em>, <em>params</em>, <em>parse=False</em><big>)</big><a class="headerlink" href="#fsdfs.filesystem.Filesystem.nodeRPC" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<tt class="descname">nodeRPC</tt><big>(</big><em>host</em>, <em>method</em>, <em>params={}</em>, <em>parse=False</em><big>)</big><a class="headerlink" href="#fsdfs.filesystem.Filesystem.nodeRPC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inter-node communication method</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="fsdfs.filesystem.Filesystem.nukeFile">
 <tt class="descname">nukeFile</tt><big>(</big><em>filepath</em><big>)</big><a class="headerlink" href="#fsdfs.filesystem.Filesystem.nukeFile" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Deletes a file on all the nodes</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="fsdfs.filesystem.Filesystem.report">
 <tt class="descname">report</tt><big>(</big><big>)</big><a class="headerlink" href="#fsdfs.filesystem.Filesystem.report" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Sends the local status to the master server</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="fsdfs.filesystem.Filesystem.searchFile">
 <tt class="descname">searchFile</tt><big>(</big><em>file</em><big>)</big><a class="headerlink" href="#fsdfs.filesystem.Filesystem.searchFile" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the nodes where a file is stored</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="fsdfs.filesystem.Filesystem.start">
 <tt class="descname">start</tt><big>(</big><big>)</big><a class="headerlink" href="#fsdfs.filesystem.Filesystem.start" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Start the HTTP server.
+If the server is master, also start the replicator.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="fsdfs.filesystem.Filesystem.stop">
 <tt class="descname">stop</tt><big>(</big><big>)</big><a class="headerlink" href="#fsdfs.filesystem.Filesystem.stop" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="fsdfs.filesystem.HTTPInterface">
-<em class="property">class </em><tt class="descclassname">fsdfs.filesystem.</tt><tt class="descname">HTTPInterface</tt><big>(</big><em>fs</em><big>)</big><a class="headerlink" href="#fsdfs.filesystem.HTTPInterface" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="attribute">
-<dt id="fsdfs.filesystem.HTTPInterface.daemon">
-<tt class="descname">daemon</tt><a class="headerlink" href="#fsdfs.filesystem.HTTPInterface.daemon" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filesystem.HTTPInterface.getName">
-<tt class="descname">getName</tt><big>(</big><big>)</big><a class="headerlink" href="#fsdfs.filesystem.HTTPInterface.getName" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="fsdfs.filesystem.HTTPInterface.ident">
-<tt class="descname">ident</tt><a class="headerlink" href="#fsdfs.filesystem.HTTPInterface.ident" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filesystem.HTTPInterface.isAlive">
-<tt class="descname">isAlive</tt><big>(</big><big>)</big><a class="headerlink" href="#fsdfs.filesystem.HTTPInterface.isAlive" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filesystem.HTTPInterface.isDaemon">
-<tt class="descname">isDaemon</tt><big>(</big><big>)</big><a class="headerlink" href="#fsdfs.filesystem.HTTPInterface.isDaemon" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filesystem.HTTPInterface.is_alive">
-<tt class="descname">is_alive</tt><big>(</big><big>)</big><a class="headerlink" href="#fsdfs.filesystem.HTTPInterface.is_alive" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filesystem.HTTPInterface.join">
-<tt class="descname">join</tt><big>(</big><em>timeout=None</em><big>)</big><a class="headerlink" href="#fsdfs.filesystem.HTTPInterface.join" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="fsdfs.filesystem.HTTPInterface.name">
-<tt class="descname">name</tt><a class="headerlink" href="#fsdfs.filesystem.HTTPInterface.name" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filesystem.HTTPInterface.run">
-<tt class="descname">run</tt><big>(</big><big>)</big><a class="headerlink" href="#fsdfs.filesystem.HTTPInterface.run" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filesystem.HTTPInterface.setDaemon">
-<tt class="descname">setDaemon</tt><big>(</big><em>daemonic</em><big>)</big><a class="headerlink" href="#fsdfs.filesystem.HTTPInterface.setDaemon" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filesystem.HTTPInterface.setName">
-<tt class="descname">setName</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#fsdfs.filesystem.HTTPInterface.setName" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filesystem.HTTPInterface.start">
-<tt class="descname">start</tt><big>(</big><big>)</big><a class="headerlink" href="#fsdfs.filesystem.HTTPInterface.start" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="fsdfs.filesystem.ThreadingBaseHTTPServer">
-<em class="property">class </em><tt class="descclassname">fsdfs.filesystem.</tt><tt class="descname">ThreadingBaseHTTPServer</tt><big>(</big><em>server_address</em>, <em>RequestHandlerClass</em>, <em>bind_and_activate=True</em><big>)</big><a class="headerlink" href="#fsdfs.filesystem.ThreadingBaseHTTPServer" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="method">
-<dt id="fsdfs.filesystem.ThreadingBaseHTTPServer.close_request">
-<tt class="descname">close_request</tt><big>(</big><em>request</em><big>)</big><a class="headerlink" href="#fsdfs.filesystem.ThreadingBaseHTTPServer.close_request" title="Permalink to this definition">¶</a></dt>
-<dd><p>Called to clean up an individual request.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filesystem.ThreadingBaseHTTPServer.fileno">
-<tt class="descname">fileno</tt><big>(</big><big>)</big><a class="headerlink" href="#fsdfs.filesystem.ThreadingBaseHTTPServer.fileno" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return socket file number.</p>
-<p>Interface required by select().</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filesystem.ThreadingBaseHTTPServer.finish_request">
-<tt class="descname">finish_request</tt><big>(</big><em>request</em>, <em>client_address</em><big>)</big><a class="headerlink" href="#fsdfs.filesystem.ThreadingBaseHTTPServer.finish_request" title="Permalink to this definition">¶</a></dt>
-<dd><p>Finish one request by instantiating RequestHandlerClass.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filesystem.ThreadingBaseHTTPServer.get_request">
-<tt class="descname">get_request</tt><big>(</big><big>)</big><a class="headerlink" href="#fsdfs.filesystem.ThreadingBaseHTTPServer.get_request" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the request and client address from the socket.</p>
-<p>May be overridden.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filesystem.ThreadingBaseHTTPServer.handle_error">
-<tt class="descname">handle_error</tt><big>(</big><em>request</em>, <em>client_address</em><big>)</big><a class="headerlink" href="#fsdfs.filesystem.ThreadingBaseHTTPServer.handle_error" title="Permalink to this definition">¶</a></dt>
-<dd><p>Handle an error gracefully.  May be overridden.</p>
-<p>The default is to print a traceback and continue.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filesystem.ThreadingBaseHTTPServer.handle_request">
-<tt class="descname">handle_request</tt><big>(</big><big>)</big><a class="headerlink" href="#fsdfs.filesystem.ThreadingBaseHTTPServer.handle_request" title="Permalink to this definition">¶</a></dt>
-<dd><p>Handle one request, possibly blocking.</p>
-<p>Respects self.timeout.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filesystem.ThreadingBaseHTTPServer.handle_timeout">
-<tt class="descname">handle_timeout</tt><big>(</big><big>)</big><a class="headerlink" href="#fsdfs.filesystem.ThreadingBaseHTTPServer.handle_timeout" title="Permalink to this definition">¶</a></dt>
-<dd><p>Called if no new request arrives within self.timeout.</p>
-<p>Overridden by ForkingMixIn.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filesystem.ThreadingBaseHTTPServer.process_request">
-<tt class="descname">process_request</tt><big>(</big><em>request</em>, <em>client_address</em><big>)</big><a class="headerlink" href="#fsdfs.filesystem.ThreadingBaseHTTPServer.process_request" title="Permalink to this definition">¶</a></dt>
-<dd><p>Start a new thread to process the request.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filesystem.ThreadingBaseHTTPServer.process_request_thread">
-<tt class="descname">process_request_thread</tt><big>(</big><em>request</em>, <em>client_address</em><big>)</big><a class="headerlink" href="#fsdfs.filesystem.ThreadingBaseHTTPServer.process_request_thread" title="Permalink to this definition">¶</a></dt>
-<dd><p>Same as in BaseServer but as a thread.</p>
-<p>In addition, exception handling is done here.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filesystem.ThreadingBaseHTTPServer.serve_forever">
-<tt class="descname">serve_forever</tt><big>(</big><em>poll_interval=0.5</em><big>)</big><a class="headerlink" href="#fsdfs.filesystem.ThreadingBaseHTTPServer.serve_forever" title="Permalink to this definition">¶</a></dt>
-<dd><p>Handle one request at a time until shutdown.</p>
-<p>Polls for shutdown every poll_interval seconds. Ignores
-self.timeout. If you need to do periodic tasks, do them in
-another thread.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filesystem.ThreadingBaseHTTPServer.server_activate">
-<tt class="descname">server_activate</tt><big>(</big><big>)</big><a class="headerlink" href="#fsdfs.filesystem.ThreadingBaseHTTPServer.server_activate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Called by constructor to activate the server.</p>
-<p>May be overridden.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filesystem.ThreadingBaseHTTPServer.server_bind">
-<tt class="descname">server_bind</tt><big>(</big><big>)</big><a class="headerlink" href="#fsdfs.filesystem.ThreadingBaseHTTPServer.server_bind" title="Permalink to this definition">¶</a></dt>
-<dd><p>Override server_bind to store the server name.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filesystem.ThreadingBaseHTTPServer.server_close">
-<tt class="descname">server_close</tt><big>(</big><big>)</big><a class="headerlink" href="#fsdfs.filesystem.ThreadingBaseHTTPServer.server_close" title="Permalink to this definition">¶</a></dt>
-<dd><p>Called to clean-up the server.</p>
-<p>May be overridden.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filesystem.ThreadingBaseHTTPServer.setFS">
-<tt class="descname">setFS</tt><big>(</big><em>fs</em><big>)</big><a class="headerlink" href="#fsdfs.filesystem.ThreadingBaseHTTPServer.setFS" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filesystem.ThreadingBaseHTTPServer.shutdown">
-<tt class="descname">shutdown</tt><big>(</big><big>)</big><a class="headerlink" href="#fsdfs.filesystem.ThreadingBaseHTTPServer.shutdown" title="Permalink to this definition">¶</a></dt>
-<dd><p>Stops the serve_forever loop.</p>
-<p>Blocks until the loop has finished. This must be called while
-serve_forever() is running in another thread, or it will
-deadlock.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filesystem.ThreadingBaseHTTPServer.verify_request">
-<tt class="descname">verify_request</tt><big>(</big><em>request</em>, <em>client_address</em><big>)</big><a class="headerlink" href="#fsdfs.filesystem.ThreadingBaseHTTPServer.verify_request" title="Permalink to this definition">¶</a></dt>
-<dd><p>Verify the request.  May be overridden.</p>
-<p>Return True if we should proceed with this request.</p>
+<dd><p>Stops the filesystem</p>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="class">
-<dt id="fsdfs.filesystem.myHandler">
-<em class="property">class </em><tt class="descclassname">fsdfs.filesystem.</tt><tt class="descname">myHandler</tt><big>(</big><em>request</em>, <em>client_address</em>, <em>server</em><big>)</big><a class="headerlink" href="#fsdfs.filesystem.myHandler" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="attribute">
-<dt id="fsdfs.filesystem.myHandler.MessageClass">
-<tt class="descname">MessageClass</tt><a class="headerlink" href="#fsdfs.filesystem.myHandler.MessageClass" title="Permalink to this definition">¶</a></dt>
-<dd><p>alias of <tt class="xref py py-class docutils literal"><span class="pre">Message</span></tt></p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filesystem.myHandler.address_string">
-<tt class="descname">address_string</tt><big>(</big><big>)</big><a class="headerlink" href="#fsdfs.filesystem.myHandler.address_string" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the client address formatted for logging.</p>
-<p>This version looks up the full hostname using gethostbyaddr(),
-and tries to find a name that contains at least one dot.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filesystem.myHandler.date_time_string">
-<tt class="descname">date_time_string</tt><big>(</big><em>timestamp=None</em><big>)</big><a class="headerlink" href="#fsdfs.filesystem.myHandler.date_time_string" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the current date and time formatted for a message header.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filesystem.myHandler.do_POST">
-<tt class="descname">do_POST</tt><big>(</big><big>)</big><a class="headerlink" href="#fsdfs.filesystem.myHandler.do_POST" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filesystem.myHandler.end_headers">
-<tt class="descname">end_headers</tt><big>(</big><big>)</big><a class="headerlink" href="#fsdfs.filesystem.myHandler.end_headers" title="Permalink to this definition">¶</a></dt>
-<dd><p>Send the blank line ending the MIME headers.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filesystem.myHandler.finish">
-<tt class="descname">finish</tt><big>(</big><big>)</big><a class="headerlink" href="#fsdfs.filesystem.myHandler.finish" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filesystem.myHandler.handle">
-<tt class="descname">handle</tt><big>(</big><big>)</big><a class="headerlink" href="#fsdfs.filesystem.myHandler.handle" title="Permalink to this definition">¶</a></dt>
-<dd><p>Handle multiple requests if necessary.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filesystem.myHandler.handle_one_request">
-<tt class="descname">handle_one_request</tt><big>(</big><big>)</big><a class="headerlink" href="#fsdfs.filesystem.myHandler.handle_one_request" title="Permalink to this definition">¶</a></dt>
-<dd><p>Handle a single HTTP request.</p>
-<p>You normally don&#8217;t need to override this method; see the class
-__doc__ string for information on how to handle specific HTTP
-commands such as GET and POST.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filesystem.myHandler.log_date_time_string">
-<tt class="descname">log_date_time_string</tt><big>(</big><big>)</big><a class="headerlink" href="#fsdfs.filesystem.myHandler.log_date_time_string" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the current time formatted for logging.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filesystem.myHandler.log_error">
-<tt class="descname">log_error</tt><big>(</big><em>format</em>, <em>*args</em><big>)</big><a class="headerlink" href="#fsdfs.filesystem.myHandler.log_error" title="Permalink to this definition">¶</a></dt>
-<dd><p>Log an error.</p>
-<p>This is called when a request cannot be fulfilled.  By
-default it passes the message on to log_message().</p>
-<p>Arguments are the same as for log_message().</p>
-<p>XXX This should go to the separate error log.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filesystem.myHandler.log_message">
-<tt class="descname">log_message</tt><big>(</big><em>format</em>, <em>*args</em><big>)</big><a class="headerlink" href="#fsdfs.filesystem.myHandler.log_message" title="Permalink to this definition">¶</a></dt>
-<dd><p>Log an arbitrary message.</p>
-<p>This is used by all other logging functions.  Override
-it if you have specific logging wishes.</p>
-<p>The first argument, FORMAT, is a format string for the
-message to be logged.  If the format string contains
-any % escapes requiring parameters, they should be
-specified as subsequent arguments (it&#8217;s just like
-printf!).</p>
-<p>The client host and current date/time are prefixed to
-every message.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filesystem.myHandler.log_request">
-<tt class="descname">log_request</tt><big>(</big><em>code='-'</em>, <em>size='-'</em><big>)</big><a class="headerlink" href="#fsdfs.filesystem.myHandler.log_request" title="Permalink to this definition">¶</a></dt>
-<dd><p>Log an accepted request.</p>
-<p>This is called by send_response().</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filesystem.myHandler.parse_request">
-<tt class="descname">parse_request</tt><big>(</big><big>)</big><a class="headerlink" href="#fsdfs.filesystem.myHandler.parse_request" title="Permalink to this definition">¶</a></dt>
-<dd><p>Parse a request (internal).</p>
-<p>The request should be stored in self.raw_requestline; the results
-are in self.command, self.path, self.request_version and
-self.headers.</p>
-<p>Return True for success, False for failure; on failure, an
-error is sent back.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filesystem.myHandler.send_error">
-<tt class="descname">send_error</tt><big>(</big><em>code</em>, <em>message=None</em><big>)</big><a class="headerlink" href="#fsdfs.filesystem.myHandler.send_error" title="Permalink to this definition">¶</a></dt>
-<dd><p>Send and log an error reply.</p>
-<p>Arguments are the error code, and a detailed message.
-The detailed message defaults to the short entry matching the
-response code.</p>
-<p>This sends an error response (so it must be called before any
-output has been generated), logs the error, and finally sends
-a piece of HTML explaining the error to the user.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filesystem.myHandler.send_header">
-<tt class="descname">send_header</tt><big>(</big><em>keyword</em>, <em>value</em><big>)</big><a class="headerlink" href="#fsdfs.filesystem.myHandler.send_header" title="Permalink to this definition">¶</a></dt>
-<dd><p>Send a MIME header.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filesystem.myHandler.send_response">
-<tt class="descname">send_response</tt><big>(</big><em>code</em>, <em>message=None</em><big>)</big><a class="headerlink" href="#fsdfs.filesystem.myHandler.send_response" title="Permalink to this definition">¶</a></dt>
-<dd><p>Send the response header and log the response code.</p>
-<p>Also send two standard headers with the server software
-version and the current date.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filesystem.myHandler.setup">
-<tt class="descname">setup</tt><big>(</big><big>)</big><a class="headerlink" href="#fsdfs.filesystem.myHandler.setup" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filesystem.myHandler.simpleResponse">
-<tt class="descname">simpleResponse</tt><big>(</big><em>code</em>, <em>content</em><big>)</big><a class="headerlink" href="#fsdfs.filesystem.myHandler.simpleResponse" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filesystem.myHandler.version_string">
-<tt class="descname">version_string</tt><big>(</big><big>)</big><a class="headerlink" href="#fsdfs.filesystem.myHandler.version_string" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the server software version string.</p>
-</dd></dl>
-
-</dd></dl>
-
-<span class="target" id="module-fsdfs.replicator"></span><dl class="class">
 <dt id="fsdfs.replicator.Replicator">
 <em class="property">class </em><tt class="descclassname">fsdfs.replicator.</tt><tt class="descname">Replicator</tt><big>(</big><em>fs</em><big>)</big><a class="headerlink" href="#fsdfs.replicator.Replicator" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="attribute">
+<dd><p>This is the Replicator class.
+It manages files on every node.</p>
+<p>It takes a Filesystem instance in argument which is saved in self.fs.</p>
+<p>It&#8217;s because a Replicator is also a Filesystem :-)</p>
+<dl class="attribute">
 <dt id="fsdfs.replicator.Replicator.daemon">
 <tt class="descname">daemon</tt><a class="headerlink" href="#fsdfs.replicator.Replicator.daemon" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -497,22 +210,26 @@ version and the current date.</p>
 <dl class="method">
 <dt id="fsdfs.replicator.Replicator.performNukes">
 <tt class="descname">performNukes</tt><big>(</big><big>)</big><a class="headerlink" href="#fsdfs.replicator.Replicator.performNukes" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>to write.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="fsdfs.replicator.Replicator.performReplication">
 <tt class="descname">performReplication</tt><big>(</big><em>maxOperations=10</em><big>)</big><a class="headerlink" href="#fsdfs.replicator.Replicator.performReplication" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>to write.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="fsdfs.replicator.Replicator.replicateFile">
 <tt class="descname">replicateFile</tt><big>(</big><em>file</em><big>)</big><a class="headerlink" href="#fsdfs.replicator.Replicator.replicateFile" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Describe the algorithm...</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="fsdfs.replicator.Replicator.run">
 <tt class="descname">run</tt><big>(</big><big>)</big><a class="headerlink" href="#fsdfs.replicator.Replicator.run" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>to write</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="fsdfs.replicator.Replicator.setDaemon">
@@ -527,7 +244,9 @@ version and the current date.</p>
 <dl class="method">
 <dt id="fsdfs.replicator.Replicator.shutdown">
 <tt class="descname">shutdown</tt><big>(</big><big>)</big><a class="headerlink" href="#fsdfs.replicator.Replicator.shutdown" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Shutdown the server by setting the variable self.stopnow to True.</p>
+<p>It breaks the while which runs the Replicator.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="fsdfs.replicator.Replicator.start">
@@ -537,84 +256,113 @@ version and the current date.</p>
 <dl class="method">
 <dt id="fsdfs.replicator.Replicator.updateAllFileDb">
 <tt class="descname">updateAllFileDb</tt><big>(</big><big>)</big><a class="headerlink" href="#fsdfs.replicator.Replicator.updateAllFileDb" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>to write.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="fsdfs.replicator.Replicator.updateFileDb">
 <tt class="descname">updateFileDb</tt><big>(</big><em>file</em><big>)</big><a class="headerlink" href="#fsdfs.replicator.Replicator.updateFileDb" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>to write.</p>
+</dd></dl>
 
 </dd></dl>
 
 <span class="target" id="module-fsdfs.filedb"></span><dl class="class">
 <dt id="fsdfs.filedb.FileDbBase">
 <em class="property">class </em><tt class="descclassname">fsdfs.filedb.</tt><tt class="descname">FileDbBase</tt><big>(</big><em>fs</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.FileDbBase" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="method">
+<dd><p>Parent class for files database.</p>
+<dl class="method">
 <dt id="fsdfs.filedb.FileDbBase.addFileToNode">
 <tt class="descname">addFileToNode</tt><big>(</big><em>file</em>, <em>node</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.FileDbBase.addFileToNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a file to a node (in argument).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fsdfs.filedb.FileDbBase.getCountAll">
+<tt class="descname">getCountAll</tt><big>(</big><big>)</big><a class="headerlink" href="#fsdfs.filedb.FileDbBase.getCountAll" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="fsdfs.filedb.FileDbBase.getCountInNode">
 <tt class="descname">getCountInNode</tt><big>(</big><em>node</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.FileDbBase.getCountInNode" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>to write</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="fsdfs.filedb.FileDbBase.getKn">
 <tt class="descname">getKn</tt><big>(</big><em>file</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.FileDbBase.getKn" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>to write</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="fsdfs.filedb.FileDbBase.getMaxKnInNode">
 <tt class="descname">getMaxKnInNode</tt><big>(</big><em>node</em>, <em>num=1</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.FileDbBase.getMaxKnInNode" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>to write</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="fsdfs.filedb.FileDbBase.getMinKnAll">
 <tt class="descname">getMinKnAll</tt><big>(</big><em>num=1</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.FileDbBase.getMinKnAll" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>to write</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="fsdfs.filedb.FileDbBase.getNodes">
 <tt class="descname">getNodes</tt><big>(</big><em>file</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.FileDbBase.getNodes" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Return file&#8217;s node list.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="fsdfs.filedb.FileDbBase.getSize">
 <tt class="descname">getSize</tt><big>(</big><em>file</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.FileDbBase.getSize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the size of a file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fsdfs.filedb.FileDbBase.getSizeAll">
+<tt class="descname">getSizeAll</tt><big>(</big><big>)</big><a class="headerlink" href="#fsdfs.filedb.FileDbBase.getSizeAll" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="fsdfs.filedb.FileDbBase.getSizeInNode">
 <tt class="descname">getSizeInNode</tt><big>(</big><em>node</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.FileDbBase.getSizeInNode" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Return the sum of each files managed by a node.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="fsdfs.filedb.FileDbBase.listAll">
 <tt class="descname">listAll</tt><big>(</big><big>)</big><a class="headerlink" href="#fsdfs.filedb.FileDbBase.listAll" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>List all files in the database.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="fsdfs.filedb.FileDbBase.listInNode">
 <tt class="descname">listInNode</tt><big>(</big><em>node</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.FileDbBase.listInNode" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>to write</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="fsdfs.filedb.FileDbBase.listNukes">
 <tt class="descname">listNukes</tt><big>(</big><big>)</big><a class="headerlink" href="#fsdfs.filedb.FileDbBase.listNukes" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>to write</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="fsdfs.filedb.FileDbBase.removeFileFromNode">
 <tt class="descname">removeFileFromNode</tt><big>(</big><em>file</em>, <em>node</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.FileDbBase.removeFileFromNode" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Remove a file from a node.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="fsdfs.filedb.FileDbBase.update">
 <tt class="descname">update</tt><big>(</big><em>file</em>, <em>data</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.FileDbBase.update" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update file&#8217;s data.
-Data is a environment in a dictionnary which may contains:
-nodes, size, date, replication level (n), time...</p>
+<dd><p>Update file&#8217;s data.</p>
+<p>Data is a environment in a dictionnary which may contains:
+* nodes
+* size 
+* date 
+* replication level (n)
+* time</p>
 </dd></dl>
 
 </dd></dl>
@@ -625,8 +373,8 @@ nodes, size, date, replication level (n), time...</p>
 <dd></dd></dl>
 
 <span class="target" id="module-fsdfs.filedb.memory"></span><dl class="class">
-<dt id="fsdfs.filedb.memory.FileDb">
-<em class="property">class </em><tt class="descclassname">fsdfs.filedb.memory.</tt><tt class="descname">FileDb</tt><big>(</big><em>fs</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.memory.FileDb" title="Permalink to this definition">¶</a></dt>
+<dt id="fsdfs.filedb.memory.memoryFileDb">
+<em class="property">class </em><tt class="descclassname">fsdfs.filedb.memory.</tt><tt class="descname">memoryFileDb</tt><big>(</big><em>fs</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.memory.memoryFileDb" title="Permalink to this definition">¶</a></dt>
 <dd><p>FileDb class for <em>memory</em>
 Everything is stored in a big dictionnary with filename as key:
 {filename:</p>
@@ -637,153 +385,182 @@ Everything is stored in a big dictionnary with filename as key:
 ....</blockquote>
 <p>}</p>
 <dl class="method">
-<dt id="fsdfs.filedb.memory.FileDb.addFileToNode">
-<tt class="descname">addFileToNode</tt><big>(</big><em>file</em>, <em>node</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.memory.FileDb.addFileToNode" title="Permalink to this definition">¶</a></dt>
+<dt id="fsdfs.filedb.memory.memoryFileDb.addFileToNode">
+<tt class="descname">addFileToNode</tt><big>(</big><em>file</em>, <em>node</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.memory.memoryFileDb.addFileToNode" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="fsdfs.filedb.memory.FileDb.getCountInNode">
-<tt class="descname">getCountInNode</tt><big>(</big><em>node</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.memory.FileDb.getCountInNode" title="Permalink to this definition">¶</a></dt>
+<dt id="fsdfs.filedb.memory.memoryFileDb.getCountAll">
+<tt class="descname">getCountAll</tt><big>(</big><big>)</big><a class="headerlink" href="#fsdfs.filedb.memory.memoryFileDb.getCountAll" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="fsdfs.filedb.memory.FileDb.getKn">
-<tt class="descname">getKn</tt><big>(</big><em>file</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.memory.FileDb.getKn" title="Permalink to this definition">¶</a></dt>
+<dt id="fsdfs.filedb.memory.memoryFileDb.getCountInNode">
+<tt class="descname">getCountInNode</tt><big>(</big><em>node</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.memory.memoryFileDb.getCountInNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>to write</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fsdfs.filedb.memory.memoryFileDb.getKn">
+<tt class="descname">getKn</tt><big>(</big><em>file</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.memory.memoryFileDb.getKn" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="fsdfs.filedb.memory.FileDb.getMaxKnInNode">
-<tt class="descname">getMaxKnInNode</tt><big>(</big><em>node</em>, <em>num=1</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.memory.FileDb.getMaxKnInNode" title="Permalink to this definition">¶</a></dt>
+<dt id="fsdfs.filedb.memory.memoryFileDb.getMaxKnInNode">
+<tt class="descname">getMaxKnInNode</tt><big>(</big><em>node</em>, <em>num=1</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.memory.memoryFileDb.getMaxKnInNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>to write</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fsdfs.filedb.memory.memoryFileDb.getMinKnAll">
+<tt class="descname">getMinKnAll</tt><big>(</big><em>num=1</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.memory.memoryFileDb.getMinKnAll" title="Permalink to this definition">¶</a></dt>
+<dd><p>to write</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fsdfs.filedb.memory.memoryFileDb.getNodes">
+<tt class="descname">getNodes</tt><big>(</big><em>file</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.memory.memoryFileDb.getNodes" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="fsdfs.filedb.memory.FileDb.getMinKnAll">
-<tt class="descname">getMinKnAll</tt><big>(</big><em>num=1</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.memory.FileDb.getMinKnAll" title="Permalink to this definition">¶</a></dt>
+<dt id="fsdfs.filedb.memory.memoryFileDb.getSize">
+<tt class="descname">getSize</tt><big>(</big><em>file</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.memory.memoryFileDb.getSize" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="fsdfs.filedb.memory.FileDb.getNodes">
-<tt class="descname">getNodes</tt><big>(</big><em>file</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.memory.FileDb.getNodes" title="Permalink to this definition">¶</a></dt>
+<dt id="fsdfs.filedb.memory.memoryFileDb.getSizeAll">
+<tt class="descname">getSizeAll</tt><big>(</big><big>)</big><a class="headerlink" href="#fsdfs.filedb.memory.memoryFileDb.getSizeAll" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="fsdfs.filedb.memory.FileDb.getSize">
-<tt class="descname">getSize</tt><big>(</big><em>file</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.memory.FileDb.getSize" title="Permalink to this definition">¶</a></dt>
+<dt id="fsdfs.filedb.memory.memoryFileDb.getSizeInNode">
+<tt class="descname">getSizeInNode</tt><big>(</big><em>node</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.memory.memoryFileDb.getSizeInNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the sum of each files managed by a node.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fsdfs.filedb.memory.memoryFileDb.listAll">
+<tt class="descname">listAll</tt><big>(</big><big>)</big><a class="headerlink" href="#fsdfs.filedb.memory.memoryFileDb.listAll" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="fsdfs.filedb.memory.FileDb.getSizeInNode">
-<tt class="descname">getSizeInNode</tt><big>(</big><em>node</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.memory.FileDb.getSizeInNode" title="Permalink to this definition">¶</a></dt>
+<dt id="fsdfs.filedb.memory.memoryFileDb.listInNode">
+<tt class="descname">listInNode</tt><big>(</big><em>node</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.memory.memoryFileDb.listInNode" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="fsdfs.filedb.memory.FileDb.listAll">
-<tt class="descname">listAll</tt><big>(</big><big>)</big><a class="headerlink" href="#fsdfs.filedb.memory.FileDb.listAll" title="Permalink to this definition">¶</a></dt>
+<dt id="fsdfs.filedb.memory.memoryFileDb.listNukes">
+<tt class="descname">listNukes</tt><big>(</big><big>)</big><a class="headerlink" href="#fsdfs.filedb.memory.memoryFileDb.listNukes" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="fsdfs.filedb.memory.FileDb.listInNode">
-<tt class="descname">listInNode</tt><big>(</big><em>node</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.memory.FileDb.listInNode" title="Permalink to this definition">¶</a></dt>
+<dt id="fsdfs.filedb.memory.memoryFileDb.removeFileFromNode">
+<tt class="descname">removeFileFromNode</tt><big>(</big><em>file</em>, <em>node</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.memory.memoryFileDb.removeFileFromNode" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="fsdfs.filedb.memory.FileDb.listNukes">
-<tt class="descname">listNukes</tt><big>(</big><big>)</big><a class="headerlink" href="#fsdfs.filedb.memory.FileDb.listNukes" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filedb.memory.FileDb.removeFileFromNode">
-<tt class="descname">removeFileFromNode</tt><big>(</big><em>file</em>, <em>node</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.memory.FileDb.removeFileFromNode" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filedb.memory.FileDb.update">
-<tt class="descname">update</tt><big>(</big><em>file</em>, <em>data</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.memory.FileDb.update" title="Permalink to this definition">¶</a></dt>
+<dt id="fsdfs.filedb.memory.memoryFileDb.update">
+<tt class="descname">update</tt><big>(</big><em>file</em>, <em>data</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.memory.memoryFileDb.update" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-<span class="target" id="module-fsdfs.filedb.sqlite"></span><dl class="class">
-<dt id="fsdfs.filedb.sqlite.SqlLiteDb">
-<em class="property">class </em><tt class="descclassname">fsdfs.filedb.sqlite.</tt><tt class="descname">SqlLiteDb</tt><big>(</big><em>fs</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.sqlite.SqlLiteDb" title="Permalink to this definition">¶</a></dt>
-<dd><p>FileDb class for <em>sqlite</em></p>
-<p>Table files has row:
-filename (text),
-nodes (text),
-size (integer),
-date (text),
-n (integer)</p>
-<dl class="method">
-<dt id="fsdfs.filedb.sqlite.SqlLiteDb.addFileToNode">
-<tt class="descname">addFileToNode</tt><big>(</big><em>file</em>, <em>node</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.sqlite.SqlLiteDb.addFileToNode" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filedb.sqlite.SqlLiteDb.getCountInNode">
-<tt class="descname">getCountInNode</tt><big>(</big><em>node</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.sqlite.SqlLiteDb.getCountInNode" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filedb.sqlite.SqlLiteDb.getKn">
-<tt class="descname">getKn</tt><big>(</big><em>file</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.sqlite.SqlLiteDb.getKn" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filedb.sqlite.SqlLiteDb.getMaxKnInNode">
-<tt class="descname">getMaxKnInNode</tt><big>(</big><em>node</em>, <em>num=1</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.sqlite.SqlLiteDb.getMaxKnInNode" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filedb.sqlite.SqlLiteDb.getMinKnAll">
-<tt class="descname">getMinKnAll</tt><big>(</big><em>num=1</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.sqlite.SqlLiteDb.getMinKnAll" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filedb.sqlite.SqlLiteDb.getNodes">
-<tt class="descname">getNodes</tt><big>(</big><em>file</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.sqlite.SqlLiteDb.getNodes" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filedb.sqlite.SqlLiteDb.getSize">
-<tt class="descname">getSize</tt><big>(</big><em>file</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.sqlite.SqlLiteDb.getSize" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filedb.sqlite.SqlLiteDb.getSizeInNode">
-<tt class="descname">getSizeInNode</tt><big>(</big><em>node</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.sqlite.SqlLiteDb.getSizeInNode" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filedb.sqlite.SqlLiteDb.listAll">
-<tt class="descname">listAll</tt><big>(</big><big>)</big><a class="headerlink" href="#fsdfs.filedb.sqlite.SqlLiteDb.listAll" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filedb.sqlite.SqlLiteDb.listInNode">
-<tt class="descname">listInNode</tt><big>(</big><em>node</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.sqlite.SqlLiteDb.listInNode" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filedb.sqlite.SqlLiteDb.listNukes">
-<tt class="descname">listNukes</tt><big>(</big><big>)</big><a class="headerlink" href="#fsdfs.filedb.sqlite.SqlLiteDb.listNukes" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filedb.sqlite.SqlLiteDb.removeFileFromNode">
-<tt class="descname">removeFileFromNode</tt><big>(</big><em>file</em>, <em>node</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.sqlite.SqlLiteDb.removeFileFromNode" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="fsdfs.filedb.sqlite.SqlLiteDb.update">
-<tt class="descname">update</tt><big>(</big><em>file</em>, <em>data</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.sqlite.SqlLiteDb.update" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="function">
+<span class="target" id="module-fsdfs.filedb.sqlite"></span><dl class="function">
 <dt id="fsdfs.filedb.sqlite.dict_factory">
 <tt class="descclassname">fsdfs.filedb.sqlite.</tt><tt class="descname">dict_factory</tt><big>(</big><em>cursor</em>, <em>row</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.sqlite.dict_factory" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="class">
+<dt id="fsdfs.filedb.sqlite.sqliteFileDb">
+<em class="property">class </em><tt class="descclassname">fsdfs.filedb.sqlite.</tt><tt class="descname">sqliteFileDb</tt><big>(</big><em>fs</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.sqlite.sqliteFileDb" title="Permalink to this definition">¶</a></dt>
+<dd><p>FileDb class for SQLite</p>
+<p>Table files has row:
+* filename (text),
+* nodes (text),
+* size (integer),
+* date (text),
+* n (integer)</p>
+<dl class="method">
+<dt id="fsdfs.filedb.sqlite.sqliteFileDb.addFileToNode">
+<tt class="descname">addFileToNode</tt><big>(</big><em>file</em>, <em>node</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.sqlite.sqliteFileDb.addFileToNode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fsdfs.filedb.sqlite.sqliteFileDb.getCountAll">
+<tt class="descname">getCountAll</tt><big>(</big><big>)</big><a class="headerlink" href="#fsdfs.filedb.sqlite.sqliteFileDb.getCountAll" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fsdfs.filedb.sqlite.sqliteFileDb.getCountInNode">
+<tt class="descname">getCountInNode</tt><big>(</big><em>node</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.sqlite.sqliteFileDb.getCountInNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>to write</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fsdfs.filedb.sqlite.sqliteFileDb.getKn">
+<tt class="descname">getKn</tt><big>(</big><em>file</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.sqlite.sqliteFileDb.getKn" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fsdfs.filedb.sqlite.sqliteFileDb.getMaxKnInNode">
+<tt class="descname">getMaxKnInNode</tt><big>(</big><em>node</em>, <em>num=1</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.sqlite.sqliteFileDb.getMaxKnInNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>to write</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fsdfs.filedb.sqlite.sqliteFileDb.getMinKnAll">
+<tt class="descname">getMinKnAll</tt><big>(</big><em>num=1</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.sqlite.sqliteFileDb.getMinKnAll" title="Permalink to this definition">¶</a></dt>
+<dd><p>to write</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fsdfs.filedb.sqlite.sqliteFileDb.getNodes">
+<tt class="descname">getNodes</tt><big>(</big><em>file</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.sqlite.sqliteFileDb.getNodes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fsdfs.filedb.sqlite.sqliteFileDb.getSize">
+<tt class="descname">getSize</tt><big>(</big><em>file</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.sqlite.sqliteFileDb.getSize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fsdfs.filedb.sqlite.sqliteFileDb.getSizeAll">
+<tt class="descname">getSizeAll</tt><big>(</big><big>)</big><a class="headerlink" href="#fsdfs.filedb.sqlite.sqliteFileDb.getSizeAll" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fsdfs.filedb.sqlite.sqliteFileDb.getSizeInNode">
+<tt class="descname">getSizeInNode</tt><big>(</big><em>node</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.sqlite.sqliteFileDb.getSizeInNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the sum of each files managed by a node.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fsdfs.filedb.sqlite.sqliteFileDb.listAll">
+<tt class="descname">listAll</tt><big>(</big><big>)</big><a class="headerlink" href="#fsdfs.filedb.sqlite.sqliteFileDb.listAll" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fsdfs.filedb.sqlite.sqliteFileDb.listInNode">
+<tt class="descname">listInNode</tt><big>(</big><em>node</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.sqlite.sqliteFileDb.listInNode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fsdfs.filedb.sqlite.sqliteFileDb.listNukes">
+<tt class="descname">listNukes</tt><big>(</big><big>)</big><a class="headerlink" href="#fsdfs.filedb.sqlite.sqliteFileDb.listNukes" title="Permalink to this definition">¶</a></dt>
+<dd><p>to write</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fsdfs.filedb.sqlite.sqliteFileDb.removeFileFromNode">
+<tt class="descname">removeFileFromNode</tt><big>(</big><em>file</em>, <em>node</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.sqlite.sqliteFileDb.removeFileFromNode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fsdfs.filedb.sqlite.sqliteFileDb.update">
+<tt class="descname">update</tt><big>(</big><em>file</em>, <em>data</em><big>)</big><a class="headerlink" href="#fsdfs.filedb.sqlite.sqliteFileDb.update" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
 
 </div>
 

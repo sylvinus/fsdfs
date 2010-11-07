@@ -1,12 +1,12 @@
 API Reference
 =============
 
-.. automodule:: fsdfs.filesystem
+.. autoclass:: fsdfs.filesystem.Filesystem
    :members:
    :undoc-members:
    :inherited-members:
    
-.. automodule:: fsdfs.replicator
+.. autoclass:: fsdfs.replicator.Replicator
    :members:
    :undoc-members:
    :inherited-members:

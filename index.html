@@ -52,9 +52,9 @@
 <div class="section" id="goals">
 <h2>Goals<a class="headerlink" href="#goals" title="Permalink to this headline">¶</a></h2>
 <p>fsdfs was originally developed at Jamendo.com to manage the distribution of millions of MP3/OGG files.</p>
-<dl class="docutils">
-<dt>fsdfs aims to :</dt>
-<dd><ul class="first last simple">
+<p>fsdfs aims to :</p>
+<blockquote>
+<ul class="simple">
 <li>make a single virtual filesystem accessible from several nodes</li>
 <li>be fully distributed (no single point of failure)</li>
 <li>automatically manage sharding/replication : adding a new node takes 10 seconds</li>
@@ -63,8 +63,7 @@
 <li>allow userland variables (like popularity) to boost a file&#8217;s replication/redundancy level</li>
 <li>sit on top of any POSIX filesystem</li>
 </ul>
-</dd>
-</dl>
+</blockquote>
 </div>
 <div class="section" id="roadmap">
 <h2>Roadmap<a class="headerlink" href="#roadmap" title="Permalink to this headline">¶</a></h2>
@@ -74,13 +73,21 @@ already be structured to make its implementation easy.</p>
 </div>
 <div class="section" id="design-for-version-1-0">
 <h2>Design for version 1.0<a class="headerlink" href="#design-for-version-1-0" title="Permalink to this headline">¶</a></h2>
-<p>Each file has two important variables :
-* Its target replication count N. (N=3 by default, can be customized per-file by a user-defined python function)
-* Its current replication count K</p>
-<p>The master has a list of all the nodes with their status, which includes :
-* cpu/network load
-* list of all the files replicated on the node
-* free disk quota</p>
+<p>Each file has two important variables :</p>
+<blockquote>
+<ul class="simple">
+<li>Its target replication count N. (N=3 by default, can be customized per-file by a user-defined python function)</li>
+<li>Its current replication count K</li>
+</ul>
+</blockquote>
+<p>The master has a list of all the nodes with their status, which includes :</p>
+<blockquote>
+<ul class="simple">
+<li>cpu/network load</li>
+<li>list of all the files replicated on the node</li>
+<li>free disk quota</li>
+</ul>
+</blockquote>
 <p>The free disk quota will always tend to zero because each nodes tries to replicate as many files as it can.
 Hence, max(K-N) is a more interesting number for a node, because it measures the extent of &#8220;over-replication&#8221;.
 If max(K-N)&gt;0, some copies on the server are not strictly necessary and could be deleted.
@@ -109,24 +116,38 @@ positive, ideally greater than 1 (in which case all the files would have one mor
 </div>
 <div class="section" id="how-to-test">
 <h2>How to test<a class="headerlink" href="#how-to-test" title="Permalink to this headline">¶</a></h2>
-<blockquote>
-python tests/basic.py
-python tests/quota.py</blockquote>
+<p>just run:</p>
+<div class="highlight-python"><pre>python tests/basic.py
+python tests/quota.py
+python tests/persist.py</pre>
+</div>
 </div>
 <div class="section" id="todo">
 <h2>Todo<a class="headerlink" href="#todo" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li>Admin command (watch replication)</li>
 <li>Test crashes/disconnects/...</li>
-<li>Decide on how to manage file updates. Either:
-- Nuke then insert
-- Append md5 to all filenames
-- Manage a file version system</li>
+<li>Decide on how to manage file updates. Either:</li>
+</ul>
+<blockquote>
+<ul class="simple">
+<li>Nuke then insert</li>
+<li>Append md5 to all filenames</li>
+<li>Manage a file version system</li>
+</ul>
+</blockquote>
+<ul class="simple">
 <li>SQLite or other persistent filedb backend</li>
 <li>Complete Sphinx documentation</li>
-<li>Outreach to community
-- setup twitter account / polish website
-- do public talks / pycon / ...</li>
+<li>Outreach to community</li>
+</ul>
+<blockquote>
+<ul class="simple">
+<li>setup twitter account / polish website</li>
+<li>do public talks / pycon / ...</li>
+</ul>
+</blockquote>
+<ul class="simple">
 <li>performance tests</li>
 <li>fsdfsd</li>
 <li>FUSE layer?</li>
@@ -137,13 +158,7 @@ python tests/quota.py</blockquote>
 </div>
 <div class="section" id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
-<p>The easiest way to get fsdfs is if you have <a class="reference external" href="http://peak.telecommunity.com/DevCenter/EasyInstall">setuptools</a> installed:</p>
-<div class="highlight-python"><pre>easy_install fsdfs</pre>
-</div>
-<p>Without setuptools, it&#8217;s still pretty easy. Download the fsdfs.tgz file from
-<a class="reference external" href="http://pypi.python.org/pypi/fsdfs/">fsdfs&#8217;s Cheeseshop page</a>, untar it and run:</p>
-<div class="highlight-python"><pre>python setup.py install</pre>
-</div>
+<p>There are no packages yet, just clone our github repo!</p>
 <div class="section" id="help-and-development">
 <h3>Help and development<a class="headerlink" href="#help-and-development" title="Permalink to this headline">¶</a></h3>
 <p>If you&#8217;d like to help out, you can fork the project
