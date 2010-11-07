@@ -10,13 +10,13 @@ Goals
 fsdfs was originally developed at Jamendo.com to manage the distribution of millions of MP3/OGG files.
 
 fsdfs aims to :
-* make a single virtual filesystem accessible from several nodes
-* be fully distributed (no single point of failure)
-* automatically manage sharding/replication : adding a new node takes 10 seconds
-* try to fill up its allowed disk quota to maximize redundancy
-* be extensible via simple python code
-* allow userland variables (like popularity) to boost a file's replication/redundancy level
-* sit on top of any POSIX filesystem
+ * make a single virtual filesystem accessible from several nodes
+ * be fully distributed (no single point of failure)
+ * automatically manage sharding/replication : adding a new node takes 10 seconds
+ * try to fill up its allowed disk quota to maximize redundancy
+ * be extensible via simple python code
+ * allow userland variables (like popularity) to boost a file's replication/redundancy level
+ * sit on top of any POSIX filesystem
 
 Roadmap
 -------
