@@ -16,3 +16,5 @@ Todo
 - fsdfsd
 - FUSE layer?
 - Nagios plugin
+- Error catching everywhere
+- Solid python logging

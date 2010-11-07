@@ -20,6 +20,8 @@ class TestFS(Filesystem):
     
    
 class basicTests(unittest.TestCase):
+    filedb = "memory"
+    
     def setUp(self):
         if os.path.exists("./tests/datadirs"):
 			shutil.rmtree("./tests/datadirs")
@@ -33,14 +35,16 @@ class basicTests(unittest.TestCase):
             "host":"localhost:42342",
             "datadir":"./tests/datadirs/A",
             "secret":secret,
-            "master":"localhost:42342"
+            "master":"localhost:42342",
+            "filedb":self.filedb
         })
         
         nodeB = TestFS({
             "host":"localhost:42352",
             "datadir":"./tests/datadirs/B",
             "secret":secret,
-            "master":"localhost:42342"
+            "master":"localhost:42342",
+            "filedb":self.filedb
         })
         
         nodeA.start()
@@ -78,7 +82,7 @@ class basicTests(unittest.TestCase):
         nodeB.stop()
         
     
-    def testManyNodes(self):
+    def _testManyNodes(self):
         
         secret = "azpdoazrRR"
         
@@ -90,7 +94,8 @@ class basicTests(unittest.TestCase):
                 "host":"localhost:%s"%(42362+2*i),
                 "datadir":"./tests/datadirs/node%s" % i,
                 "secret":secret,
-                "master":"localhost:%s"%(42362+2*0)
+                "master":"localhost:%s"%(42362+2*0),
+                "filedb":self.filedb
             }))
             nodes[i].start()
             

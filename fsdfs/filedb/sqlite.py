@@ -1,4 +1,5 @@
-import sqlite3
+import sqlite3,os
+
 from filedb import FileDbBase
 
 def dict_factory(cursor, row):
@@ -7,7 +8,7 @@ def dict_factory(cursor, row):
 		d[col[0]] = row[idx]
 	return d
 
-class SqlLiteDb(FileDbBase):
+class sqliteFileDb(FileDbBase):
 	'''
 	FileDb class for SQLite
 
@@ -23,7 +24,10 @@ class SqlLiteDb(FileDbBase):
 		FileDbBase.__init__(self, fs)
 		self.files = {}
 		
-		self.conn = sqlite3.connect('./db.sqlite')
+		self.dbdir = os.path.join(self.fs.config["datadir"],".fsdfs")
+		if not os.path.isdir(self.dbdir):
+			os.makedirs(self.dbdir)
+		self.conn = sqlite3.connect(os.path.join(self.dbdir,"filedb.sqlite"))
 
 		# change the row output by dictionnary
 		# result is now like:
@@ -31,7 +35,7 @@ class SqlLiteDb(FileDbBase):
 		#  {'row1': value1-2, 'row2': value2-2}]
 		self.conn.row_factory = dict_factory
 
-		self.cursor = conn.cursor()
+		self.cursor = self.conn.cursor()
 		
 		self.cursor.execute('''CREATE TABLE files
 					(filename text,

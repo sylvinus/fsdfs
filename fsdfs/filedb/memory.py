@@ -1,6 +1,6 @@
 from filedb import FileDbBase
 
-class FileDb(FileDbBase):
+class memoryFileDb(FileDbBase):
     '''
     FileDb class for *memory*
     Everything is stored in a big dictionnary with filename as key:

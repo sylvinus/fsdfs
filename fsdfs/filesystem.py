@@ -40,8 +40,8 @@ class Filesystem:
 		
 		self.startTime = time.time()
 		
-		# Todo: if the server rebooted, load "sqlite"
-		self.filedb = loadFileDb("memory", self)
+		#todo: sqlite default when stable
+		self.filedb = loadFileDb(self.config.get("filedb","memory"), self)
 		
 		self.nodedb = {}
 		

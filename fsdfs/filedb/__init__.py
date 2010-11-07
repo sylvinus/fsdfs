@@ -1,13 +1,14 @@
-import imp
+import imp,traceback
 
 def loadFileDb(id,*args,**kwargs):
 	
 	try:
 		fp, pathname, description = imp.find_module(id,__path__)
 		assert fp
-		return imp.load_module(id.replace(".",""),fp, pathname, description).FileDb(*args,**kwargs)
+		return getattr(imp.load_module(id.replace(".",""),fp, pathname, description),"%sFileDb" % id)(*args,**kwargs)
 	except Exception, err:
 		print "error while loading filedb : %s" % err
+		traceback.print_exc()
 		return False
 
 
