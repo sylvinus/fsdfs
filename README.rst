@@ -60,7 +60,8 @@ The algorithm used is very simple :
 2. choose a server :
  * not already having a copy of this file
  * not too loaded
- * with either free disk or a high max(K-N)
+ * with enough free disk
+ * if no servers have space, pick the server with the file having max(K-N), delete this file, GOTO 2
 3. Have the file copied to this server (=> K++)
 4. GOTO 1
 
