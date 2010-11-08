@@ -106,7 +106,8 @@ met or exceeded. In other words, it has to make min(K-N) accross all known files
 <ul class="simple">
 <li>not already having a copy of this file</li>
 <li>not too loaded</li>
-<li>with either free disk or a high max(K-N)</li>
+<li>with enough free disk</li>
+<li>if no servers have space, pick the server with the file having max(K-N), delete this file, GOTO 2</li>
 </ul>
 </blockquote>
 <ol class="arabic simple" start="3">
