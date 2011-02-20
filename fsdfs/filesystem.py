@@ -40,8 +40,6 @@ class Filesystem:
 		
 		self.startTime = time.time()
 		
-		#todo: sqlite default when stable
-		self.filedb = loadFileDb(self.config.get("filedb","memory"), self)
 		
 		self.nodedb = {}
 		
@@ -158,9 +156,19 @@ class Filesystem:
 	
 	def start(self):
 		'''
-		Start the HTTP server.
+		Start the node
 		If the server is master, also start the replicator.
 		'''
+		
+		filedb_options = {}
+		filedb_backend = self.config.get("filedb","memory")
+		if type(filedb_backend)==dict:
+			filedb_options=filedb_backend
+			filedb_backend=filedb_options["backend"]
+		    
+		self.filedb = loadFileDb(filedb_backend, self, filedb_options)
+		
+		
 		
 		self.httpinterface = HTTPInterface(self)
 		self.httpinterface.start()

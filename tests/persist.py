@@ -21,9 +21,17 @@ class TestFS(Filesystem):
    
 from basic import basicTests
    
-class persistTests(basicTests):
-    filedb = "sqlite"
+class persistBasicTests(basicTests):
+    filedb = {
+		"backend":"mysql",
+		"user":"root",
+		"passwd":"",
+		"host":"localhost",
+		"db":"fsdfs_test"
+	}
     
+#Don't run basictests again
+del basicTests
         
 if __name__ == '__main__':
     unittest.main()

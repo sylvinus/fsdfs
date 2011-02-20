@@ -18,8 +18,16 @@ class FileDbBase:
 	Parent class for files database.
 	'''
 	
-	def __init__(self, fs):
+	def __init__(self, fs, options):
 		self.fs = fs
+		self.options = options
+	
+	
+	def reset(self):
+		'''
+		Empty the database
+		'''
+		pass
 	
 	def update(self, file, data):
 		'''
@@ -89,7 +97,7 @@ class FileDbBase:
 		to write
 		'''
 		
-		pass
+		return []
 	
 	def getMaxKnInNode(self, node, num=1):
 		'''
@@ -129,7 +137,7 @@ class FileDbBase:
 		'''
 		Return the sum of each files managed by a node.
 		'''
-		
+
 		return sum([self.getSize(f) for f in self.listInNode(node)])
 		
 	def getCountInNode(self, node):

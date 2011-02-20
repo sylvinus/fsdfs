@@ -1,20 +1,22 @@
 Todo
 ----
 
-- Admin command (watch replication)
+Blockers V1
 - Test crashes/disconnects/...
+- fsdfsd
+- Error catching everywhere
+- Solid python logging
+
+
+V1.1
 - Decide on how to manage file updates. Either:
  - Nuke then insert
- - Append md5 to all filenames
+ - Append md5 to all filenames (=V1)
  - Manage a file version system
-- SQLite or other persistent filedb backend
 - Complete Sphinx documentation
 - Outreach to community
  - setup twitter account / polish website
  - do public talks / pycon / ...
 - performance tests
-- fsdfsd
 - FUSE layer?
 - Nagios plugin
-- Error catching everywhere
-- Solid python logging

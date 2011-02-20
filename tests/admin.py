@@ -7,6 +7,11 @@ import unittest
 import threading
 import shutil
 
+try:
+	import simplejson as json
+except:
+	import json
+
 
 import logging
 logging.basicConfig(level=logging.DEBUG)
@@ -19,7 +24,7 @@ class TestFS(Filesystem):
     pass
     
    
-class basicTests(unittest.TestCase):
+class adminTests(unittest.TestCase):
     filedb = "memory"
     
     def setUp(self):
@@ -30,12 +35,13 @@ class basicTests(unittest.TestCase):
     def testTwoNodes(self):
         
         secret = "azpdoazrRR"
+        master = "localhost:42342"
         
         nodeA = TestFS({
-            "host":"localhost:42342",
+            "host":master,
             "datadir":"./tests/datadirs/A",
             "secret":secret,
-            "master":"localhost:42342",
+            "master":master,
             "filedb":self.filedb
         })
         
@@ -43,17 +49,13 @@ class basicTests(unittest.TestCase):
             "host":"localhost:42352",
             "datadir":"./tests/datadirs/B",
             "secret":secret,
-            "master":"localhost:42342",
+            "master":master,
             "filedb":self.filedb
         })
         
         nodeA.start()
         nodeB.start()
         
-        nodeA.filedb.reset()
-        nodeB.filedb.reset()
-        
-
         
         
         nodeA.importFile("./tests/fixtures/test.txt","dir1/dir2/filename.ext")
@@ -65,17 +67,13 @@ class basicTests(unittest.TestCase):
         self.assertEquals(open(nodeB.getLocalFilePath("dir1/dir2/filename.ext")).read(),open("./tests/fixtures/test.txt").read())
         self.assertEquals(open(nodeA.getLocalFilePath("dir3/dir4/filename2.ext")).read(),open("./tests/fixtures/test2.txt").read())
         
-        globalStatusA=nodeA.getGlobalStatus()
-        globalStatusB=nodeB.getGlobalStatus()
+        globalStatusA = json.loads(os.popen("python bin/admin.py --json --secret=%s --master=%s globalstatus" % (secret,master)).read())
 
-        self.assertTrue(4<=globalStatusA["uptime"])
-        self.assertTrue(6>=globalStatusA["uptime"])
-        
+        print globalStatusA
+
+        self.assertEquals(5,globalStatusA["uptime"])
         
         del globalStatusA["uptime"]
-        del globalStatusB["uptime"]
-        
-        self.assertEquals(globalStatusA,globalStatusB)
         
         self.assertEquals(2,globalStatusA["countGlobal"])
         self.assertEquals(-1,globalStatusA["minKnGlobal"][0][0])
@@ -83,20 +81,12 @@ class basicTests(unittest.TestCase):
         self.assertEquals("localhost:42342",globalStatusA["node"])
         
         
-        nodeA.nukeFile("dir1/dir2/filename.ext")
-        
-        sleep(2)
-        
-        self.assertFalse(os.path.isfile(nodeA.getLocalFilePath("dir1/dir2/filename.ext")))
-        self.assertFalse(os.path.isfile(nodeB.getLocalFilePath("dir1/dir2/filename.ext")))
-
-
         
         nodeA.stop()
         nodeB.stop()
         
     
-    def testManyNodes(self):
+    def _testManyNodes(self):
         
         secret = "azpdoazrRR"
         

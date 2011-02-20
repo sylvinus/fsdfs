@@ -3,14 +3,16 @@ import time
 import random
 import logging as logger
 
+from filedb import loadFileDb
     
+
 class Replicator(threading.Thread):
     '''
 	This is the Replicator class.
 	It manages files on every node.
 	
-	It takes a Filesystem instance in argument which is saved in self.fs. 
-
+	It takes a Filesystem instance in argument which is saved in self.fs.
+	
 	It's because a Replicator is also a Filesystem :-)
     '''
     
@@ -18,21 +20,29 @@ class Replicator(threading.Thread):
         threading.Thread.__init__(self)
         self.fs = fs
         self.stopnow = False
+
+        #issues with threading and sqlite
+        backend=self.fs.config.get("filedb","memory")
+        if backend=="sqlite":
+            self.filedb = loadFileDb(backend, self.fs)
+        else:
+            self.filedb = self.fs.filedb
         
+    
     def shutdown(self):
 		'''
 		Shutdown the server by setting the variable self.stopnow to True.
-
+		
 		It breaks the while which runs the Replicator.
 		'''
-
+		
 		self.stopnow = True
-        
+    
     def run(self):
         '''
 		to write
         '''
-
+        
         while not self.stopnow:
             
             self.updateAllFileDb()
@@ -41,54 +51,54 @@ class Replicator(threading.Thread):
             
             self.performReplication(10)
             time.sleep(1)
-        
+    
     
     def performNukes(self):
 	'''
 	to write.
 	'''
-
-        nukes = self.fs.filedb.listNukes()
+        
+        nukes = self.filedb.listNukes()
         
         for file in nukes:
             #do a set() because list may change while looping
-            nodes = set(self.fs.filedb.getNodes(file))
+            nodes = set(self.filedb.getNodes(file))
             for node in nodes:
                 deleted = ("ok"==self.fs.nodeRPC(node,"DELETE",{"filepath":file}).read())
                 
                 if deleted:
-                    self.fs.filedb.removeFileFromNode(file,node)
-                
+                    self.filedb.removeFileFromNode(file,node)
+    
     
     def performReplication(self, maxOperations=10):
  	'''
 	to write.
 	'''
-       
-        knownNeeds = self.fs.filedb.getMinKnAll(num=maxOperations)
+        
+        knownNeeds = self.filedb.getMinKnAll(num=maxOperations)
         for file in knownNeeds:
             self.replicateFile(file)
-
+    
     def updateAllFileDb(self):
 	'''
 	to write.
 	'''
-
-        for f in self.fs.filedb.listAll():
+        
+        for f in self.filedb.listAll():
             self.updateFileDb(f)
-            
+    
     def updateFileDb(self, file):
  	'''
 	to write.
 	'''
-       
+        
         #no P2P search yet. master always knows where files are
         #nodes = set(self.fs.searchFile(file,p2p=True))
         
         rules = self.fs.getReplicationRules(file)
         
-        self.fs.filedb.update(file, {"n": rules["n"]}) #"nodes":nodes,
-
+        self.filedb.update(file, {"n": rules["n"]}) #"nodes":nodes,
+    
     #
     # suggestList elements are (filepath,known need,known copies)
     #
@@ -96,20 +106,20 @@ class Replicator(threading.Thread):
 	'''
 	Describe the algorithm...
 	'''
-
+        
         knownNodes = self.fs.getKnownNodes()
         
-        #print "\n".join(["%s has %s" % (n,self.fs.filedb.listInNode(n)) for n in knownNodes])
-            
+        #print "\n".join(["%s has %s" % (n,self.filedb.listInNode(n)) for n in knownNodes])
+        
         
         random.shuffle(knownNodes)
         
         # 1. filter nodes already having the file
-        alreadyNodes = self.fs.filedb.getNodes(file)
+        alreadyNodes = self.filedb.getNodes(file)
         
-        size = self.fs.filedb.getSize(file)
+        size = self.filedb.getSize(file)
         
-        kn = self.fs.filedb.getKn(file)
+        kn = self.filedb.getKn(file)
         
         logger.debug("Replicating file %s (size=%s, kn=%s)" % (file, size, kn))
         
@@ -125,7 +135,7 @@ class Replicator(threading.Thread):
         
         
         newnodes = []
-        for node in knownNodes:     
+        for node in knownNodes:
             #only target nodes which don't have the file
             if node not in alreadyNodes:
                 #only target nodes with enough free disk or with some files to delete to make space
@@ -144,12 +154,12 @@ class Replicator(threading.Thread):
         
         foundHost = False
         
-        while not foundHost:    
+        while not foundHost:
             #order by free disk desc
             newnodes.sort(cmp=lambda x,y:cmp(self.fs.nodedb[x]["df"],
 							self.fs.nodedb[y]["df"]),
 							reverse=True)
-
+            
             #if the node with the most free disk has a place for the file, store it there
             if self.fs.nodedb[newnodes[0]]["df"] >= size:
                 node = newnodes[0]
@@ -160,43 +170,43 @@ class Replicator(threading.Thread):
 								self.fs.nodedb[newnodes[0]]["df"],
 								file
 							))
-                
+            
             #no more space anywhere. not a problem, pick the node with max(k-n) and delete that copy
             else:
-                newnodes.sort(cmp=lambda x,y:cmp(self.fs.filedb.getKn(self.fs.filedb.getMaxKnInNode(x)[0]),
-								self.fs.filedb.getKn(self.fs.filedb.getMaxKnInNode(y)[0])),
+                newnodes.sort(cmp=lambda x,y:cmp(self.filedb.getKn(self.filedb.getMaxKnInNode(x)[0]),
+								self.filedb.getKn(self.filedb.getMaxKnInNode(y)[0])),
 								reverse=True)
                 
                 node = newnodes[0]
                 
-                file_to_remove = self.fs.filedb.getMaxKnInNode(node)[0]
+                file_to_remove = self.filedb.getMaxKnInNode(node)[0]
                 
-                #print (file_to_remove,self.fs.filedb.getKn(file_to_remove),kn,newnodes)
-                #print [self.fs.filedb.getMaxKnInNode(x) for x in newnodes]
-                #print self.fs.filedb.files
+                #print (file_to_remove,self.filedb.getKn(file_to_remove),kn,newnodes)
+                #print [self.filedb.getMaxKnInNode(x) for x in newnodes]
+                #print self.filedb.files
                 
                 # file with highest k-N has an inferior or equal k-N to the file we're replicating (+1 because if we replicate it will increase)
                 # it doesn't need replication.
-                if self.fs.filedb.getKn(file_to_remove) <= (kn + 1):
+                if self.filedb.getKn(file_to_remove) <= (kn + 1):
                     logger.debug("No file to remove with higher kn!")
                     break
-                
 
+                
                 logger.debug("Deleting file %s on %s because it has kn=%s" % (
 								file_to_remove,
 								node,
-								self.fs.filedb.getKn(file_to_remove)
+								self.filedb.getKn(file_to_remove)
 							))
                 
-                self.fs.nodedb[node]["df"] += self.fs.filedb.getSize(file_to_remove)
-                self.fs.nodedb[node]["size"] -= self.fs.filedb.getSize(file_to_remove)
+                self.fs.nodedb[node]["df"] += self.filedb.getSize(file_to_remove)
+                self.fs.nodedb[node]["size"] -= self.filedb.getSize(file_to_remove)
                 
                 
                 deleted = ("ok" == self.fs.nodeRPC(node, "DELETE", {"filepath": file_to_remove}).read())
                 
                 if deleted:
-                    self.fs.filedb.removeFileFromNode(file_to_remove,node)
-                    
+                    self.filedb.removeFileFromNode(file_to_remove,node)
+        
         
         if foundHost:
             # 3. make the node replicate it
@@ -204,5 +214,5 @@ class Replicator(threading.Thread):
             
             #add it directly to filedb
             if downloaded:
-                self.fs.filedb.addFileToNode(file,node)
+                self.filedb.addFileToNode(file,node)
             

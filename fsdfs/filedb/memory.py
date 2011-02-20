@@ -12,9 +12,12 @@ class memoryFileDb(FileDbBase):
     }
     '''
     
-    def __init__(self,fs):
-        FileDbBase.__init__(self, fs)
+    def __init__(self,fs, options):
+        FileDbBase.__init__(self, fs, options)
         
+        self.reset()
+        
+    def reset(self):
         self.files = {}
     
     def update(self, file, data):
