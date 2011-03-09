@@ -1,146 +1,149 @@
-import sqlite3,os
+import sqlite3
 
-from filedb import FileDbBase
+from filedb.sql import sqlFileDb
+
+
+# http://code.activestate.com/recipes/496799-run-sqlite-connections-in-isolated-threads/
+import Queue, time, thread, os
+from threading import Thread
+
+_threadex = thread.allocate_lock()
+qthreads = 0
+sqlqueue = Queue.Queue()
+
+ConnectCmd = "connect"
+SqlCmd = "SQL"
+StopCmd = "stop"
+
+class DbCmd:
+    def __init__(self, cmd, params=[]):
+        self.cmd = cmd
+        self.params = params
+
+class DbWrapper(Thread):
+    def __init__(self, path, nr):
+        Thread.__init__(self)
+        self.path = path
+        self.nr = nr
+    def run(self):
+        global qthreads
+        con = sqlite3.connect(self.path)
+        con.row_factory = dict_factory
+        cur = con.cursor()
+        while True:
+            s = sqlqueue.get()
+            print "Conn %d -> %s -> %s" % (self.nr, s.cmd, s.params)
+            if s.cmd == SqlCmd:
+                commitneeded = False
+                res = []
+#               s.params is a list to bundle statements into a "transaction"
+                for sql in s.params:
+                    cur.execute(sql[0],sql[1])
+                    if not sql[0].upper().startswith("SELECT"):
+                        commitneeded = True
+                    for row in cur.fetchall(): res.append(row)
+                if commitneeded: 
+                    # print "commit needed for "+sql[0]
+                    con.commit()
+                s.resultqueue.put(res)
+            else:
+                _threadex.acquire()
+                qthreads -= 1
+                _threadex.release()
+#               allow other threads to stop
+                sqlqueue.put(s)
+                s.resultqueue.put(None)
+                break
+
+def execSQL(s):
+    if s.cmd == ConnectCmd:
+        global qthreads
+        _threadex.acquire()
+        qthreads += 1
+        _threadex.release()
+        wrap = DbWrapper(s.params, qthreads)
+        wrap.start()
+    elif s.cmd == StopCmd:
+        s.resultqueue = Queue.Queue()
+        sqlqueue.put(s)
+#       sleep until all threads are stopped
+        while qthreads > 0: time.sleep(0.1)
+    else:
+        s.resultqueue = Queue.Queue()
+        sqlqueue.put(s)
+        return s.resultqueue.get()
+
+
+
+
 
 def dict_factory(cursor, row):
-	d = {}
-	for idx, col in enumerate(cursor.description):
-		d[col[0]] = row[idx]
-	return d
+    d = {}
+    for idx, col in enumerate(cursor.description):
+        d[col[0]] = row[idx]
+    return d
 
-class sqliteFileDb(FileDbBase):
-	'''
-	FileDb class for SQLite
-
-	Table files has rows:
-	* filename (text),
-	* size (integer),
-	* date (text),
-	* n (integer)
-	
-	Table files_nodes has rows:
-	* filename (text),
-	* node (text),
+class sqliteFileDb(sqlFileDb):
+    """
+    FileDb class for sqlite
     
-	
-	'''
-	
-	def __init__(self, fs, options):
-		FileDbBase.__init__(self, fs, options)
-		
-		self.dbdir = os.path.join(self.fs.config["datadir"],".fsdfs")
-		if not os.path.isdir(self.dbdir):
-			os.makedirs(self.dbdir)
-		self.conn = sqlite3.connect(os.path.join(self.dbdir,"filedb.sqlite"))
-		
-		# change the row output by dictionnary
-		# result is now like:
-		# [{'row1': value1, 'row2': value2},
-		#  {'row1': value1-2, 'row2': value2-2}]
-		self.conn.row_factory = dict_factory
-
-		self.cursor = self.conn.cursor()
-		
-		self.cursor.execute('''CREATE TABLE IF NOT EXISTS files
-					(filename text,
-					size integer,
-					date text,
-					n integer)''')
-					
-		self.cursor.execute('''CREATE TABLE IF NOT EXISTS files_nodes
-					(filename text,
-					node text)''')
-
-
-		self.conn.commit()
-	
-	def update(self, file, data):
-	    
-		if "nodes" in data:
-			self.cursor.execute('''DELETE FROM files_nodes WHERE filename=?''', (file,))
-			for node in data["nodes"]:
-				self.addFileToNode(file,node)
-			del data["nodes"]
-
-		if len(data.keys())==0:
-			return
-
-		self.cursor.execute('''SELECT COUNT(*) FROM files WHERE filename=?''', (file,))
-		nb_files = self.cursor.fetchall()
-		if len(nb_files):
-			# create a generic sql request depending of the content of data
-			# dirty..
-			req_str = []
-			arg_list = []
-			for key, value in data.iteritems():
-				req_str.append("%s=? " % (key))
-				arg_list.append(value)
-			arg_list.append(file)
-			self.cursor.execute('''UPDATE %s FROM files WHERE filename=?''' % (' '.join(req_str)), tuple(arg_list))
-			self.conn.commit()
-		else:
-			# same thing here
-			# create a generic sql request depending of the content of data
-			# very very dirty...
-			req_str = []
-			arg_list = []
-			for key, value in data.iteritems():
-				req_str.append(key)
-				arg_list.append(value)
-			arg_list.append(file)			
-			self.cursor.execute('''INSERT INTO files(%s) VALUES (%s)''' % (','.join(req_str), ','.join(['?' for i in xrange(len(req_str))])), tuple(arg_list))		
-			self.conn.commit()
-			
-	def getKn(self, file):
-		self.cursor.execute('''SELECT n FROM files WHERE filename=? LIMIT 1''', (file,))
-		result = self.cursor.fetchall()
-		
-		self.cursor.execute('''SELECT count(*) as c FROM files_nodes WHERE filename=? LIMIT 1''', (file,))
-		nodes = self.cursor.fetchrow()
+    """
+    
+    unixtimefunction = ""
+    
+    def execute(self,sql,args=tuple()):
+        sql = sql.replace("""%s""","?")
         
-		
-		if len(result):
-			return int(nodes['c']) - result[0]['n']
-		else:
-			return None
-	
-	def addFileToNode(self, file, node):
-
-		#todo unique key
-		self.removeFileFromNode(file,node)
+        execSQL(DbCmd(SqlCmd,[(sql,args)]))
+    
+    def connect(self):
         
-		self.cursor.execute('''INSERT INTO files_nodes(filename,node) VALUES (?,?)''', (file,node))
-		
-		
-	def removeFileFromNode(self, file, node):
-		self.cursor.execute('''DELETE FROM files_nodes WHERE filename=? and node=?''', (file,node))
-		
-							
-	def getNodes(self, file):
-		self.cursor.execute('''SELECT node FROM files_nodes WHERE filename=?''', (file,))
-		result = self.cursor.fetchall()
-
-		return set([ i['node'] for i in result ])
-	
-	def getSize(self, file):
-		self.cursor.execute('''SELECT size FROM files WHERE filename=? LIMIT 1''', (file,))
-		result = self.cursor.fetchrow()
-		
-		if len(result):
-			return result['size']
-		else:
-			return None
-			
-	def listAll(self):
-		self.cursor.execute('''SELECT filename FROM files''', (file,))
-		result = self.cursor.fetchall()
-
-		return [ i['filename'] for i in result ]
-	
-	
-	def listInNode(self, node):
-		self.cursor.execute('''SELECT filename FROM files_nodes WHERE node=?''', (node,))
-		result = self.cursor.fetchall()
-
-		return [ i['filename'] for i in result ]
+        self.dbdir = os.path.join(self.fs.config["datadir"],".fsdfs")
+        if not os.path.isdir(self.dbdir):
+            os.makedirs(self.dbdir)
+        execSQL(DbCmd(ConnectCmd, os.path.join(self.dbdir,"filedb.sqlite")))
+    
+    def __init__(self, fs, options={}):
+        sqlFileDb.__init__(self, fs, options)
+        
+        self.options = options
+        
+        self.connect()
+        
+        self.t_files = "files"
+        self.t_nodes = "nodes"
+        self.t_files_nodes = "files_nodes"
+        
+        self.execute("""CREATE TABLE IF NOT EXISTS """+self.t_files+""" (
+          id INTEGER PRIMARY KEY,
+          filename TEXT,
+          size INTEGER,
+          t INTEGER,
+          n INTEGER,
+          nuked INTEGER,
+          UNIQUE (filename)
+        );""")
+        
+        self.execute("""CREATE INDEX IF NOT EXISTS i_nuked ON """+self.t_files+"""(nuked)""")
+        
+        self.execute("""CREATE TABLE IF NOT EXISTS """+self.t_files_nodes+""" (
+          file_id INTEGER,
+          node_id INTEGER,
+          PRIMARY KEY (file_id,node_id)
+        );""")
+        
+        self.execute("""CREATE INDEX IF NOT EXISTS i_node ON """+self.t_files_nodes+"""(node_id)""")
+        
+        
+        self.execute("""CREATE TABLE IF NOT EXISTS """+self.t_nodes+""" (
+          id INTEGER PRIMARY KEY,
+          address TEXT,
+          UNIQUE (address)
+        );""")
+      
+    
+    def reset(self):
+        self.execute("""DELETE FROM """+self.t_files_nodes)
+        self.execute("""DELETE FROM """+self.t_files)
+        self.execute("""DELETE FROM """+self.t_nodes)
         

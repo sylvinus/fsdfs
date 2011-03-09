@@ -23,7 +23,7 @@ from basic import basicTests
    
 class persistBasicTests(basicTests):
     filedb = {
-		"backend":"mysql",
+		"backend":"sqlite",
 		"user":"root",
 		"passwd":"",
 		"host":"localhost",

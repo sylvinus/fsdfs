@@ -21,13 +21,6 @@ class Replicator(threading.Thread):
         self.fs = fs
         self.stopnow = False
 
-        #issues with threading and sqlite
-        backend=self.fs.config.get("filedb","memory")
-        if backend=="sqlite":
-            self.filedb = loadFileDb(backend, self.fs)
-        else:
-            self.filedb = self.fs.filedb
-        
     
     def shutdown(self):
 		'''
@@ -43,6 +36,15 @@ class Replicator(threading.Thread):
 		to write
         '''
         
+
+        #issues with threading and sqlite
+        backend=self.fs.config.get("filedb","memory")
+        if backend["backend"]=="sqlite":
+            self.filedb = loadFileDb(backend["backend"], self.fs)
+        else:
+            self.filedb = self.fs.filedb
+
+
         while not self.stopnow:
             
             self.updateAllFileDb()

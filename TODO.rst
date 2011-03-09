@@ -6,7 +6,7 @@ Blockers V1
 - fsdfsd
 - Error catching everywhere
 - Solid python logging
-
+- reindex command ? (listdir=>filedb)
 
 V1.1
 - Decide on how to manage file updates. Either:
@@ -20,3 +20,4 @@ V1.1
 - performance tests
 - FUSE layer?
 - Nagios plugin
+- report download numbers to the master / change N in real-time

@@ -112,6 +112,7 @@ class basicTests(unittest.TestCase):
                 "filedb":self.filedb
             }))
             nodes[i].start()
+            nodes[i].filedb.reset()
             
         
         nodes[0].importFile("./tests/fixtures/test.txt","dir1/dir2/filename.ext")
