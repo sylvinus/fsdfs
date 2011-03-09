@@ -18,20 +18,44 @@ from fsdfs.filesystem import Filesystem
 class TestFS(Filesystem):
     pass
     
+    
+chosenFileDb =     {
+        "backend":"sqlite",
+    }
+    
+    
+
+"""
+filedb = {
+    "backend":"mysql",
+    "user":"root",
+    "passwd":"",
+    "host":"localhost",
+    "db":"fsdfs_test"
+}
+
+
+filedb = {
+    "backend":"mongodb",
+    "host":"localhost",
+    "db":"fsdfs_test",
+    "port":27017
+}
+"""
+
    
 from basic import basicTests
+from quota import quotaTests
    
 class persistBasicTests(basicTests):
+    
     filedb = {
-		"backend":"sqlite",
-		"user":"root",
-		"passwd":"",
-		"host":"localhost",
-		"db":"fsdfs_test"
-	}
+        "backend":"sqlite",
+    }
     
 #Don't run basictests again
 del basicTests
+del quotaTests
         
 if __name__ == '__main__':
     unittest.main()

@@ -23,6 +23,8 @@ class TestFS(Filesystem):
     
    
 class quotaTests(unittest.TestCase):
+    filedb = "memory"
+    
     def setUp(self):
 		
 		if os.path.exists("./tests/datadirs"):
@@ -40,7 +42,8 @@ class quotaTests(unittest.TestCase):
             "datadir":"./tests/datadirs/A",
             "secret":secret,
             "master":"localhost:52342",
-            "maxstorage":10
+            "maxstorage":10,
+            "filedb":self.filedb
         })
         
         nodeB = TestFS({
@@ -48,7 +51,8 @@ class quotaTests(unittest.TestCase):
             "datadir":"./tests/datadirs/B",
             "secret":secret,
             "master":"localhost:52342",
-            "maxstorage":10
+            "maxstorage":10,
+            "filedb":self.filedb
         })
         
         nodeC = TestFS({
@@ -56,7 +60,8 @@ class quotaTests(unittest.TestCase):
             "datadir":"./tests/datadirs/C",
             "secret":secret,
             "master":"localhost:52342",
-            "maxstorage":10
+            "maxstorage":10,
+            "filedb":self.filedb
         })
         
         nodeD = TestFS({
@@ -64,7 +69,8 @@ class quotaTests(unittest.TestCase):
             "datadir":"./tests/datadirs/D",
             "secret":secret,
             "master":"localhost:52342",
-            "maxstorage":10
+            "maxstorage":10,
+            "filedb":self.filedb
         })
         
         
@@ -135,7 +141,8 @@ class quotaTests(unittest.TestCase):
             "datadir":"./tests/datadirs/A",
             "secret":secret,
             "master":"localhost:42342",
-            "maxstorage":13
+            "maxstorage":13,
+            "filedb":self.filedb
         })
         
         nodeB = TestFS({
@@ -143,7 +150,8 @@ class quotaTests(unittest.TestCase):
             "datadir":"./tests/datadirs/B",
             "secret":secret,
             "master":"localhost:42342",
-            "maxstorage":100000
+            "maxstorage":100000,
+            "filedb":self.filedb
         })
         
         nodeC = TestFS({
@@ -151,7 +159,8 @@ class quotaTests(unittest.TestCase):
             "datadir":"./tests/datadirs/C",
             "secret":secret,
             "master":"localhost:42342",
-            "maxstorage":12
+            "maxstorage":12,
+            "filedb":self.filedb
         })
         
         nodeD = TestFS({
@@ -159,7 +168,8 @@ class quotaTests(unittest.TestCase):
             "datadir":"./tests/datadirs/D",
             "secret":secret,
             "master":"localhost:42342",
-            "maxstorage":1
+            "maxstorage":1,
+            "filedb":self.filedb
         })
         
         nodeA.start()
