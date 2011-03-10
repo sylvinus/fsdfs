@@ -9,6 +9,7 @@ Blockers V1
 - reindex command ? (listdir=>filedb)
 
 V1.1
+- Implement ctrl-c stopping everything
 - Decide on how to manage file updates. Either:
  - Nuke then insert
  - Append md5 to all filenames (=V1)

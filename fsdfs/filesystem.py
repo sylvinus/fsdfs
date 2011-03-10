@@ -124,7 +124,10 @@ class Filesystem:
         if not os.path.isdir(os.path.dirname(destpath)):
             os.makedirs(os.path.dirname(destpath))
         
-        if mode == "copy":
+        if mode == "download" or (type(src)==str and src.startswith("http://")):
+            print "Downloading %s" % src
+            urllib.urlretrieve(src,destpath)
+        elif mode == "copy":
             shutil.copy(src, destpath)
         elif mode == "move":
             shutil.move(src, destpath)

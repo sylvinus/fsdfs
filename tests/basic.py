@@ -27,6 +27,42 @@ class basicTests(unittest.TestCase):
 			shutil.rmtree("./tests/datadirs")
         os.makedirs("./tests/datadirs")
         
+        
+    def testFileDownloadImport(self):
+    
+        secret = "azpdoazrRR"
+    
+        nodeA = TestFS({
+            "host":"localhost:42342",
+            "datadir":"./tests/datadirs/A",
+            "secret":secret,
+            "master":"localhost:42342",
+            "filedb":self.filedb
+        })
+    
+        nodeB = TestFS({
+            "host":"localhost:42352",
+            "datadir":"./tests/datadirs/B",
+            "secret":secret,
+            "master":"localhost:42342",
+            "filedb":self.filedb
+        })
+    
+        nodeA.start()
+        nodeB.start()
+    
+        nodeA.filedb.reset()
+        nodeB.filedb.reset()
+    
+        nodeA.importFile("http://api.jamendo.com/get2/stream/track/redirect/?id=241","dir1/dir2/filename.ext")
+    
+        sleep(5)
+    
+        #file should be on B
+        statusB = nodeB.getStatus()
+        print statusB
+        self.assertTrue(statusB["size"]>3*1024*1024)
+        
     def testTwoNodes(self):
         
         secret = "azpdoazrRR"
