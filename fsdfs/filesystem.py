@@ -124,7 +124,7 @@ class Filesystem:
         if not os.path.isdir(os.path.dirname(destpath)):
             os.makedirs(os.path.dirname(destpath))
         
-        if mode == "download" or (type(src)==str and src.startswith("http://")):
+        if mode == "download" or ((type(src)==str or type(src)==unicode) and src.startswith("http://")):
             print "Downloading %s" % src
             urllib.urlretrieve(src,destpath)
         elif mode == "copy":
@@ -374,7 +374,14 @@ class myHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             deleted = self.server.fs.deleteFile(params["filepath"])
             
             self.simpleResponse(200, "ok" if deleted else "nok")
-            
+        
+        
+        elif p[1] == "IMPORT":
+
+            self.server.fs.importFile(params["url"],params["filepath"])
+
+            self.simpleResponse(200, "ok")
+
         
         elif p[1]=="NUKE":
             

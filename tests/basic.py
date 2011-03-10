@@ -63,6 +63,18 @@ class basicTests(unittest.TestCase):
         print statusB
         self.assertTrue(statusB["size"]>3*1024*1024)
         
+        #try to import it from B !
+        
+        nodeB.nodeRPC(nodeB.config["master"],"IMPORT",{"url":"http://api.jamendo.com/get2/stream/track/redirect/?id=242","filepath":"dir1/dir2/filename2.ext"})
+        
+        sleep(5)
+        
+        #file should be on B
+        statusB = nodeB.getStatus()
+        print statusB
+        self.assertTrue(statusB["size"]>5*1024*1024)
+        
+        
     def testTwoNodes(self):
         
         secret = "azpdoazrRR"
