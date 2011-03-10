@@ -125,15 +125,23 @@ class Filesystem:
             os.makedirs(os.path.dirname(destpath))
         
         if mode == "download" or ((type(src)==str or type(src)==unicode) and src.startswith("http://")):
-            urllib.urlretrieve(src,destpath)
-        elif mode == "copy":
+            
+            #todo do we need further checks of complete transfer with this?
+            src = urllib2.urlopen(src,None,timeout=60)
+            mode = "copyobj"
+            
+        if mode == "copy":
             shutil.copy(src, destpath)
         elif mode == "move":
             shutil.move(src, destpath)
         elif mode == "copyobj":
             f = open(destpath, "wb")
             shutil.copyfileobj(src, f)
-            f.close()
+            try:
+                f.close()
+                src.close()
+            except:
+                pass
         
         size = os.stat(destpath).st_size
         
@@ -236,7 +244,7 @@ class Filesystem:
         query = json.dumps(params)
         
         #print "http://%s/%s" % (host,method)
-        ret = urllib2.urlopen("http://%s/%s" % (host, method),"h=" + self.hashQuery(query) + "&p=" + urllib.quote(query))
+        ret = urllib2.urlopen("http://%s/%s" % (host, method),"h=" + self.hashQuery(query) + "&p=" + urllib.quote(query),timeout=60)
         
         if parse:
             return json.loads(ret.read())
