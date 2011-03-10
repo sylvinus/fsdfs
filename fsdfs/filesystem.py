@@ -314,6 +314,10 @@ class Filesystem:
     
     def addNode(self,node,status):
         status["lastReport"] = time.time()
+        
+        if not node in self.nodedb:
+            self.filedb.hasChanged=True
+            
         self.nodedb[node] = status
     
     def getStatus(self):
