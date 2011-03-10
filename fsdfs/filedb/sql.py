@@ -29,7 +29,7 @@ class sqlFileDb(FileDbBase):
         if result:
             return int(result[0]['id'])
         else:
-            self.execute("""INSERT INTO """+self.t_files+"""(filename) VALUES (%s)""", (filename,))
+            self.execute("""INSERT IGNORE INTO """+self.t_files+"""(filename) VALUES (%s)""", (filename,))
             return self._getFileId(filename)
         
     def _getNodeId(self,node):
@@ -37,7 +37,7 @@ class sqlFileDb(FileDbBase):
         if result:
             return result[0]['id']
         else:
-            self.execute("""INSERT INTO """+self.t_nodes+"""(address) VALUES (%s)""", (node,))
+            self.execute("""INSERT IGNORE INTO """+self.t_nodes+"""(address) VALUES (%s)""", (node,))
             return self._getNodeId(node)
 
     

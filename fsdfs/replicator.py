@@ -52,10 +52,10 @@ class Replicator(threading.Thread):
             self.performReplication(self.fs.config["replicatorDepth"])
             
             #Sleep for one minute unless something happens..
-            if False and not self.lastIterationDidSomething:
+            if not self.lastIterationDidSomething and self.fs.config["replicatorIdleTime"]>0:
                 [time.sleep(1) for i in range(self.fs.config["replicatorIdleTime"]) if not self.lastIterationDidSomething and not self.stopnow and not self.fs.filedb.hasChanged]
             else:
-                time.sleep(0.1)
+                time.sleep(self.fs.config["replicatorInterval"])
     
     
     def performNukes(self):

@@ -39,6 +39,7 @@ class Filesystem:
         "replicatorConcurrency":10,
         "replicatorDepth":10,
         "replicatorIdleTime":60,
+        "replicatorInterval":0.1,
         "port":4242,
         "maxstorage":10 * 1024 * 1024 * 1024, #10G
         "reportInterval":60,

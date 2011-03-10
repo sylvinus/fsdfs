@@ -60,7 +60,7 @@ class basicTests(unittest.TestCase):
     
         #file should be on B
         statusB = nodeB.getStatus()
-        print statusB
+
         self.assertTrue(statusB["size"]>3*1024*1024)
         
         #try to import it from B !
@@ -71,7 +71,7 @@ class basicTests(unittest.TestCase):
         
         #file should be on B
         statusB = nodeB.getStatus()
-        print statusB
+
         self.assertTrue(statusB["size"]>5*1024*1024)
 
 
