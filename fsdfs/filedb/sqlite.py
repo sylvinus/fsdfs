@@ -38,9 +38,8 @@ class sqliteFileDb(sqlFileDb):
         
         ret = None
         try:
-            cur = self.con.cursor()
-            cur.execute(sql,args)
-            ret = cur.fetchall()
+            self.cur.execute(sql,args)
+            ret = self.cur.fetchall()
         finally:
             self.sqlLock.release()
         
@@ -52,8 +51,9 @@ class sqliteFileDb(sqlFileDb):
         if not os.path.isdir(self.dbdir):
             os.makedirs(self.dbdir)
 
-        self.con = sqlite3.connect(os.path.join(self.dbdir,"filedb.sqlite"),isolation_level=None,check_same_thread=False,timeout=5)
+        self.con = sqlite3.connect(os.path.join(self.dbdir,"filedb.sqlite"),check_same_thread=False,timeout=5) #,isolation_level=None,
         self.con.row_factory = dict_factory
+        self.cur = self.con.cursor()
     
     def __init__(self, fs, options={}):
         sqlFileDb.__init__(self, fs, options)

@@ -13,6 +13,8 @@ class sqlFileDb(FileDbBase):
         
     def __init__(self, fs, options={}):
         FileDbBase.__init__(self, fs, options)
+        
+        self.hasChanged=True
 
     def execute(self,sql,*args):
         self.cursor.execute(sql,*args)        
@@ -75,6 +77,7 @@ class sqlFileDb(FileDbBase):
             for node in data["nodes"]:
                 self.addFileToNode(file,node)
 
+        self.hasChanged=True
             
     def getKn(self, file):
         result = self.execute("""SELECT id,n FROM """+self.t_files+""" WHERE filename=%s LIMIT 1""", (file,))
@@ -97,11 +100,14 @@ class sqlFileDb(FileDbBase):
         
         self.execute("""INSERT INTO """+self.t_files_nodes+"""(file_id,node_id) VALUES (%s,%s)""", (file_id,node_id))
         
+        self.hasChanged=True
         
     def removeFileFromNode(self, file, node):
         file_id = self._getFileId(file)
         node_id = self._getNodeId(node)
         self.execute("""DELETE FROM """+self.t_files_nodes+""" WHERE file_id=%s and node_id=%s""", (file_id,node_id))
+        
+        self.hasChanged=True
         
     def getNodes(self, file):
         file_id = self._getFileId(file)

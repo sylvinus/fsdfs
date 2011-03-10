@@ -19,6 +19,8 @@ class memoryFileDb(FileDbBase):
         
     def reset(self):
         self.files = {}
+        
+        self.hasChanged=True
     
     def update(self, file, data):
 
@@ -30,15 +32,19 @@ class memoryFileDb(FileDbBase):
 
         if data.get("nuked",False) is None:
             del self.files[file]["nuked"]
+            
+        self.hasChanged=True
         
     def getKn(self,file):
         return len(self.files[file]["nodes"]) - self.files[file]["n"]    
     
     def addFileToNode(self, file, node):
         self.files[file]["nodes"].add(node)
+        self.hasChanged=True
    
     def removeFileFromNode(self, file, node):
         self.files[file]["nodes"].discard(node)
+        self.hasChanged=True
           
     def listNukes(self):
         n = set()

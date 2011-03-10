@@ -207,9 +207,10 @@ class Filesystem:
         self.httpinterface = HTTPInterface(self)
         self.httpinterface.start()
         
-        
         self.report()
         
+        #self.reporter = Reporter(self)
+        #self.reporter.start()
         
         if self.ismaster:
             self.replicator = Replicator(self)
@@ -225,6 +226,9 @@ class Filesystem:
         self.httpinterface.server.shutdown()
         
         self.httpinterface.server.server_close()
+        
+        #self.reporter.shutdown()
+        #self.reporter.join()
         
         #self.httpinterface.join()
         
@@ -333,6 +337,27 @@ class Filesystem:
         return self.nodedb.keys()
   
 
+class Reporter(threading.Thread):
+
+    def __init__(self, fs):
+        threading.Thread.__init__(self)
+        self.fs = fs
+        self.stopnow = False
+        
+    def run(self):
+
+        while not self.stopnow:
+            try:
+                self.fs.report()
+            except Exception,e:
+                self.fs.error("While reporting : %s" % e)
+                
+            [time.sleep(1) for i in range(60) if not self.stopnow]
+        
+    def shutdown(self):
+
+        self.stopnow = True
+
 class HTTPInterface(threading.Thread):
     
     def __init__(self, fs):
@@ -359,7 +384,7 @@ class ThreadingBaseHTTPServer(ThreadingMixIn,BaseHTTPServer.HTTPServer):
 class myHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     
     def log_message(self,format,*args):
-        self.server.fs.debug("%s - - [%s] %s\n" % (self.address_string(), self.log_date_time_string(), format%args),"request")
+        self.server.fs.debug("%s - - [%s] %s" % (self.address_string(), self.log_date_time_string(), format%args),"request")
     
     #def log_request(self, code='-', size='-'):
     #    print "haaa"

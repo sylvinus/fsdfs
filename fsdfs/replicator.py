@@ -19,6 +19,8 @@ class Replicator(threading.Thread):
         threading.Thread.__init__(self)
         self.fs = fs
         self.stopnow = False
+        
+        self.lastIterationDidSomething = True
 
     
     def shutdown(self):
@@ -41,10 +43,19 @@ class Replicator(threading.Thread):
             
             self.updateAllFileDb()
             
+            self.fs.filedb.hasChanged=False
+            
             self.performNukes()
             
+            self.lastIterationDidSomething=False
+            
             self.performReplication(10)
-            time.sleep(1)
+            
+            #Sleep for one minute unless something happens..
+            if not self.lastIterationDidSomething:
+                [time.sleep(1) for i in range(60) if not self.lastIterationDidSomething and not self.stopnow and not self.fs.filedb.hasChanged]
+            else:
+                time.sleep(0.1)
     
     
     def performNukes(self):
@@ -119,6 +130,7 @@ class Replicator(threading.Thread):
         
         #don't risk deleting everything on a node just to make space
         if size > 10*1024*1024*1024:
+            self.fs.debug("File too big, don't risk messing with the nodes","repl")
             return False
         
         #all the nodes already have the file!
@@ -203,6 +215,9 @@ class Replicator(threading.Thread):
         
         
         if foundHost:
+            
+            self.lastIterationDidSomething=True
+            
             # 3. make the node replicate it
             downloaded = ("ok" == self.fs.nodeRPC(node, "SUGGEST", {"filepath": file}).read())
             
