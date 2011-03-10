@@ -36,14 +36,7 @@ class Replicator(threading.Thread):
 		to write
         '''
         
-
-        #issues with threading and sqlite
-        backend=self.fs.config.get("filedb","memory")
-        if backend["backend"]=="sqlite":
-            self.filedb = loadFileDb(backend["backend"], self.fs)
-        else:
-            self.filedb = self.fs.filedb
-
+        self.filedb = self.fs.filedb
 
         while not self.stopnow:
             
@@ -52,7 +45,7 @@ class Replicator(threading.Thread):
             self.performNukes()
             
             self.performReplication(10)
-            time.sleep(1)
+            time.sleep(0.1)
     
     
     def performNukes(self):

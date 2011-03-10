@@ -11,6 +11,9 @@ if sqlite3.version_info[0]<2 and sqlite3.version_info[1]<6:
 
 from filedb.sql import sqlFileDb
 
+import os,sys
+
+from threading import Lock
 
 def dict_factory(cursor, row):
     d = {}
@@ -31,11 +34,17 @@ class sqliteFileDb(sqlFileDb):
         
         sql = sql.replace("""%s""","?")
         
-        cur = self.con.cursor()
-    
-        cur.execute(sql,args)
+        self.sqlLock.acquire()
         
-        return cur.fetchall()
+        ret = None
+        try:
+            cur = self.con.cursor()
+            cur.execute(sql,args)
+            ret = cur.fetchall()
+        finally:
+            self.sqlLock.release()
+        
+        return ret
         
     def connect(self):
         
@@ -43,13 +52,15 @@ class sqliteFileDb(sqlFileDb):
         if not os.path.isdir(self.dbdir):
             os.makedirs(self.dbdir)
 
-        self.con = sqlite3.connect(os.path.join(self.dbdir,"filedb.sqlite"),isolation_level=None,check_same_thread=False)
+        self.con = sqlite3.connect(os.path.join(self.dbdir,"filedb.sqlite"),isolation_level=None,check_same_thread=False,timeout=5)
         self.con.row_factory = dict_factory
     
     def __init__(self, fs, options={}):
         sqlFileDb.__init__(self, fs, options)
         
         self.options = options
+        
+        self.sqlLock = Lock()
         
         self.connect()
         

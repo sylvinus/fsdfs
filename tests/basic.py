@@ -5,7 +5,7 @@ import os, sys, re
 from time import sleep
 import unittest
 import threading
-import shutil
+import shutil,time
 
 
 import logging
@@ -104,13 +104,20 @@ class basicTests(unittest.TestCase):
         
         nodes = []
         for i in range(numNodes):
-            nodes.append(TestFS({
-                "host":"localhost:%s"%(42362+2*i),
+            
+            opts = {
+                "port":(42362+2*i),
                 "datadir":"./tests/datadirs/node%s" % i,
                 "secret":secret,
                 "master":"localhost:%s"%(42362+2*0),
                 "filedb":self.filedb
-            }))
+            }
+            
+            if i==0:
+                opts["master"]=True
+                opts["host"]="localhost:%s" % opts["port"]
+
+            nodes.append(TestFS(opts))
             nodes[i].start()
             nodes[i].filedb.reset()
             
@@ -119,7 +126,7 @@ class basicTests(unittest.TestCase):
         nodes[0].importFile("./tests/fixtures/test2.txt","dir3/dir4/filename2.ext")
         
         #max repl/sec = 1 new node per file
-        sleep(numNodes*1.1)
+        sleep(numNodes*1.1*0.5)
         
         
         for node in nodes:
@@ -144,7 +151,7 @@ class basicTests(unittest.TestCase):
         nodes[0].importFile("./tests/fixtures/test2.txt","dir1/dir2/filename.ext")
         
         #max repl/sec = 1 new node per file
-        sleep(numNodes*1.1)
+        sleep(numNodes*1.1*0.5)
         
         for node in nodes:
             self.assertEquals(open(node.getLocalFilePath("dir1/dir2/filename.ext")).read(),open("./tests/fixtures/test2.txt").read())

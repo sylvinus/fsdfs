@@ -19,14 +19,10 @@ class TestFS(Filesystem):
     pass
     
     
-chosenFileDb =     {
-        "backend":"sqlite",
-    }
-    
-    
 
-"""
-filedb = {
+
+
+chosenFileDb = {
     "backend":"mysql",
     "user":"root",
     "passwd":"",
@@ -34,7 +30,12 @@ filedb = {
     "db":"fsdfs_test"
 }
 
+chosenFileDb =     {
+        "backend":"sqlite",
+    }
+    
 
+"""
 filedb = {
     "backend":"mongodb",
     "host":"localhost",
@@ -49,9 +50,7 @@ from quota import quotaTests
    
 class persistBasicTests(basicTests):
     
-    filedb = {
-        "backend":"sqlite",
-    }
+    filedb = chosenFileDb
     
 #Don't run basictests again
 del basicTests
