@@ -366,98 +366,113 @@ class myHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     
     def do_POST(self):
         
-        #print "got %s at %s" % (self.path,self.server.fs.host)
-        
-        params = self._getPostParams()
-        
-        if params == False:
-            return
-        
-        p = self.path.split("/")
-        
-        if p[1] == "DOWNLOAD":
+        try:
             
-            local = self.server.fs.getLocalFilePath(params["filepath"])
+            #print "got %s at %s" % (self.path,self.server.fs.host)
+        
+            params = self._getPostParams()
+        
+            if params == False:
+                return
+        
+            p = self.path.split("/")
+        
+            if p[1] == "DOWNLOAD":
             
-            if not os.path.isfile(local):
-                self.send_response(404)
-            else:
-                self.send_response(200)
-                self.end_headers()
+                local = self.server.fs.getLocalFilePath(params["filepath"])
+            
+                if not os.path.isfile(local):
+                    self.send_response(404)
+                else:
+                    self.send_response(200)
+                    self.end_headers()
                 
-                f = open(local, "rb")
-                shutil.copyfileobj(f, self.wfile)
-                f.close()
+                    f = open(local, "rb")
+                    shutil.copyfileobj(f, self.wfile)
+                    f.close()
             
-            self.connection.shutdown(1)
+                self.connection.shutdown(1)
         
         
-        elif p[1] == "DELETE":
+            elif p[1] == "DELETE":
             
-            deleted = self.server.fs.deleteFile(params["filepath"])
+                deleted = self.server.fs.deleteFile(params["filepath"])
             
-            self.simpleResponse(200, "ok" if deleted else "nok")
+                self.simpleResponse(200, "ok" if deleted else "nok")
         
         
-        elif p[1] == "IMPORT":
+            elif p[1] == "IMPORT":
 
-            self.server.fs.importFile(params["url"],params["filepath"])
+                self.server.fs.importFile(params["url"],params["filepath"])
 
-            self.simpleResponse(200, "ok")
+                self.simpleResponse(200, "ok")
 
         
-        elif p[1]=="NUKE":
+            elif p[1]=="NUKE":
             
-            nuked = self.server.fs.nukeFile(params["filepath"])
+                nuked = self.server.fs.nukeFile(params["filepath"])
             
-            if not nuked:
-                self.simpleResponse(403,"can only nuke files on master")
-            else:
+                if not nuked:
+                    self.simpleResponse(403,"can only nuke files on master")
+                else:
+                    self.simpleResponse(200,"ok")
+        
+        
+            elif p[1] == "SUGGEST":
+            
+                #local = self.server.fs.getLocalFilePath(params["filepath"])
+            
+                downloaded = self.server.fs.downloadFile(params["filepath"])
+            
+                self.simpleResponse(200,"ok" if downloaded else "nok")
+        
+        
+            elif p[1] == "STATUS":
+            
+                self.simpleResponse(200,json.dumps(self.server.fs.getStatus()))
+        
+            elif p[1] == "GLOBALSTATUS":
+
+            
+                if not self.server.fs.ismaster:
+                    self.simpleResponse(403,"not on master")
+                else:
+                    status = self.server.fs.getGlobalStatus()
+                
+                    self.simpleResponse(200,json.dumps(status))
+
+        
+        
+            elif p[1] == "SEARCH":
+            
+                nodes = self.server.fs.filedb.getNodes(params["filepath"])
+            
+                self.simpleResponse(200,json.dumps(list(nodes)))
+        
+            elif p[1] == "GETIP":
+            
+                self.simpleResponse(200,json.dumps(self.client_address[0]))
+        
+        
+            elif p[1] == "REPORT":
+            
+                self.server.fs.addNode(params["node"],params)
+            
                 self.simpleResponse(200,"ok")
-        
-        
-        elif p[1] == "SUGGEST":
-            
-            #local = self.server.fs.getLocalFilePath(params["filepath"])
-            
-            downloaded = self.server.fs.downloadFile(params["filepath"])
-            
-            self.simpleResponse(200,"ok" if downloaded else "nok")
-        
-        
-        elif p[1] == "STATUS":
-            
-            self.simpleResponse(200,json.dumps(self.server.fs.getStatus()))
-        
-        elif p[1] == "GLOBALSTATUS":
-
-            
-            if not self.server.fs.ismaster:
-                self.simpleResponse(403,"not on master")
-            else:
-                status = self.server.fs.getGlobalStatus()
                 
-                self.simpleResponse(200,json.dumps(status))
-
-        
-        
-        elif p[1] == "SEARCH":
+            elif p[1] == "RAISE":
+                
+                #error test
+                raise Exception, "test error"
+                
+        except Exception,e:
             
-            nodes = self.server.fs.filedb.getNodes(params["filepath"])
+            self.simpleResponse(500,str(e))
             
-            self.simpleResponse(200,json.dumps(list(nodes)))
-        
-        elif p[1] == "GETIP":
+            self.server.fs.error("When serving %s : %s" % (p,e))
             
-            self.simpleResponse(200,json.dumps(self.client_address[0]))
-        
-        
-        elif p[1] == "REPORT":
             
-            self.server.fs.addNode(params["node"],params)
             
-            self.simpleResponse(200,"ok")
-    
     
     def simpleResponse(self, code, content):
         self.send_response(code)
