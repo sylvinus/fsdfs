@@ -49,11 +49,11 @@ class Replicator(threading.Thread):
             
             self.lastIterationDidSomething=False
             
-            self.performReplication(10)
+            self.performReplication(self.fs.config["replicatorDepth"])
             
             #Sleep for one minute unless something happens..
-            if not self.lastIterationDidSomething:
-                [time.sleep(1) for i in range(60) if not self.lastIterationDidSomething and not self.stopnow and not self.fs.filedb.hasChanged]
+            if False and not self.lastIterationDidSomething:
+                [time.sleep(1) for i in range(self.fs.config["replicatorIdleTime"]) if not self.lastIterationDidSomething and not self.stopnow and not self.fs.filedb.hasChanged]
             else:
                 time.sleep(0.1)
     
@@ -81,8 +81,12 @@ class Replicator(threading.Thread):
 	'''
         
         knownNeeds = self.filedb.getMinKnAll(num=maxOperations)
+        self.downloadThreads = []
         for file in knownNeeds:
             self.replicateFile(file)
+            
+        for t in self.downloadThreads:
+            t.join()
     
     def updateAllFileDb(self):
 	'''
@@ -218,10 +222,30 @@ class Replicator(threading.Thread):
             
             self.lastIterationDidSomething=True
             
-            # 3. make the node replicate it
-            downloaded = ("ok" == self.fs.nodeRPC(node, "SUGGEST", {"filepath": file}).read())
+            t = DownloadThread(self.fs,node,file)
+            t.start()
             
-            #add it directly to filedb
-            if downloaded:
-                self.filedb.addFileToNode(file,node)
+            self.downloadThreads.append(t)
             
+            if len(self.downloadThreads)>=self.fs.config["replicatorConcurrency"]:
+                self.downloadThreads.pop(0).join()
+
+
+class DownloadThread(threading.Thread):
+
+    def __init__(self,fs,node,file):
+        threading.Thread.__init__(self)
+        self.fs = fs
+        self.node = node
+        self.file = file
+
+        self.daemon = True
+        
+    def run(self):
+
+        # 3. make the node replicate it
+        downloaded = ("ok" == self.fs.nodeRPC(self.node, "SUGGEST", {"filepath": self.file}).read())
+        
+        #add it directly to filedb
+        if downloaded:
+            self.fs.filedb.addFileToNode(self.file,self.node)

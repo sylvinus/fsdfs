@@ -132,7 +132,7 @@ class quotaTests(unittest.TestCase):
         nodeD.stop()
         
         
-    def testSimple(self):
+    def testSpaceOptimization(self):
         
         secret = "azpdoazrRR"
         
@@ -142,6 +142,7 @@ class quotaTests(unittest.TestCase):
             "secret":secret,
             "master":"localhost:42342",
             "maxstorage":13,
+            "replicatorConcurrency":1,
             "filedb":self.filedb
         })
         
@@ -192,8 +193,8 @@ class quotaTests(unittest.TestCase):
             self.assertHasFile(nodeA, "tests/fixtures/10b.txt")
             self.assertHasFile(nodeA, "tests/fixtures/1b.txt")
             
-            self.assertHasFile(nodeB, "tests/fixtures/1b.txt")
-            self.assertHasFile(nodeB, "tests/fixtures/1b.txt")
+            self.assertHasFile(nodeB, "tests/fixtures/10b.txt")
+            self.assertHasFile(nodeB, "tests/fixtures/2b.txt")
             self.assertHasFile(nodeB, "tests/fixtures/1b.txt")
             
             self.assertHasFile(nodeC, "tests/fixtures/10b.txt")

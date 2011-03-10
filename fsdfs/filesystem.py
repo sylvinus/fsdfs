@@ -35,22 +35,37 @@ class Filesystem:
     * maxstorage -- A number of bytes (or a string like "10G") that are available for fsdfs
     '''
     
+    defaultConfig = {
+        "replicatorConcurrency":10,
+        "replicatorDepth":10,
+        "replicatorIdleTime":60,
+        "port":4242,
+        "maxstorage":10 * 1024 * 1024 * 1024, #10G
+        "reportInterval":60,
+        "getIpTimeout":120
+    }
+    
     def __init__(self, config):
-        self.config = copy.deepcopy(config)
-        
         
         self.startTime = time.time()
+        
+        self.config = copy.deepcopy(self.defaultConfig)
+        self.config.update(config)
+        
+        self.locks = {
+            "importFileMkdir":threading.Lock()
+        }
         
         # We didn't get any hostname but we got a port. Ask the master what is our IP then.
         if "host" not in self.config and "port" in self.config:
             self.debug("fsdfs only has port %s, autodetecting IP with master at %s ..." % (self.config["port"],self.config["master"]))
             
-            for i in range(30):
+            for i in range(self.config["getIpTimeout"]):
                 try:
                     ip = self.nodeRPC(self.config["master"],"GETIP",parse=True)
                     break
                 except:
-                    time.sleep(2)
+                    time.sleep(1)
                     pass
                     
             self.config["host"] = "%s:%s" % (ip,self.config["port"])
@@ -67,14 +82,13 @@ class Filesystem:
             self.config["master"]=self.host
 
         
-        if not self.config.get("maxstorage", False):
-            self.maxstorage = 10 * 1024 * 1024 * 1024 #default 10G
-        elif type(self.config["maxstorage"]) == int:
-            self.maxstorage = self.config["maxstorage"]
-        elif re.match("[0-9]+G", self.config["maxstorage"]):
-             self.maxstorage=int(self.config["maxstorage"][0:-1]) * 1024 * 1024 * 1024
-        else:
-            raise Exception, "Unknown maxstorage format"
+        if self.config.get("maxstorage", False):
+            if type(self.config["maxstorage"]) == int:
+                self.maxstorage = self.config["maxstorage"]
+            elif re.match("[0-9]+G", self.config["maxstorage"]):
+                 self.maxstorage=int(self.config["maxstorage"][0:-1]) * 1024 * 1024 * 1024
+            else:
+                raise Exception, "Unknown maxstorage format"
             
         self.debug("fsdfs node starting on %s ; master is %s" % (self.host,self.config["master"]))
     
@@ -97,8 +111,8 @@ class Filesystem:
     def debug(self,msg,type="debug"):
         logging.debug("%s - %s" % (type,msg))
         
-    def error(self,msg):
-        logging.error(msg)
+    def error(self,msg,error=None):
+        logging.error("%s - %s" % (msg,error),exc_info=1)
     
     
     def deleteFile(self, filepath):
@@ -138,8 +152,13 @@ class Filesystem:
         
         destpath = self.getLocalFilePath(filepath)
         
-        if not os.path.isdir(os.path.dirname(destpath)):
-            os.makedirs(os.path.dirname(destpath))
+        
+        self.locks["importFileMkdir"].acquire()
+        try:
+            if not os.path.isdir(os.path.dirname(destpath)):
+                os.makedirs(os.path.dirname(destpath))
+        finally:
+            self.locks["importFileMkdir"].release()
         
         if mode == "download" or ((type(src)==str or type(src)==unicode) and src.startswith("http://")):
             
@@ -339,6 +358,7 @@ class Filesystem:
             "df": self.maxstorage - self.filedb.getSizeInNode(self.host),
             "uptime":int(time.time()-self.startTime),
             "load": 0,
+            "count": self.filedb.getCountInNode(self.host),
             "size": self.filedb.getSizeInNode(self.host)
         }
         #"files":self.filedb.listAll()
@@ -366,7 +386,7 @@ class Reporter(threading.Thread):
             except Exception,e:
                 self.fs.error("While reporting : %s" % e)
                 
-            [time.sleep(1) for i in range(60) if not self.stopnow]
+            [time.sleep(1) for i in range(self.fs.config["reportInterval"]) if not self.stopnow]
         
     def shutdown(self):
 
@@ -508,7 +528,7 @@ class myHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             
             self.simpleResponse(500,str(e))
             
-            self.server.fs.error("When serving %s : %s" % (p,e))
+            self.server.fs.error("When serving %s %s : %s" % (p[1],params,e))
             
             
             
