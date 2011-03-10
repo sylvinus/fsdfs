@@ -133,7 +133,7 @@ class basicTests(unittest.TestCase):
         
         self.assertEquals(2,globalStatusA["countGlobal"])
         self.assertEquals(-1,globalStatusA["minKnGlobal"][0][0])
-        self.assertEquals(2,len(globalStatusA["nodes"]))
+        self.assertEquals(2,len(globalStatusA["nodes"].keys()))
         self.assertEquals("localhost:42342",globalStatusA["node"])
         
         

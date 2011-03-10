@@ -6,9 +6,9 @@ import sys,os
 from optparse import OptionParser
 
 try:
-	import simplejson as json
+    import simplejson as json
 except:
-	import json
+    import json
 
 def getOptionsParser():
         
@@ -25,27 +25,38 @@ def getOptionsParser():
 
 
 def main():
-	
-	(optionsattr,args) = getOptionsParser().parse_args()
-	
-	if args[0]=="globalstatus":
-		
-		from fsdfs.filesystem import Filesystem
-		
-		node = Filesystem({
+    
+    (optionsattr,args) = getOptionsParser().parse_args()
+    
+    if args[0]=="globalstatus":
+        
+        from fsdfs.filesystem import Filesystem
+        
+        node = Filesystem({
             "host":"no-host",
             "secret":optionsattr.secret,
             "master":optionsattr.master
         })
 
-		ret = node.getGlobalStatus()
+        ret = node.getGlobalStatus()
 
+    elif args[0]=="search":
+        
+        from fsdfs.filesystem import Filesystem
+        
+        node = Filesystem({
+            "host":"no-host",
+            "secret":optionsattr.secret,
+            "master":optionsattr.master
+        })
 
-	if optionsattr.json:
-		print json.dumps(ret)
-	else:
-		print ret
+        ret = node.searchFile(args[1])
+
+    if optionsattr.json:
+        print json.dumps(ret)
+    else:
+        print ret
 
 if __name__ == '__main__':
-	main()
+    main()
 

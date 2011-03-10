@@ -170,30 +170,7 @@ class Filesystem:
             })
         
         self.report()
-        
-    
-    def getGlobalStatus(self):
-        
-        '''
-        Returns the global status of the distributed filesystem
-        '''
-        
-        if not self.ismaster:
-            return self.nodeRPC(self.config["master"], "GLOBALSTATUS", parse=True)
-        else:
-            
-            status = self.getStatus()
-            
-            minKns = [(self.filedb.getKn(f),f) for f in self.filedb.getMinKnAll(num=1)]
-            
-            status["nodes"] = self.nodedb.keys()
-            status["sizeGlobal"] = self.filedb.getSizeAll()
-            status["countGlobal"] = self.filedb.getCountAll()
-            status["minKnGlobal"] = minKns
-            
-            #pass thru JSON to have the same exact returns as if in remote fetch
-            return json.loads(json.dumps(status))
-    
+
     
     def start(self):
         '''
@@ -319,6 +296,30 @@ class Filesystem:
             self.filedb.hasChanged=True
             
         self.nodedb[node] = status
+
+    
+    def getGlobalStatus(self):
+        
+        '''
+        Returns the global status of the distributed filesystem
+        '''
+        
+        if not self.ismaster:
+            return self.nodeRPC(self.config["master"], "GLOBALSTATUS", parse=True)
+        else:
+            
+            status = self.getStatus()
+            
+            minKns = [(self.filedb.getKn(f),f) for f in self.filedb.getMinKnAll(num=1)]
+            
+            status["nodes"] = self.nodedb
+            status["sizeGlobal"] = self.filedb.getSizeAll()
+            status["countGlobal"] = self.filedb.getCountAll()
+            status["minKnGlobal"] = minKns
+            
+            #pass thru JSON to have the same exact returns as if in remote fetch
+            return json.loads(json.dumps(status))
+
     
     def getStatus(self):
         '''
