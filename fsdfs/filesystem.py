@@ -81,15 +81,13 @@ class Filesystem:
         if self.config["master"] is True:
             self.config["master"]=self.host
 
+        if type(self.config["maxstorage"]) == long or type(self.config["maxstorage"]) == int :
+            self.maxstorage = self.config["maxstorage"]
+        elif re.match("[0-9]+G", self.config["maxstorage"]):
+             self.maxstorage=int(self.config["maxstorage"][0:-1]) * 1024 * 1024 * 1024
+        else:
+            raise Exception, "Unknown maxstorage format"
         
-        if self.config.get("maxstorage", False):
-            if type(self.config["maxstorage"]) == int:
-                self.maxstorage = self.config["maxstorage"]
-            elif re.match("[0-9]+G", self.config["maxstorage"]):
-                 self.maxstorage=int(self.config["maxstorage"][0:-1]) * 1024 * 1024 * 1024
-            else:
-                raise Exception, "Unknown maxstorage format"
-            
         self.debug("fsdfs node starting on %s ; master is %s" % (self.host,self.config["master"]))
     
     def getReplicationRules(self, filepath):
