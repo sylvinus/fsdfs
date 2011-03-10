@@ -125,7 +125,6 @@ class Filesystem:
             os.makedirs(os.path.dirname(destpath))
         
         if mode == "download" or ((type(src)==str or type(src)==unicode) and src.startswith("http://")):
-            print "Downloading %s" % src
             urllib.urlretrieve(src,destpath)
         elif mode == "copy":
             shutil.copy(src, destpath)
@@ -176,7 +175,7 @@ class Filesystem:
         Start the node
         If the server is master, also start the replicator.
         '''
-        print "starting %s" % self.host
+        #print "starting %s" % self.host
         
         filedb_options = {}
         filedb_backend = self.config.get("filedb","memory")
@@ -262,7 +261,7 @@ class Filesystem:
             try:
                 remote = self.nodeRPC(host, "DOWNLOAD", {"filepath": filepath})
             except Exception, err:
-                print err
+                #print err
                 continue
             
             #We don't need checksumming here... we're using TCP
