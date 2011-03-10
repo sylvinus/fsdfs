@@ -142,7 +142,6 @@ class quotaTests(unittest.TestCase):
             "secret":secret,
             "master":"localhost:42342",
             "maxstorage":13,
-            "replicatorConcurrency":1,
             "filedb":self.filedb
         })
         
@@ -184,7 +183,7 @@ class quotaTests(unittest.TestCase):
         nodeA.importFile("tests/fixtures/2b.txt","tests/fixtures/2b.txt")
         nodeA.importFile("tests/fixtures/1b.txt","tests/fixtures/1b.txt")
         
-        sleep(6)
+        sleep(3)
         
         
         for i in range(0,3):

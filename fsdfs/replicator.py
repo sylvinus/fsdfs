@@ -82,6 +82,7 @@ class Replicator(threading.Thread):
         
         knownNeeds = self.filedb.getMinKnAll(num=maxOperations)
         self.downloadThreads = []
+        self.previsionalSizeAdded = {}
         for file in knownNeeds:
             self.replicateFile(file)
             
@@ -115,6 +116,10 @@ class Replicator(threading.Thread):
 	'''
 	Describe the algorithm...
 	'''
+       
+       
+        def df(node):
+            return self.fs.nodedb[node]["df"] - self.previsionalSizeAdded.get(node,0)
         
         knownNodes = self.fs.getKnownNodes()
         
@@ -149,7 +154,7 @@ class Replicator(threading.Thread):
             #only target nodes which don't have the file
             if node not in alreadyNodes:
                 #only target nodes with enough free disk or with some files to delete to make space
-                if self.fs.nodedb[node]["df"] + self.fs.nodedb[node]["size"] >= size:
+                if df(node) + self.fs.nodedb[node]["size"] >= size:
                     newnodes.append(node)
         
         #print (knownNodes,alreadyNodes,newnodes,self.fs.nodedb)
@@ -166,18 +171,17 @@ class Replicator(threading.Thread):
         
         while not foundHost:
             #order by free disk desc
-            newnodes.sort(cmp=lambda x,y:cmp(self.fs.nodedb[x]["df"],
-							self.fs.nodedb[y]["df"]),
+            newnodes.sort(cmp=lambda x,y:cmp(df(x),df(y)),
 							reverse=True)
             
             #if the node with the most free disk has a place for the file, store it there
-            if self.fs.nodedb[newnodes[0]]["df"] >= size:
+            if df(newnodes[0]) >= size:
                 node = newnodes[0]
                 foundHost = True
                 
                 self.fs.debug("Node %s still has enough space (%s) for %s" % (
 								node,
-								self.fs.nodedb[newnodes[0]]["df"],
+								df(newnodes[0]),
 								file
 							),"repl")
             
@@ -220,6 +224,11 @@ class Replicator(threading.Thread):
         
         if foundHost:
             
+            # avoid sending everything in the current replication batch to the same server
+            # by already taking into account how much less space we'll use
+            self.previsionalSizeAdded.setdefault(node,0)
+            self.previsionalSizeAdded[node]+=size
+            
             self.lastIterationDidSomething=True
             
             t = DownloadThread(self.fs,node,file)
@@ -229,6 +238,7 @@ class Replicator(threading.Thread):
             
             if len(self.downloadThreads)>=self.fs.config["replicatorConcurrency"]:
                 self.downloadThreads.pop(0).join()
+                self.previsionalSizeAdded[node]-=size
 
 
 class DownloadThread(threading.Thread):
