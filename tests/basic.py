@@ -28,7 +28,7 @@ class basicTests(unittest.TestCase):
         os.makedirs("./tests/datadirs")
         
        
-    def testFileDownloadImport(self):
+    def _testFileDownloadImport(self):
     
         secret = "azpdoazrRR"
     
@@ -113,6 +113,7 @@ class basicTests(unittest.TestCase):
         nodeA.importFile("./tests/fixtures/test.txt","dir1/dir2/filename.ext")
         nodeA.importFile("./tests/fixtures/test2.txt","dir3/dir4/filename2.ext")
         
+        print nodeA.filedb.getKn("dir3/dir4/filename2.ext")
         
         sleep(5)
         
@@ -150,7 +151,7 @@ class basicTests(unittest.TestCase):
         nodeB.stop()
         
     
-    def testManyNodes(self):
+    def _testManyNodes(self):
         
         secret = "azpdoazrRR"
         

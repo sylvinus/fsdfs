@@ -166,7 +166,8 @@ class Filesystem:
             "nodes": set([self.host]).union(self.filedb.getNodes(filepath)),
             "t": int(time.time()),
             "size": size,
-            "nuked":None
+            "nuked":None,
+            "n":self.getReplicationRules(filepath)["n"]
             })
         
         self.report()

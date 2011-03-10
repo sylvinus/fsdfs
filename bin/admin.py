@@ -53,7 +53,7 @@ def main():
         ret = node.searchFile(args[1])
 
     if optionsattr.json:
-        print json.dumps(ret)
+        print json.dumps(ret, indent=4)
     else:
         print ret
 
