@@ -43,8 +43,16 @@ class Filesystem:
         
         # We didn't get any hostname but we got a port. Ask the master what is our IP then.
         if "host" not in self.config and "port" in self.config:
-            ip = self.nodeRPC(self.config["master"],"GETIP",parse=True)
-            #print "Autodetected IP : %s" % ip
+            self.debug("fsdfs only has port %s, autodetecting IP with master at %s ..." % (self.config["port"],self.config["master"]))
+            
+            for i in range(30):
+                try:
+                    ip = self.nodeRPC(self.config["master"],"GETIP",parse=True)
+                    break
+                except:
+                    time.sleep(2)
+                    pass
+                    
             self.config["host"] = "%s:%s" % (ip,self.config["port"])
         
         
