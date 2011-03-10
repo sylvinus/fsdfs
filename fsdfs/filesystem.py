@@ -215,10 +215,10 @@ class Filesystem:
         self.httpinterface = HTTPInterface(self)
         self.httpinterface.start()
         
-        self.report()
+        #self.report()
         
-        #self.reporter = Reporter(self)
-        #self.reporter.start()
+        self.reporter = Reporter(self)
+        self.reporter.start()
         
         if self.ismaster:
             self.replicator = Replicator(self)
@@ -235,8 +235,8 @@ class Filesystem:
         
         self.httpinterface.server.server_close()
         
-        #self.reporter.shutdown()
-        #self.reporter.join()
+        self.reporter.shutdown()
+        self.reporter.join()
         
         #self.httpinterface.join()
         
