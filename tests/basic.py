@@ -73,6 +73,12 @@ class basicTests(unittest.TestCase):
         statusB = nodeB.getStatus()
         print statusB
         self.assertTrue(statusB["size"]>5*1024*1024)
+
+
+        
+        nodeA.stop()
+        nodeB.stop()
+
         
         
     def testTwoNodes(self):

@@ -1,7 +1,6 @@
 import threading
 import time
 import random
-import logging as logger
 
 from filedb import loadFileDb
     
@@ -45,7 +44,7 @@ class Replicator(threading.Thread):
             self.performNukes()
             
             self.performReplication(10)
-            time.sleep(0.1)
+            time.sleep(1)
     
     
     def performNukes(self):
@@ -116,7 +115,7 @@ class Replicator(threading.Thread):
         
         kn = self.filedb.getKn(file)
         
-        logger.debug("Replicating file %s (size=%s, kn=%s)" % (file, size, kn))
+        self.fs.debug("Replicating file %s (size=%s, kn=%s)" % (file, size, kn),"repl")
         
         #don't risk deleting everything on a node just to make space
         if size > 10*1024*1024*1024:
@@ -124,7 +123,7 @@ class Replicator(threading.Thread):
         
         #all the nodes already have the file!
         if len(knownNodes) <= len(alreadyNodes):
-            logger.debug("All known nodes (%s) already have the file %s" % (len(knownNodes), file))
+            self.fs.debug("All known nodes (%s) already have the file %s" % (len(knownNodes), file),"repl")
             return False
         
         
@@ -139,10 +138,10 @@ class Replicator(threading.Thread):
         
         #print (knownNodes,alreadyNodes,newnodes,self.fs.nodedb)
         if len(newnodes) == 0:
-            logger.debug("No more known nodes (%s) are big enough for the file %s" % (
+            self.fs.debug("No more known nodes (%s) are big enough for the file %s" % (
 							len(knownNodes) - len(alreadyNodes),
 							file
-						))
+						),"repl")
             return False
         
         # 2. pick a node depending on load, available size and max(kn)
@@ -160,11 +159,11 @@ class Replicator(threading.Thread):
                 node = newnodes[0]
                 foundHost = True
                 
-                logger.debug("Node %s still has enough space (%s) for %s" % (
+                self.fs.debug("Node %s still has enough space (%s) for %s" % (
 								node,
 								self.fs.nodedb[newnodes[0]]["df"],
 								file
-							))
+							),"repl")
             
             #no more space anywhere. not a problem, pick the node with max(k-n) and delete that copy
             else:
@@ -183,15 +182,15 @@ class Replicator(threading.Thread):
                 # file with highest k-N has an inferior or equal k-N to the file we're replicating (+1 because if we replicate it will increase)
                 # it doesn't need replication.
                 if self.filedb.getKn(file_to_remove) <= (kn + 1):
-                    logger.debug("No file to remove with higher kn!")
+                    self.fs.debug("No file to remove with higher kn!","repl")
                     break
 
                 
-                logger.debug("Deleting file %s on %s because it has kn=%s" % (
+                self.fs.debug("Deleting file %s on %s because it has kn=%s" % (
 								file_to_remove,
 								node,
 								self.filedb.getKn(file_to_remove)
-							))
+							),"repl")
                 
                 self.fs.nodedb[node]["df"] += self.filedb.getSize(file_to_remove)
                 self.fs.nodedb[node]["size"] -= self.filedb.getSize(file_to_remove)

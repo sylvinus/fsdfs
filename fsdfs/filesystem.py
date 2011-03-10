@@ -9,6 +9,7 @@ import BaseHTTPServer
 import urllib2
 import urllib
 import urlparse
+import logging
 
 try:
     import simplejson as json
@@ -66,6 +67,8 @@ class Filesystem:
              self.maxstorage=int(self.config["maxstorage"][0:-1]) * 1024 * 1024 * 1024
         else:
             raise Exception, "Unknown maxstorage format"
+            
+        self.debug("fsdfs node starting on %s ; master is %s" % (self.host,self.config["master"]))
     
     def getReplicationRules(self, filepath):
         '''
@@ -83,6 +86,12 @@ class Filesystem:
         
         return os.path.join(self.config["datadir"], filepath)
         
+    def debug(self,msg,type="debug"):
+        logging.debug("%s - %s" % (type,msg))
+        
+    def error(self,msg):
+        logging.error(msg)
+    
     
     def deleteFile(self, filepath):
         '''
@@ -344,9 +353,16 @@ class ThreadingBaseHTTPServer(ThreadingMixIn,BaseHTTPServer.HTTPServer):
     
     def setFS(self,fs):
         self.fs = fs
+        
 
 
 class myHandler(BaseHTTPServer.BaseHTTPRequestHandler):
+    
+    def log_message(self,format,*args):
+        self.server.fs.debug("%s - - [%s] %s\n" % (self.address_string(), self.log_date_time_string(), format%args),"request")
+    
+    #def log_request(self, code='-', size='-'):
+    #    print "haaa"
     
     def do_POST(self):
         
