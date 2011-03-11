@@ -100,12 +100,16 @@ class sqlFileDb(FileDbBase):
         
         self.execute("""INSERT INTO """+self.t_files_nodes+"""(file_id,node_id) VALUES (%s,%s)""", (file_id,node_id))
         
+        self.update(file,{'kn':self.getKn(file)})
+        
         self.hasChanged=True
         
     def removeFileFromNode(self, file, node):
         file_id = self._getFileId(file)
         node_id = self._getNodeId(node)
         self.execute("""DELETE FROM """+self.t_files_nodes+""" WHERE file_id=%s and node_id=%s""", (file_id,node_id))
+        
+        self.update(file,{'kn':self.getKn(file)})
         
         self.hasChanged=True
         
@@ -139,3 +143,69 @@ class sqlFileDb(FileDbBase):
         result = self.execute("""SELECT """+self.t_files+""".filename FROM """+self.t_files_nodes+""","""+self.t_files+""" WHERE """+self.t_files_nodes+""".file_id="""+self.t_files+""".id AND """+self.t_files_nodes+""".node_id=%s""", (node_id,))
         
         return [ i['filename'] for i in result ]
+
+
+    def getMaxKnInNode(self, node, num=1):
+        '''
+        to write
+        '''
+        node_id = self._getNodeId(node)
+        
+        result = self.execute("""SELECT F.filename FROM """+self.t_files+""" F,"""+self.t_files_nodes+""" FN WHERE F.id=FN.file_id AND FN.node_id=%s AND F.nuked=0 ORDER BY F.kn DESC LIMIT 0,%s""", (node_id,num))
+        
+        return [ i['filename'] for i in result ]
+        
+        
+    def getMinKnAll(self, num=1):
+        '''
+        to write
+        '''
+        
+        result = self.execute("""SELECT F.filename FROM """+self.t_files+""" F WHERE F.nuked=0 ORDER BY F.kn ASC LIMIT 0,%s""", (num,))
+        
+        return [ i['filename'] for i in result ]
+
+    def getSizeAll(self):
+        
+        result = self.execute("""SELECT SUM(F.size) as s FROM """+self.t_files+""" F WHERE F.nuked=0""")
+        
+        if result and result[0]['s'] is not None:
+            return long(result[0]['s'])
+        else:
+            return 0
+    
+    def getCountAll(self):
+    
+        result = self.execute("""SELECT COUNT(*) as s FROM """+self.t_files+""" F WHERE F.nuked=0""")
+    
+        if result:
+            return long(result[0]['s'])
+        else:
+            return 0
+                
+
+    def getSizeInNode(self, node):
+        '''
+        to write
+        '''
+        node_id = self._getNodeId(node)
+    
+        result = self.execute("""SELECT SUM(F.size) as s FROM """+self.t_files+""" F,"""+self.t_files_nodes+""" FN WHERE F.id=FN.file_id AND FN.node_id=%s AND F.nuked=0""", (node_id,))
+        
+        if result and result[0]['s'] is not None:
+            return long(result[0]['s'])
+        else:
+            return 0
+            
+    def getCountInNode(self, node):
+        '''
+        to write
+        '''
+        node_id = self._getNodeId(node)
+    
+        result = self.execute("""SELECT COUNT(*) as s FROM """+self.t_files+""" F,"""+self.t_files_nodes+""" FN WHERE F.id=FN.file_id AND FN.node_id=%s AND F.nuked=0""", (node_id,))
+
+        if result:
+            return long(result[0]['s'])
+        else:
+            return 0

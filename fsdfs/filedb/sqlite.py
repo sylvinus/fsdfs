@@ -70,7 +70,7 @@ class sqliteFileDb(sqlFileDb):
         if not os.path.isdir(self.dbdir):
             os.makedirs(self.dbdir)
 
-        self.con = sqlite3.connect(os.path.join(self.dbdir,"filedb.sqlite"),check_same_thread=False,isolation_level=None,timeout=5) #,
+        self.con = sqlite3.connect(os.path.join(self.dbdir,"filedb_v2.sqlite"),check_same_thread=False,isolation_level=None,timeout=5) #,
         self.con.row_factory = dict_factory
         self.cur = self.con.cursor()
     
@@ -92,7 +92,8 @@ class sqliteFileDb(sqlFileDb):
           filename TEXT,
           size INTEGER,
           t INTEGER,
-          n INTEGER,
+          n REAL,
+          kn REAL,
           nuked INTEGER
         );""")
         

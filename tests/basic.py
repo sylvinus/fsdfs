@@ -117,6 +117,12 @@ class basicTests(unittest.TestCase):
         
         sleep(5)
         
+        self.assertEquals(2,nodeA.filedb.getCountInNode("localhost:42352"))
+        self.assertEquals(26+13,nodeA.filedb.getSizeInNode("localhost:42352"))
+        self.assertEquals(2,nodeA.filedb.getCountAll())
+        self.assertEquals(26+13,nodeA.filedb.getSizeAll())
+        
+        
         self.assertEquals(open(nodeB.getLocalFilePath("dir1/dir2/filename.ext")).read(),open("./tests/fixtures/test.txt").read())
         self.assertEquals(open(nodeA.getLocalFilePath("dir3/dir4/filename2.ext")).read(),open("./tests/fixtures/test2.txt").read())
         
