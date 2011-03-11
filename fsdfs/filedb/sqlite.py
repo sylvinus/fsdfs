@@ -99,6 +99,7 @@ class sqliteFileDb(sqlFileDb):
         
         self.execute("""CREATE UNIQUE INDEX IF NOT EXISTS i_filename ON """+self.t_files+"""(filename)""")
         self.execute("""CREATE INDEX IF NOT EXISTS i_nuked ON """+self.t_files+"""(nuked)""")
+        self.execute("""CREATE INDEX IF NOT EXISTS i_kn ON """+self.t_files+"""(kn)""")
         
         self.execute("""CREATE TABLE IF NOT EXISTS """+self.t_files_nodes+""" (
           file_id INTEGER,
