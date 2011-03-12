@@ -43,7 +43,8 @@ class quotaTests(unittest.TestCase):
             "secret":secret,
             "master":"localhost:52342",
             "maxstorage":10,
-            "filedb":self.filedb
+            "filedb":self.filedb,
+            "garbageMinKn":-1
         })
         
         nodeB = TestFS({
@@ -83,7 +84,7 @@ class quotaTests(unittest.TestCase):
         
         nodeA.importFile("tests/fixtures/10b.txt","tests/fixtures/10b.txt")
         
-        sleep(4)
+        sleep(2)
         
         self.assertHasFile(nodeA, "tests/fixtures/10b.txt")
         self.assertHasFile(nodeB, "tests/fixtures/10b.txt")
@@ -101,7 +102,7 @@ class quotaTests(unittest.TestCase):
         
         nodeA.importFile("tests/fixtures/10b.2.txt","tests/fixtures/10b.2.txt")
         
-        sleep(3)
+        sleep(1)
         
         for i in range(0,3):
                 
@@ -118,12 +119,50 @@ class quotaTests(unittest.TestCase):
         
         nodeD.start()
         
-        sleep(2)
+        sleep(1)
         
         self.assertHasFile(nodeA, "tests/fixtures/10b.2.txt")
         self.assertHasFile(nodeB, "tests/fixtures/10b.txt")
         self.assertHasFile(nodeC, "tests/fixtures/10b.txt")
         self.assertHasFile(nodeD, "tests/fixtures/10b.2.txt")
+        
+        
+        #over-quota import
+        imp=nodeA.importFile("tests/fixtures/10b.3.txt","tests/fixtures/10b.3.txt")
+        self.assertTrue(imp)
+        
+        sleep(1)
+        
+        self.assertEquals(0,nodeA.getStatus()["df"])
+        self.assertEquals(0,nodeB.getStatus()["df"])
+        self.assertEquals(0,nodeC.getStatus()["df"])
+        self.assertEquals(0,nodeD.getStatus()["df"])
+        
+        self.assertHasFile(nodeA, "tests/fixtures/10b.3.txt")
+        self.assertHasFile(nodeB, "tests/fixtures/10b.txt")
+        self.assertHasFile(nodeC, "tests/fixtures/10b.txt")
+        self.assertHasFile(nodeD, "tests/fixtures/10b.2.txt")
+        
+        #again, over-quota import
+        imp=nodeA.importFile("tests/fixtures/10b.4.txt","tests/fixtures/10b.4.txt")
+        self.assertFalse(imp)
+        
+        #won't work because 10b.3.txt has kn=-1 (garbageMinKn)
+        
+        self.assertEquals(0,nodeA.getStatus()["df"])
+        self.assertEquals(0,nodeB.getStatus()["df"])
+        self.assertEquals(0,nodeC.getStatus()["df"])
+        self.assertEquals(0,nodeD.getStatus()["df"])
+        
+        self.assertHasFile(nodeA, "tests/fixtures/10b.3.txt")
+        self.assertHasFile(nodeB, "tests/fixtures/10b.txt")
+        self.assertHasFile(nodeC, "tests/fixtures/10b.txt")
+        self.assertHasFile(nodeD, "tests/fixtures/10b.2.txt")
+        
+        
+        # however, it should work in the future because master should be considered less safe than nodes and 10b.3 should have been 
+        # moved off. TODO implement this (-0.000001 in k when on master?)
+        
         
         
         nodeA.stop()

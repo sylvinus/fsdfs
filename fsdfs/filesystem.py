@@ -44,7 +44,9 @@ class Filesystem:
         "port":4242,
         "maxstorage":10 * 1024 * 1024 * 1024, #10G
         "reportInterval":60,
-        "getIpTimeout":120
+        "getIpTimeout":120,
+        "garbageOnImport":True,
+        "garbageMinKn":0
     }
     
     def __init__(self, config):
@@ -181,15 +183,38 @@ class Filesystem:
         
         size = os.stat(destpath).st_size
         
+        if self.config["garbageOnImport"]:
+            while (self.maxstorage - self.filedb.getSizeInNode(self.host))<size:
+                
+                #remove most unneeded file(s)
+                f = self.filedb.getMaxKnInNode(self.host)[0]
+                kn = self.filedb.getKn(f)
+                if kn>self.config["garbageMinKn"]:
+                    self.debug("removing %s (kn=%s) to make space for %s" % (f,kn,filepath))
+                    self.deleteFile(f)
+                else:
+                    self.debug("can't import %s because %s has kn<%s" % (filepath,f,kn))
+                    #can't remove file, kn is not high enough. Delete import.
+                    os.remove(destpath)
+                    
+                    return False
+                
+            
+        
         self.filedb.update(filepath, {
             "nodes": set([self.host]).union(self.filedb.getNodes(filepath)),
             "t": int(time.time()),
             "size": size,
             "nuked":None,
-            "n":self.getReplicationRules(filepath)["n"]
+            "n":self.getReplicationRules(filepath)["n"],
+            
+            #assume we're the only node to have the file, even if we're on a slave (he's currently unaware of other copies anyway)
+            "kn":1-self.getReplicationRules(filepath)["n"] 
             })
         
         self.report()
+        
+        return True
 
     
     def start(self):
@@ -462,9 +487,10 @@ class myHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         
             elif p[1] == "IMPORT":
 
-                self.server.fs.importFile(params["url"],params["filepath"])
-
-                self.simpleResponse(200, "ok")
+                if self.server.fs.importFile(params["url"],params["filepath"]):
+                    self.simpleResponse(200, "ok")
+                else:
+                    self.simpleResponse(502, "nok")
 
         
             elif p[1]=="NUKE":
