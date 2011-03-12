@@ -381,7 +381,7 @@ class Filesystem:
         return {
             "node": self.host,
             "df": self.maxstorage - self.filedb.getSizeInNode(self.host),
-            "maxKn":self.filedb.getMaxKinInNode(self.host),
+            "maxKn":self.filedb.getMaxKnInNode(self.host),
             "uptime":int(time.time()-self.startTime),
             "load": 0,
             "count": self.filedb.getCountInNode(self.host),
