@@ -60,7 +60,7 @@ class scalingfilesTests(unittest.TestCase):
         for i in range(numFiles):
             nodeA.importFile("./tests/fixtures/test.txt","file%s" % i)
         
-        sleep(numFiles*0.3)
+        sleep(numFiles*0.2)
         
         statusB = nodeB.getStatus()
         

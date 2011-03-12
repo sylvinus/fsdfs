@@ -29,6 +29,9 @@ class sqliteFileDb(sqlFileDb):
     
     unixtimefunction = ""
     
+    # save some writes! Or too much locking happening
+    select_before_update = True
+    
     
     def _getFileId(self,filename):
         result = self.execute("""SELECT id FROM """+self.t_files+""" WHERE filename=%s LIMIT 1""", (filename,))

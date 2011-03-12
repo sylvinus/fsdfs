@@ -53,6 +53,7 @@ class Replicator(threading.Thread):
             
             #Sleep for one minute unless something happens..
             if not self.lastIterationDidSomething and self.fs.config["replicatorIdleTime"]>0:
+                self.fs.debug("Idling for %s seconds max..." % self.fs.config["replicatorIdleTime"],"repl")
                 [time.sleep(1) for i in range(self.fs.config["replicatorIdleTime"]) if not self.lastIterationDidSomething and not self.stopnow and not self.fs.filedb.hasChanged]
             else:
                 time.sleep(self.fs.config["replicatorInterval"])
@@ -135,7 +136,7 @@ class Replicator(threading.Thread):
         
         kn = self.filedb.getKn(file)
         
-        self.fs.debug("Replicating file %s (size=%s, kn=%s)" % (file, size, kn),"repl")
+        self.fs.debug("File %s (size=%s, kn=%s)" % (file, size, kn),"repl")
         
         #don't risk deleting everything on a node just to make space
         if size > 10*1024*1024*1024:

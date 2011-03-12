@@ -8,6 +8,8 @@ class sqlFileDb(FileDbBase):
     
     """
     
+    select_before_update = False
+    
     def connect(self):
         pass
         
@@ -54,22 +56,33 @@ class sqlFileDb(FileDbBase):
                 data["nuked"]=0
     
         
-        
-        arg_list = []
-        req_str=[]
+        skip_update = False
+        if self.select_before_update and "nodes" not in data:
+            values = self.execute("""SELECT """+(",".join(data.keys()))+""" FROM """+self.t_files+""" WHERE id=%s""" % (file_id,))
 
-        for key, value in data.iteritems():
+            skip_update = True
+            for key, value in data.iteritems():
+                if data[key]!=values[0][key]:
+                    skip_update = False
+                
+                    
+        if not skip_update:
             
-            if key!="nodes":
-                if key=="t":
-                    req_str.append(key+"""="""+self.unixtimefunction+"""(%s) """)
-                else:
-                    req_str.append(key+"""=%s """)
-                arg_list.append(value)
-        arg_list.append(file_id)
+            arg_list = []
+            req_str=[]
+
+            for key, value in data.iteritems():
+            
+                if key!="nodes":
+                    if key=="t":
+                        req_str.append(key+"""="""+self.unixtimefunction+"""(%s) """)
+                    else:
+                        req_str.append(key+"""=%s """)
+                    arg_list.append(value)
+            arg_list.append(file_id)
         
-        if len(req_str):
-            self.execute("""UPDATE """+self.t_files+""" SET """+(','.join(req_str))+""" WHERE id=%s""",tuple(arg_list))
+            if len(req_str):
+                self.execute("""UPDATE """+self.t_files+""" SET """+(','.join(req_str))+""" WHERE id=%s""",tuple(arg_list))
         
     
         if "nodes" in data:

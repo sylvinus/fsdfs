@@ -407,7 +407,7 @@ class HTTPInterface(threading.Thread):
 
 class ThreadingBaseHTTPServer(ThreadingMixIn,BaseHTTPServer.HTTPServer):
     daemon_threads=False
-    allow_reuse_address=1 # ?
+    allow_reuse_address=1
     
     def setFS(self,fs):
         self.fs = fs
