@@ -25,19 +25,23 @@ class sqlFileDb(FileDbBase):
     def reset(self):
         pass
         
-    def _getFileId(self,filename):
+    def _getFileId(self,filename,create=True):
         result = self.execute("""SELECT id FROM """+self.t_files+""" WHERE filename=%s LIMIT 1""", (filename,))
         
         if result:
             return int(result[0]['id'])
+        elif not create:
+            return None
         else:
             self.execute("""INSERT IGNORE INTO """+self.t_files+"""(filename) VALUES (%s)""", (filename,))
             return self._getFileId(filename)
         
-    def _getNodeId(self,node):
+    def _getNodeId(self,node,create=True):
         result = self.execute("""SELECT id FROM """+self.t_nodes+""" WHERE address=%s LIMIT 1""", (node,))
         if result:
             return result[0]['id']
+        elif not create:
+            return None
         else:
             self.execute("""INSERT IGNORE INTO """+self.t_nodes+"""(address) VALUES (%s)""", (node,))
             return self._getNodeId(node)
@@ -127,7 +131,10 @@ class sqlFileDb(FileDbBase):
         self.hasChanged=True
         
     def getNodes(self, file):
-        file_id = self._getFileId(file)
+        file_id = self._getFileId(file,create=False)
+        if file_id is None:
+            return set()
+            
         result = self.execute("""SELECT """+self.t_nodes+""".address FROM """+self.t_files_nodes+""","""+self.t_nodes+""" WHERE """+self.t_nodes+""".id="""+self.t_files_nodes+""".node_id AND """+self.t_files_nodes+""".file_id=%s""", (file_id,))
 
         return set([ i['address'] for i in result ])
