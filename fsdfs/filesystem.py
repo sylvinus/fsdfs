@@ -193,7 +193,7 @@ class Filesystem:
                     self.debug("removing %s (kn=%s) to make space for %s" % (f,kn,filepath))
                     self.deleteFile(f)
                 else:
-                    self.debug("can't import %s because %s has kn<%s" % (filepath,f,kn))
+                    self.debug("can't import %s because %s has kn %s<=%s" % (filepath,f,kn,self.config["garbageMinKn"]))
                     #can't remove file, kn is not high enough. Delete import.
                     os.remove(destpath)
                     
@@ -357,10 +357,14 @@ class Filesystem:
             
             minKns = [(self.filedb.getKn(f),f) for f in self.filedb.getMinKnAll(num=1)]
             
-            status["nodes"] = self.nodedb
+            status["nodes"] = copy.copy(self.nodedb)
             status["sizeGlobal"] = self.filedb.getSizeAll()
             status["countGlobal"] = self.filedb.getCountAll()
             status["minKnGlobal"] = minKns
+            
+            for node in status["nodes"]:
+                status["nodes"][node]["maxKn"] = [(self.filedb.getKn(f),f) for f in self.filedb.getMaxKnInNode(node,num=1)]
+            
             
             #pass thru JSON to have the same exact returns as if in remote fetch
             return json.loads(json.dumps(status))
@@ -381,7 +385,6 @@ class Filesystem:
         return {
             "node": self.host,
             "df": self.maxstorage - self.filedb.getSizeInNode(self.host),
-            "maxKn":[(self.filedb.getKn(f),f) for f in self.filedb.getMaxKnInNode(self.host,num=1)],
             "uptime":int(time.time()-self.startTime),
             "load": 0,
             "count": self.filedb.getCountInNode(self.host),
