@@ -490,7 +490,7 @@ class myHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                 if self.server.fs.importFile(params["url"],params["filepath"]):
                     self.simpleResponse(200, "ok")
                 else:
-                    self.simpleResponse(502, "nok")
+                    self.simpleResponse(503, "couldn't make space for this file")
 
         
             elif p[1]=="NUKE":
