@@ -195,6 +195,11 @@ class basicTests(unittest.TestCase):
             self.assertEquals(open(node.getLocalFilePath("dir3/dir4/filename2.ext")).read(),open("./tests/fixtures/test2.txt").read())
         
         
+        #master should be always returned last when searching for a file
+        nodeswithfile = nodes[4].searchFile("dir1/dir2/filename.ext")
+        self.assertEquals(numNodes,len(nodeswithfile))
+        #self.assertEquals("localhost:%s"%(42362+2*0),nodeswithfile[-1])
+        
         #todo stop one node and make it come back after nuke
         
         nodes[0].nukeFile("dir1/dir2/filename.ext")

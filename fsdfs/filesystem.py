@@ -8,6 +8,7 @@ import shutil
 import BaseHTTPServer
 import urllib2
 import urllib
+import random
 import urlparse
 import logging
 
@@ -504,8 +505,18 @@ class myHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             elif p[1] == "SEARCH":
             
                 nodes = self.server.fs.filedb.getNodes(params["filepath"])
-            
-                self.simpleResponse(200,json.dumps(list(nodes)))
+                
+                #randomize nodes and always put the master at the end to avoid overloading it
+                
+                nodes = list(nodes)
+                random.shuffle(nodes)
+                
+                master = self.server.fs.config["master"]
+                if master in nodes:
+                    nodes.remove(master)
+                    nodes.append(master)
+                
+                self.simpleResponse(200,json.dumps(nodes))
         
             elif p[1] == "GETIP":
             
