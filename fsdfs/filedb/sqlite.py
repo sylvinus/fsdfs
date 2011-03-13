@@ -33,19 +33,23 @@ class sqliteFileDb(sqlFileDb):
     select_before_update = True
     
     
-    def _getFileId(self,filename):
+    def _getFileId(self,filename, insert=True):
         result = self.execute("""SELECT id FROM """+self.t_files+""" WHERE filename=%s LIMIT 1""", (filename,))
         
         if result:
             return int(result[0]['id'])
+        elif not insert:
+            return None
         else:
             self.execute("""INSERT OR IGNORE INTO """+self.t_files+"""(filename) VALUES (%s)""", (filename,))
             return self._getFileId(filename)
         
-    def _getNodeId(self,node):
+    def _getNodeId(self,node, insert=True):
         result = self.execute("""SELECT id FROM """+self.t_nodes+""" WHERE address=%s LIMIT 1""", (node,))
         if result:
             return result[0]['id']
+        elif not insert:
+            return None
         else:
             self.execute("""INSERT OR IGNORE INTO """+self.t_nodes+"""(address) VALUES (%s)""", (node,))
             return self._getNodeId(node)
