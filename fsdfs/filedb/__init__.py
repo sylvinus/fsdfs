@@ -126,6 +126,10 @@ class FileDbBase:
         files.sort(lambda x, y:cmp(self.getKn(x), self.getKn(y)))
         
         return files[0:num]
+        
+    def iterMinKnAll(self):
+        for f in self.getMinKnAll(num=self.getCountAll()):
+            yield f
     
     def getSizeAll(self):
         return sum([self.getSize(f) for f in self.listAll()])

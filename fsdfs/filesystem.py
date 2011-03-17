@@ -22,6 +22,7 @@ from SocketServer import ThreadingMixIn
 from replicator import Replicator
 sys.path.insert(0, os.path.dirname(__file__))
 from filedb import loadFileDb
+from reporter import Reporter
 
 class Filesystem:
     '''
@@ -286,7 +287,7 @@ class Filesystem:
         
         query = json.dumps(params)
         
-        #print "http://%s/%s" % (host,method)
+        #print "http://%s/%s %s" % (host,method,"h=" + self.hashQuery(query) + "&p=" + urllib.quote(query))
         ret = urllib2.urlopen("http://%s/%s" % (host, method),"h=" + self.hashQuery(query) + "&p=" + urllib.quote(query),timeout=60)
         
         if parse:
@@ -399,27 +400,6 @@ class Filesystem:
         
         return self.nodedb.keys()
   
-
-class Reporter(threading.Thread):
-
-    def __init__(self, fs):
-        threading.Thread.__init__(self)
-        self.fs = fs
-        self.stopnow = False
-        
-    def run(self):
-
-        while not self.stopnow:
-            try:
-                self.fs.report()
-            except Exception,e:
-                self.fs.error("While reporting : %s" % e)
-                
-            [time.sleep(1) for i in range(self.fs.config["reportInterval"]) if not self.stopnow]
-        
-    def shutdown(self):
-
-        self.stopnow = True
 
 class HTTPInterface(threading.Thread):
     

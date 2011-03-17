@@ -81,11 +81,16 @@ class Replicator(threading.Thread):
 	to write.
 	'''
         
-        knownNeeds = self.filedb.getMinKnAll(num=maxOperations)
+        ops = 0
         self.downloadThreads = []
         self.previsionalSizeAdded = {}
-        for file in knownNeeds:
-            self.replicateFile(file)
+        
+        for file in self.filedb.iterMinKnAll():
+            
+            if self.replicateFile(file):
+                ops+=1
+                if ops==maxOperations:
+                    break
             
         for t in self.downloadThreads:
             t.join()
@@ -240,6 +245,10 @@ class Replicator(threading.Thread):
             if len(self.downloadThreads)>=self.fs.config["replicatorConcurrency"]:
                 self.downloadThreads.pop(0).join()
                 self.previsionalSizeAdded[node]-=size
+                
+            return True
+                
+        return False
 
 
 class DownloadThread(threading.Thread):

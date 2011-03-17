@@ -185,6 +185,22 @@ class sqlFileDb(FileDbBase):
         
         return [ i['filename'] for i in result ]
 
+
+    def iterMinKnAll(self):
+        step=50
+        i=0
+        
+        total = self.getCountAll()
+        
+        while i*step<total:
+        
+            result = self.execute("""SELECT F.filename FROM """+self.t_files+""" F WHERE F.nuked=0 ORDER BY F.kn ASC LIMIT %s,%s""", (i*step,step))
+        
+            for x in result:
+                yield x['filename']
+                
+            i+=1
+            
     def getSizeAll(self):
         
         result = self.execute("""SELECT SUM(F.size) as s FROM """+self.t_files+""" F WHERE F.nuked=0""")
