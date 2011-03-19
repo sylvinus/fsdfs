@@ -30,7 +30,7 @@ class scalingfilesTests(unittest.TestCase):
         
     def testTwoNodes(self):
         
-        numFiles = 500
+        numFiles = 400
         secret = "azpdoazrRR"
         
         nodeA = TestFS({
@@ -60,9 +60,13 @@ class scalingfilesTests(unittest.TestCase):
         for i in range(numFiles):
             nodeA.importFile("./tests/fixtures/test.txt","file%s" % i)
         
-        sleep(numFiles*0.2)
+        for x in range(numFiles):
+            statusB = nodeB.getStatus()
+            if numFiles==statusB["count"]:
+                print "Got all files replicated after %s seconds" % (x*0.1)
+                break
+            time.sleep(0.1)
         
-        statusB = nodeB.getStatus()
         
         self.assertEquals(numFiles,statusB["count"])
         

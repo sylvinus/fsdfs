@@ -74,9 +74,14 @@ class sqlFileDb(FileDbBase):
             
             arg_list = []
             req_str=[]
+            
+            changes_n = False
 
             for key, value in data.iteritems():
             
+                if key=="n":
+                    changes_n=True
+                    
                 if key!="nodes":
                     if key=="t":
                         req_str.append(key+"""="""+self.unixtimefunction+"""(%s) """)
@@ -87,7 +92,9 @@ class sqlFileDb(FileDbBase):
         
             if len(req_str):
                 self.execute("""UPDATE """+self.t_files+""" SET """+(','.join(req_str))+""" WHERE id=%s""",tuple(arg_list))
-        
+                
+                if changes_n:
+                    self.update(file,{'kn':self.getKn(file)})
     
         if "nodes" in data:
             self.execute("""DELETE FROM """+self.t_files_nodes+""" WHERE file_id=%s""", (file_id,))

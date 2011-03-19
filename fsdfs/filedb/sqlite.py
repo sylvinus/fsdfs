@@ -32,11 +32,18 @@ class sqliteFileDb(sqlFileDb):
     # save some writes! Or too much locking happening
     select_before_update = True
     
+    fileidcache = {}
+    nodeidcache = {}
     
     def _getFileId(self,filename, insert=True):
+        
+        if filename in self.fileidcache:
+            return self.fileidcache[filename]
+        
         result = self.execute("""SELECT id FROM """+self.t_files+""" WHERE filename=%s LIMIT 1""", (filename,))
         
         if result:
+            self.fileidcache[filename] = int(result[0]['id'])
             return int(result[0]['id'])
         elif not insert:
             return None
@@ -45,8 +52,16 @@ class sqliteFileDb(sqlFileDb):
             return self._getFileId(filename)
         
     def _getNodeId(self,node, insert=True):
+        #if node in self.nodeidcache:
+        #    print self.nodeidcache,node,self.nodeidcache[node]
+        #    return self.nodeidcache[node]
+            
+        
         result = self.execute("""SELECT id FROM """+self.t_nodes+""" WHERE address=%s LIMIT 1""", (node,))
+
+
         if result:
+            self.nodeidcache[node] = int(result[0]['id'])
             return result[0]['id']
         elif not insert:
             return None
@@ -64,12 +79,15 @@ class sqliteFileDb(sqlFileDb):
         
         ret = None
         try:
-            self.cur.execute(sql,args)
-            ret = self.cur.fetchall()
+            ret = self._execute(sql,args)
         finally:
             self.sqlLock.release()
         
         return ret
+        
+    def _execute(self,sql,args):
+        self.cur.execute(sql,args)
+        return self.cur.fetchall()
         
     def connect(self):
         

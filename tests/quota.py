@@ -23,7 +23,7 @@ class TestFS(Filesystem):
     
    
 class quotaTests(unittest.TestCase):
-    filedb = "memory"
+    filedb = "sqlite"
     
     def setUp(self):
 		
