@@ -81,7 +81,7 @@ class replicatiobalanceTests(unittest.TestCase):
         for i in range(10):
             self.assertTrue(nodeA.importFile("tests/fixtures/1b.txt","a%s" % i))
         
-        sleep(3)
+        sleep(5)
         
         for i in range(10):
             self.assertEquals(0,nodeA.filedb.getKn("a%s" % i))
@@ -95,9 +95,10 @@ class replicatiobalanceTests(unittest.TestCase):
         
         for i in range(10):
             self.assertTrue(nodeA.importFile("tests/fixtures/1b.txt","b%s" % i))
-            
         
-        sleep(2)
+        sleep(5)
+        
+        
 
         for i in range(10):
             self.assertHasFile(nodeB, "tests/fixtures/1b.txt","a%s" % i)

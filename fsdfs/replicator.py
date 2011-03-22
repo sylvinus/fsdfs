@@ -237,14 +237,22 @@ class Replicator(threading.Thread):
             
             self.lastIterationDidSomething=True
             
-            t = DownloadThread(self.fs,node,file)
+            t = DownloadThread(self.fs,node,file,size)
             t.start()
             
             self.downloadThreads.append(t)
             
-            if len(self.downloadThreads)>=self.fs.config["replicatorConcurrency"]:
-                self.downloadThreads.pop(0).join()
-                self.previsionalSizeAdded[node]-=size
+            # try to join the first thread we find that's finished downloading
+            while len(self.downloadThreads)>=self.fs.config["replicatorConcurrency"]:
+                
+                for i in range(len(self.downloadThreads)):
+                    if not self.downloadThreads[i].isAlive():
+                        th = self.downloadThreads.pop(i)
+                        th.join()
+                        self.previsionalSizeAdded[th.node]-=th.size
+                        break
+                        
+                time.sleep(0.1)
                 
             return True
                 
@@ -253,11 +261,12 @@ class Replicator(threading.Thread):
 
 class DownloadThread(threading.Thread):
 
-    def __init__(self,fs,node,file):
+    def __init__(self,fs,node,file,size):
         threading.Thread.__init__(self)
         self.fs = fs
         self.node = node
         self.file = file
+        self.size = size
 
         self.daemon = True
         

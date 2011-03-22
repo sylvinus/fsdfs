@@ -6,6 +6,7 @@ from time import sleep
 import unittest
 import threading
 import shutil,time
+import random
 
 
 import logging
@@ -16,7 +17,12 @@ from fsdfs.filesystem import Filesystem
 
 
 class TestFS(Filesystem):
-    pass
+    def downloadFile(self, filepath):
+        
+        #sleep for 0 to 1.5 seconds
+        sleep(random.random()*1.5)
+        
+        return Filesystem.downloadFile(self,filepath)
     
    
 class scalingfilesTests(unittest.TestCase):
@@ -39,7 +45,9 @@ class scalingfilesTests(unittest.TestCase):
             "secret":secret,
             "master":"localhost:42342",
             "replicationInterval":0,
-            "filedb":self.filedb
+            "filedb":self.filedb,
+            "replicatorDepth":50,
+            "replicatorConcurrency":10
         })
         
         nodeB = TestFS({

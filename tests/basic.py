@@ -28,7 +28,7 @@ class basicTests(unittest.TestCase):
         os.makedirs("./tests/datadirs")
         
        
-    def testFileDownloadImport(self):
+    def _testFileDownloadImport(self):
     
         secret = "azpdoazrRR"
     
