@@ -257,7 +257,7 @@ class sqlFileDb(FileDbBase):
     
         result = self.execute("""SELECT N.address FROM """+self.t_nodes+""" N""")
     
-        return [ i['address'] for i in result ]
+        return [ i['address'] for i in result if i['address'] in self.nodes ]
     
     def addNode(self,node,data):
         
