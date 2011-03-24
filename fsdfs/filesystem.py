@@ -67,7 +67,7 @@ class Filesystem:
             
             for i in range(self.config["getIpTimeout"]):
                 try:
-                    ip = self.nodeRPC(self.config["master"],"GETIP",parse=True)
+                    ip = self.nodeRPC(self.config["master"],"GETIP")
                     break
                 except:
                     time.sleep(1)
@@ -274,11 +274,11 @@ class Filesystem:
         Returns the nodes where a file is stored
         '''
         
-        nodes = self.nodeRPC(self.config["master"], "SEARCH", {"filepath": file}, parse=True)
+        nodes = self.nodeRPC(self.config["master"], "SEARCH", {"filepath": file})
         
         return nodes
     
-    def nodeRPC(self,host,method,params={},parse=False):
+    def nodeRPC(self,host,method,params={},returnfd=False):
         '''
         Inter-node communication method
         '''
@@ -290,8 +290,10 @@ class Filesystem:
         #print "http://%s/%s %s" % (host,method,"h=" + self.hashQuery(query) + "&p=" + urllib.quote(query))
         ret = urllib2.urlopen("http://%s/%s" % (host, method),"h=" + self.hashQuery(query) + "&p=" + urllib.quote(query),timeout=60)
         
-        if parse:
-            return json.loads(ret.read())
+        if not returnfd:
+            j = json.loads(ret.read())
+            ret.close()
+            return j
         else:
             return ret
     
@@ -311,7 +313,7 @@ class Filesystem:
         
         for host in hosts:
             try:
-                remote = self.nodeRPC(host, "DOWNLOAD", {"filepath": filepath})
+                remote = self.nodeRPC(host, "DOWNLOAD", {"filepath": filepath},returnfd=True)
             except Exception, err:
                 #print err
                 continue
@@ -351,7 +353,7 @@ class Filesystem:
         '''
         
         if not self.ismaster:
-            return self.nodeRPC(self.config["master"], "GLOBALSTATUS", parse=True)
+            return self.nodeRPC(self.config["master"], "GLOBALSTATUS")
         else:
             
             status = self.getStatus()
@@ -498,7 +500,7 @@ class myHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         
             elif p[1] == "STATUS":
             
-                self.simpleResponse(200,json.dumps(self.server.fs.getStatus()))
+                self.simpleResponse(200,self.server.fs.getStatus())
         
             elif p[1] == "GLOBALSTATUS":
 
@@ -508,7 +510,7 @@ class myHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                 else:
                     status = self.server.fs.getGlobalStatus()
                 
-                    self.simpleResponse(200,json.dumps(status))
+                    self.simpleResponse(200,status)
 
         
         
@@ -526,11 +528,11 @@ class myHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                     nodes.remove(master)
                     nodes.append(master)
                 
-                self.simpleResponse(200,json.dumps(nodes))
+                self.simpleResponse(200,nodes)
         
             elif p[1] == "GETIP":
             
-                self.simpleResponse(200,json.dumps(self.client_address[0]))
+                self.simpleResponse(200,self.client_address[0])
         
         
             elif p[1] == "REPORT":
@@ -556,7 +558,7 @@ class myHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     def simpleResponse(self, code, content):
         self.send_response(code)
         self.end_headers()
-        self.wfile.write(content)
+        self.wfile.write(json.dumps(content))
         self.connection.shutdown(1)
     
     def _getPostParams(self):

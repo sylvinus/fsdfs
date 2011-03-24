@@ -70,7 +70,7 @@ class Replicator(threading.Thread):
             #do a set() because list may change while looping
             nodes = set(self.filedb.getNodes(file))
             for node in nodes:
-                deleted = ("ok"==self.fs.nodeRPC(node,"DELETE",{"filepath":file}).read())
+                deleted = ("ok"==self.fs.nodeRPC(node,"DELETE",{"filepath":file}))
                 
                 if deleted:
                     self.filedb.removeFileFromNode(file,node)
@@ -222,7 +222,7 @@ class Replicator(threading.Thread):
                 self.fs.nodedb[node]["size"] -= self.filedb.getSize(file_to_remove)
                 
                 
-                deleted = ("ok" == self.fs.nodeRPC(node, "DELETE", {"filepath": file_to_remove}).read())
+                deleted = ("ok" == self.fs.nodeRPC(node, "DELETE", {"filepath": file_to_remove}))
                 
                 if deleted:
                     self.filedb.removeFileFromNode(file_to_remove,node)
@@ -273,7 +273,7 @@ class DownloadThread(threading.Thread):
     def run(self):
 
         # 3. make the node replicate it
-        downloaded = ("ok" == self.fs.nodeRPC(self.node, "SUGGEST", {"filepath": self.file}).read())
+        downloaded = ("ok" == self.fs.nodeRPC(self.node, "SUGGEST", {"filepath": self.file}))
         
         #add it directly to filedb
         if downloaded:

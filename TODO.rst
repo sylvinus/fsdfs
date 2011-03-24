@@ -8,6 +8,8 @@ Blockers V1
 - reindex command ? (listdir=>filedb)
 
 V1.1
+- when adding a node with huge free space, make sure others continue to replicate (per-node replicationConcurrency)
+- Import files elswhere than master
 - Implement ctrl-c stopping everything
 - file version system?
 - Complete Sphinx documentation
