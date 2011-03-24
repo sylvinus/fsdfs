@@ -292,6 +292,8 @@ class Filesystem:
         if not returnfd:
             j = json.loads(ret.read())
             ret.fp._sock.recv=None # http://bugs.python.org/issue1208304
+            ret.fp._sock.close() # http://bugs.python.org/issue1208304
+            
             ret.close()
             return j
         else:
