@@ -38,12 +38,15 @@ class Replicator(threading.Thread):
         '''
         
         self.filedb = self.fs.filedb
+        
+        self.nodewatcher = NodeWatcher(self.fs)
+        self.nodewatcher.start()
 
         while not self.stopnow:
             
             self.updateAllFileDb()
             
-            self.fs.filedb.hasChanged=False
+            self.filedb.hasChanged=False
             
             self.performNukes()
             
@@ -54,7 +57,7 @@ class Replicator(threading.Thread):
             #Sleep for one minute unless something happens..
             if not self.lastIterationDidSomething and self.fs.config["replicatorIdleTime"]>0:
                 self.fs.debug("Idling for %s seconds max..." % self.fs.config["replicatorIdleTime"],"repl")
-                [time.sleep(1) for i in range(self.fs.config["replicatorIdleTime"]) if not self.lastIterationDidSomething and not self.stopnow and not self.fs.filedb.hasChanged]
+                [time.sleep(1) for i in range(self.fs.config["replicatorIdleTime"]) if not self.lastIterationDidSomething and not self.stopnow and not self.filedb.hasChanged]
             else:
                 time.sleep(self.fs.config["replicatorInterval"])
     
@@ -125,9 +128,9 @@ class Replicator(threading.Thread):
        
        
         def df(node):
-            return self.fs.nodedb[node]["df"] - self.previsionalSizeAdded.get(node,0)
+            return self.filedb.getNode(node)["df"] - self.previsionalSizeAdded.get(node,0)
         
-        knownNodes = self.fs.getKnownNodes()
+        knownNodes = self.filedb.listNodes()
         
         #print "\n".join(["%s has %s" % (n,self.filedb.listInNode(n)) for n in knownNodes])
         
@@ -160,7 +163,7 @@ class Replicator(threading.Thread):
             #only target nodes which don't have the file
             if node not in alreadyNodes:
                 #only target nodes with enough free disk or with some files to delete to make space
-                if df(node) + self.fs.nodedb[node]["size"] >= size:
+                if df(node) + self.filedb.getNode(node)["size"] >= size:
                     newnodes.append(node)
         
         #print (knownNodes,alreadyNodes,newnodes,self.fs.nodedb)
@@ -218,8 +221,8 @@ class Replicator(threading.Thread):
 								self.filedb.getKn(file_to_remove)
 							),"repl")
                 
-                self.fs.nodedb[node]["df"] += self.filedb.getSize(file_to_remove)
-                self.fs.nodedb[node]["size"] -= self.filedb.getSize(file_to_remove)
+                self.filedb.getNode(node)["df"] += self.filedb.getSize(file_to_remove)
+                self.filedb.getNode(node)["size"] -= self.filedb.getSize(file_to_remove)
                 
                 
                 deleted = ("ok" == self.fs.nodeRPC(node, "DELETE", {"filepath": file_to_remove}))
@@ -258,6 +261,23 @@ class Replicator(threading.Thread):
                 
         return False
 
+
+class NodeWatcher(threading.Thread):
+    def __init__(self,fs):
+        threading.Thread.__init__(self)
+        self.daemon = True
+        self.fs = fs
+        
+    def run(self):
+        
+        while True:
+            time.sleep(self.fs.config["reportInterval"]/2)
+            for node in self.fs.filedb.listNodes():
+                lastUpdate = self.fs.filedb.getNode(node)["lastUpdate"]
+                if lastUpdate<(time.time()-self.fs.config["reportInterval"]*self.fs.config["maxMissedReports"]):
+                    self.fs.debug("Node %s missed %s reports, removing it from the swarm" % (node,self.fs.config["maxMissedReports"]))
+                    self.fs.filedb.removeNode(node)
+                
 
 class DownloadThread(threading.Thread):
 

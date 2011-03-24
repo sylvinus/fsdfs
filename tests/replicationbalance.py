@@ -140,7 +140,7 @@ class replicatiobalanceTests(unittest.TestCase):
         
         sleep(7)
         
-        self.assertEquals(3,len(nodeA.getKnownNodes()))
+        self.assertEquals(3,len(nodeA.filedb.listNodes()))
         
         #nodeA should be maxed out with "a" files even if they are not the most critical
         self.assertEquals(10,nodeA.getStatus()["df"])

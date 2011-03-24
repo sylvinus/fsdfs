@@ -47,7 +47,8 @@ class Filesystem:
         "reportInterval":60,
         "getIpTimeout":120,
         "garbageOnImport":True,
-        "garbageMinKn":0
+        "garbageMinKn":0,
+        "maxMissedReports":3
     }
     
     def __init__(self, config):
@@ -60,6 +61,8 @@ class Filesystem:
         self.locks = {
             "importFileMkdir":threading.Lock()
         }
+        
+        self.filedb = False
         
         # We didn't get any hostname but we got a port. Ask the master what is our IP then.
         if "host" not in self.config and "port" in self.config:
@@ -75,8 +78,6 @@ class Filesystem:
                     
             self.config["host"] = "%s:%s" % (ip,self.config["port"])
         
-        
-        self.nodedb = {}
         
         self.ismaster = (self.config["master"] == self.config["host"]) or (self.config["master"] is True)
         
@@ -225,20 +226,18 @@ class Filesystem:
         '''
         #print "starting %s" % self.host
         
-        filedb_options = {}
-        filedb_backend = self.config.get("filedb","memory")
-        if type(filedb_backend)==dict:
-            filedb_options=filedb_backend
-            filedb_backend=filedb_options["backend"]
+        if not self.filedb:
+            
+            filedb_options = {}
+            filedb_backend = self.config.get("filedb","sqlite")
+            if type(filedb_backend)==dict:
+                filedb_options=filedb_backend
+                filedb_backend=filedb_options["backend"]
         
-        self.filedb = loadFileDb(filedb_backend, self, filedb_options)
-        
-        
+            self.filedb = loadFileDb(filedb_backend, self, filedb_options)
         
         self.httpinterface = HTTPInterface(self)
         self.httpinterface.start()
-        
-        #self.report()
         
         self.reporter = Reporter(self)
         self.reporter.start()
@@ -292,6 +291,7 @@ class Filesystem:
         
         if not returnfd:
             j = json.loads(ret.read())
+            ret.fp._sock.recv=None # http://bugs.python.org/issue1208304
             ret.close()
             return j
         else:
@@ -328,24 +328,16 @@ class Filesystem:
         
         return False
     
-    def report(self):
+    def report(self,with_files=False):
         '''
         Sends the local status to the master server
         '''
         if self.ismaster:
-            self.addNode(self.host,self.getStatus())
+            self.filedb.addNode(self.host,self.getStatus(with_files=with_files))
         else:
-            self.nodeRPC(self.config["master"], "REPORT", self.getStatus())
-    
-    def addNode(self,node,status):
-        status["lastReport"] = time.time()
-        
-        if not node in self.nodedb:
-            self.filedb.hasChanged=True
-            
-        self.nodedb[node] = status
+            #print "reporting %s" % self.getStatus(with_files=with_files)
+            self.nodeRPC(self.config["master"], "REPORT", self.getStatus(with_files=with_files))
 
-    
     def getGlobalStatus(self):
         
         '''
@@ -360,7 +352,11 @@ class Filesystem:
             
             minKns = [(self.filedb.getKn(f),f) for f in self.filedb.getMinKnAll(num=1)]
             
-            status["nodes"] = copy.copy(self.nodedb)
+            nodes = {}
+            for node in self.filedb.listNodes():
+                nodes[node] = self.filedb.getNode(node)
+                
+            status["nodes"] = nodes
             status["sizeGlobal"] = self.filedb.getSizeAll()
             status["countGlobal"] = self.filedb.getCountAll()
             status["minKnGlobal"] = minKns
@@ -373,7 +369,7 @@ class Filesystem:
             return json.loads(json.dumps(status))
 
     
-    def getStatus(self):
+    def getStatus(self,with_files=False):
         '''
         Return the status of a Filesystem server.
         
@@ -385,7 +381,7 @@ class Filesystem:
         * size -- the size of the node (sum of the files)
         '''
         
-        return {
+        ret =  {
             "node": self.host,
             "df": self.maxstorage - self.filedb.getSizeInNode(self.host),
             "uptime":int(time.time()-self.startTime),
@@ -393,16 +389,12 @@ class Filesystem:
             "count": self.filedb.getCountInNode(self.host),
             "size": self.filedb.getSizeInNode(self.host)
         }
-        #"files":self.filedb.listAll()
-    
-    def getKnownNodes(self):
-        '''
-        to write.
-        '''
         
-        return self.nodedb.keys()
-  
-
+        if with_files:
+            ret["files"] = self.filedb.listAll()
+            
+        return ret
+    
 class HTTPInterface(threading.Thread):
     
     def __init__(self, fs):
@@ -537,9 +529,14 @@ class myHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         
             elif p[1] == "REPORT":
             
-                self.server.fs.addNode(params["node"],params)
+                if not self.server.fs.ismaster:
+                    self.simpleResponse(403,"not on master")
+                else:
+                    self.server.fs.filedb.addNode(params["node"],params)
             
-                self.simpleResponse(200,"ok")
+                    self.simpleResponse(200,"ok")
+                
+                
                 
             elif p[1] == "RAISE":
                 

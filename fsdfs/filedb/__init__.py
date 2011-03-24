@@ -70,6 +70,30 @@ class FileDbBase:
         '''
         
         pass
+
+    def listNodes(self):
+        '''
+        Return all known nodes
+        '''
+        pass
+        
+    def getNode(self,node):
+        '''
+        Get data about a node
+        '''
+        
+    def addNode(self,node,data):
+        '''
+        Add a known nodes
+        '''
+        pass
+    
+    def removeNode(self,node):
+        '''
+        Remove a known nodes
+        '''
+        pass
+    
     
     def getSize(self, file):
         '''

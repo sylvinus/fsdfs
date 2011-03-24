@@ -119,7 +119,7 @@ class quotaTests(unittest.TestCase):
         
         nodeD.start()
         
-        sleep(1)
+        sleep(3)
         
         self.assertHasFile(nodeA, "tests/fixtures/10b.2.txt")
         self.assertHasFile(nodeB, "tests/fixtures/10b.txt")
@@ -171,7 +171,7 @@ class quotaTests(unittest.TestCase):
         nodeD.stop()
         
         
-    def testSpaceOptimization(self):
+    def _testSpaceOptimization(self):
         
         secret = "azpdoazrRR"
         

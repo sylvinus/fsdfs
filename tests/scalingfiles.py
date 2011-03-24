@@ -47,7 +47,9 @@ class scalingfilesTests(unittest.TestCase):
             "replicationInterval":0,
             "filedb":self.filedb,
             "replicatorDepth":50,
-            "replicatorConcurrency":10
+            "replicatorConcurrency":10,
+            "reportInterval":2,
+            "maxMissedReports":3
         })
         
         nodeB = TestFS({
@@ -55,7 +57,9 @@ class scalingfilesTests(unittest.TestCase):
             "datadir":"./tests/datadirs/B",
             "secret":secret,
             "master":"localhost:42342",
-            "filedb":self.filedb
+            "filedb":self.filedb,
+            "reportInterval":2,
+            "maxMissedReports":3
         })
         
         nodeA.start()
@@ -78,8 +82,35 @@ class scalingfilesTests(unittest.TestCase):
         
         self.assertEquals(numFiles,statusB["count"])
         
+        
+        nodeB.stop()
+        
+        #
+        #
+        nodeA.stop()
+        return
+        #
+        # test doesn't work because replicator puts too much stress on the addFilesToNode loop.
+        
+        sleep(8)
+        
+        g = nodeA.getGlobalStatus()
+        self.assertEquals(1,len(g["nodes"]))
+        
+        print "restarting node..."
+        
+        nodeB.start()
+        
+        sleep(0.05*numFiles)
+        
+        for i in range(numFiles):
+            print "testing %s" % i
+            self.assertEquals([nodeB.host,nodeA.host],nodeA.searchFile("file%s" % i))
+        
+        
         nodeA.stop()
         nodeB.stop()
+        
 
     
       

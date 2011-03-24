@@ -9,12 +9,16 @@ class Reporter(threading.Thread):
         
     def run(self):
 
+        first = True
+
         while not self.stopnow:
             try:
-                self.fs.report()
+                self.fs.report(with_files=(first and not self.fs.ismaster))
+                first=False
             except Exception,e:
                 self.fs.error("While reporting : %s" % e)
                 
+            
             [time.sleep(1) for i in range(self.fs.config["reportInterval"]) if not self.stopnow]
         
     def shutdown(self):

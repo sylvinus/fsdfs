@@ -1,4 +1,5 @@
 from filedb import FileDbBase
+import time
 
 class memoryFileDb(FileDbBase):
     '''
@@ -19,6 +20,7 @@ class memoryFileDb(FileDbBase):
         
     def reset(self):
         self.files = {}
+        self.nodes = {}
         
         self.hasChanged=True
     
@@ -73,4 +75,35 @@ class memoryFileDb(FileDbBase):
                 innode.append(f)
 
         return innode
+        
+    def addNode(self,node,data):
+        data["lastUpdate"] = time.time()
+        
+        if "files" in data:
+            for f in data["files"]:
+                self.addFileToNode(f,node)
+                
+            del data["files"]
+        
+        self.nodes[node] = data
+        self.hasChanged=True
+        
+    def listNodes(self):
+        return self.nodes.keys()
+        
+    def getNode(self,node):
+        if not node in self.nodes:
+            return None
+        else:
+            return self.nodes[node]
+            
+    def removeNode(self,node):
+        if node in self.nodes:
+            del self.nodes[node]
+        
+        #also delete in all files
+        for f in self.files:
+            if node in self.files[f]["nodes"]:
+                self.files[f]["nodes"].discard(node)
     
+        self.hasChanged=True

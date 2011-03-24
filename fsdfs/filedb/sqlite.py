@@ -48,7 +48,7 @@ class sqliteFileDb(sqlFileDb):
         elif not insert:
             return None
         else:
-            self.execute("""INSERT OR IGNORE INTO """+self.t_files+"""(filename) VALUES (%s)""", (filename,))
+            self.execute("""INSERT IGNORE INTO """+self.t_files+"""(filename) VALUES (%s)""", (filename,))
             return self._getFileId(filename)
         
     def _getNodeId(self,node, insert=True):
@@ -66,7 +66,7 @@ class sqliteFileDb(sqlFileDb):
         elif not insert:
             return None
         else:
-            self.execute("""INSERT OR IGNORE INTO """+self.t_nodes+"""(address) VALUES (%s)""", (node,))
+            self.execute("""INSERT IGNORE INTO """+self.t_nodes+"""(address) VALUES (%s)""", (node,))
             return self._getNodeId(node)
     
     
@@ -74,6 +74,8 @@ class sqliteFileDb(sqlFileDb):
         #print "%s - %s %s" % (self.fs.host,sql,args)
         
         sql = sql.replace("""%s""","?")
+        if sql[0:14]=="INSERT IGNORE ":
+            sql = "INSERT OR IGNORE "+sql[14:]
         
         self.sqlLock.acquire()
         

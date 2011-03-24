@@ -1,4 +1,5 @@
 import MySQLdb,os
+import time
 
 from filedb import FileDbBase
 
@@ -18,6 +19,8 @@ class sqlFileDb(FileDbBase):
         
         self.hasChanged=True
 
+        self.nodes = {}
+        
     def execute(self,sql,*args):
         self.cursor.execute(sql,*args)        
         return self.cursor.fetchall()
@@ -116,13 +119,10 @@ class sqlFileDb(FileDbBase):
     
     def addFileToNode(self, file, node):
 
-        #todo unique key
-        self.removeFileFromNode(file,node)
-        
         file_id = self._getFileId(file)
         node_id = self._getNodeId(node)
         
-        self.execute("""INSERT INTO """+self.t_files_nodes+"""(file_id,node_id) VALUES (%s,%s)""", (file_id,node_id))
+        self.execute("""INSERT IGNORE INTO """+self.t_files_nodes+"""(file_id,node_id) VALUES (%s,%s)""", (file_id,node_id))
         
         self.update(file,{'kn':self.getKn(file)})
         
@@ -252,3 +252,55 @@ class sqlFileDb(FileDbBase):
             return long(result[0]['s'])
         else:
             return 0
+            
+    def listNodes(self):
+    
+        result = self.execute("""SELECT N.address FROM """+self.t_nodes+""" N""")
+    
+        return [ i['address'] for i in result ]
+    
+    def addNode(self,node,data):
+        
+        node_id = self._getNodeId(node)
+        
+        data["lastUpdate"] = time.time()
+        
+        if "files" in data:
+            for f in data["files"]:
+                self.addFileToNode(f,node)
+                
+            del data["files"]
+        
+        if not node in self.nodes:
+            self.hasChanged=True
+            
+        self.nodes[node] = data
+        
+    def getNode(self,node):
+        
+        node_id = self._getNodeId(node,insert=False)
+        
+        if not node_id:
+            return None
+        
+        if node not in self.nodes:
+            return {}
+        else:
+            return self.nodes[node]
+        
+        
+    def removeNode(self,node):
+        
+        node_id = self._getNodeId(node)
+        
+        files = self.listInNode(node)
+        
+        result = self.execute("""DELETE FROM """+self.t_nodes+""" WHERE address=%s""",(node,))
+        
+        result = self.execute("""DELETE FROM """+self.t_files_nodes+""" WHERE node_id=%s""",(node_id,))
+
+        #adjust FN cache
+        for file in files:
+            self.update(file,{'kn':self.getKn(file)})
+        
+        
