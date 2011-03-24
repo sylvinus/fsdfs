@@ -532,9 +532,13 @@ class myHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                 if not self.server.fs.ismaster:
                     self.simpleResponse(403,"not on master")
                 else:
+                    
+                    #answer before because addNode can take lots of time if getting first packet with_files
+                    self.simpleResponse(200,"ok")
+                    
                     self.server.fs.filedb.addNode(params["node"],params)
             
-                    self.simpleResponse(200,"ok")
+                    
                 
                 
                 
