@@ -11,6 +11,7 @@ import urllib
 import random
 import urlparse
 import logging
+import socket
 
 try:
     import simplejson as json
@@ -430,6 +431,11 @@ class myHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     
     def do_POST(self):
         
+        
+        #force no keepalive
+        self.close_connection = 1
+        
+        
         try:
             
             #print "got %s at %s" % (self.path,self.server.fs.host)
@@ -556,13 +562,17 @@ class myHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             self.server.fs.error("When serving %s %s : %s" % (p[1],params,e))
             
             
-            
-    
     def simpleResponse(self, code, content):
+        
         self.send_response(code)
         self.end_headers()
         self.wfile.write(json.dumps(content))
-        self.connection.shutdown(1)
+        self.connection.shutdown(socket.SHUT_RDWR)
+        
+        try:
+            self.finish()
+        except:
+            pass
     
     def _getPostParams(self):
         
