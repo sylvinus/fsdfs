@@ -49,7 +49,8 @@ class Filesystem:
         "getIpTimeout":120,
         "garbageOnImport":True,
         "garbageMinKn":0,
-        "maxMissedReports":3
+        "maxMissedReports":3,
+        "downloadTimeout":3600
     }
     
     def __init__(self, config):
@@ -278,7 +279,7 @@ class Filesystem:
         
         return nodes
     
-    def nodeRPC(self,host,method,params={},returnfd=False):
+    def nodeRPC(self,host,method,params={},returnfd=False,timeout=30):
         '''
         Inter-node communication method
         '''
@@ -288,7 +289,7 @@ class Filesystem:
         query = json.dumps(params)
         
         #print "http://%s/%s %s" % (host,method,"h=" + self.hashQuery(query) + "&p=" + urllib.quote(query))
-        ret = urllib2.urlopen("http://%s/%s" % (host, method),"h=" + self.hashQuery(query) + "&p=" + urllib.quote(query),timeout=60)
+        ret = urllib2.urlopen("http://%s/%s" % (host, method),"h=" + self.hashQuery(query) + "&p=" + urllib.quote(query),timeout=timeout)
         
         if not returnfd:
             j = json.loads(ret.read())
@@ -316,7 +317,7 @@ class Filesystem:
         
         for host in hosts:
             try:
-                remote = self.nodeRPC(host, "DOWNLOAD", {"filepath": filepath},returnfd=True)
+                remote = self.nodeRPC(host, "DOWNLOAD", {"filepath": filepath},returnfd=True,timeout=self.config["downloadTimeout"])
             except Exception, err:
                 #print err
                 continue

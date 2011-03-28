@@ -293,7 +293,7 @@ class DownloadThread(threading.Thread):
     def run(self):
 
         # 3. make the node replicate it
-        downloaded = ("ok" == self.fs.nodeRPC(self.node, "SUGGEST", {"filepath": self.file}))
+        downloaded = ("ok" == self.fs.nodeRPC(self.node, "SUGGEST", {"filepath": self.file},timeout=self.fs.config["downloadTimeout"]+10))
         
         #add it directly to filedb
         if downloaded:
