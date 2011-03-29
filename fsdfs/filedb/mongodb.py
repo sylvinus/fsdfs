@@ -75,7 +75,7 @@ class mongodbFileDb(FileDbBase):
         #print toupdate
         self.files.update({"_id":file},toupdate,upsert=True,safe=True,multi=False)
         
-        self.files.ensure_index([("kn",pymongo.ASCENDING)])
+        self.files.ensure_index([("kn",pymongo.ASCENDING),("nuked",pymongo.ASCENDING)])
         
         if updatekn:
             self.files.update({"_id":file},{"$set":{"kn":self.getKn(file)}},safe=True,multi=False)
