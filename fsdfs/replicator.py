@@ -87,7 +87,7 @@ class Replicator(threading.Thread):
         ops = 0
         self.downloadThreads = []
         self.previsionalSizeAdded = {}
-        
+
         for file in self.filedb.iterMinKnAll():
             
             if self.replicateFile(file):
@@ -126,9 +126,10 @@ class Replicator(threading.Thread):
 	Describe the algorithm...
 	'''
        
-       
+        #print "try rep %s" % file
+        
         def df(node):
-            return self.filedb.getNode(node)["df"] - self.previsionalSizeAdded.get(node,0)
+            return self.filedb.getNode(node).get("df",0) - self.previsionalSizeAdded.get(node,0)
         
         knownNodes = self.filedb.listNodes()
         

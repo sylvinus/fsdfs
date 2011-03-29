@@ -23,7 +23,12 @@ class TestFS(Filesystem):
     
    
 class replicatiobalanceTests(unittest.TestCase):
-    filedb = "sqlite"
+    filedb = {
+        "backend":"mongodb",
+        "host":"localhost",
+        "db":"fsdfs_test",
+        "port":27017
+    }
     
     def setUp(self):
 		
@@ -42,6 +47,7 @@ class replicatiobalanceTests(unittest.TestCase):
             "datadir":"./tests/datadirs/A",
             "secret":secret,
             "master":"localhost:52342",
+            "resetFileDbOnStart":True,
             "maxstorage":10,
             "filedb":self.filedb,
             "garbageMinKn":-1,
@@ -55,6 +61,7 @@ class replicatiobalanceTests(unittest.TestCase):
         nodeB = TestFS({
             "host":"localhost:52352",
             "datadir":"./tests/datadirs/B",
+            "resetFileDbOnStart":True,
             "secret":secret,
             "master":"localhost:52342",
             "maxstorage":10,
@@ -65,6 +72,7 @@ class replicatiobalanceTests(unittest.TestCase):
         nodeC = TestFS({
             "host":"localhost:52362",
             "datadir":"./tests/datadirs/C",
+            "resetFileDbOnStart":True,
             "secret":secret,
             "master":"localhost:52342",
             "maxstorage":10,
@@ -133,6 +141,7 @@ class replicatiobalanceTests(unittest.TestCase):
         
         #restart 
         
+        masteropts["resetFileDbOnStart"]=False
         nodeA = TestFS(masteropts)
         nodeA.start()
         

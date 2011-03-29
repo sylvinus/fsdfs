@@ -26,7 +26,12 @@ class TestFS(Filesystem):
     
    
 class scalingfilesTests(unittest.TestCase):
-    filedb = "sqlite"
+    filedb = {
+        "backend":"mongodb",
+        "host":"localhost",
+        "db":"fsdfs_test",
+        "port":27017
+    }
     
     def setUp(self):
         if os.path.exists("./tests/datadirs"):
@@ -43,6 +48,7 @@ class scalingfilesTests(unittest.TestCase):
             "host":"localhost:42342",
             "datadir":"./tests/datadirs/A",
             "secret":secret,
+            "resetFileDbOnStart":True,
             "master":"localhost:42342",
             "replicationInterval":0,
             "filedb":self.filedb,
@@ -56,6 +62,7 @@ class scalingfilesTests(unittest.TestCase):
             "host":"localhost:42352",
             "datadir":"./tests/datadirs/B",
             "secret":secret,
+            "resetFileDbOnStart":True,
             "master":"localhost:42342",
             "filedb":self.filedb,
             "reportInterval":2,
@@ -64,9 +71,6 @@ class scalingfilesTests(unittest.TestCase):
         
         nodeA.start()
         nodeB.start()
-        
-        nodeA.filedb.reset()
-        nodeB.filedb.reset()
         
 
         for i in range(numFiles):
@@ -87,8 +91,8 @@ class scalingfilesTests(unittest.TestCase):
         
         #
         #
-        nodeA.stop()
-        return
+        #nodeA.stop()
+        #return
         #
         # test doesn't work because replicator puts too much stress on the addFilesToNode loop.
         
@@ -98,6 +102,8 @@ class scalingfilesTests(unittest.TestCase):
         self.assertEquals(1,len(g["nodes"]))
         
         print "restarting node..."
+        
+        nodeB.config["resetFileDbOnStart"] = False
         
         nodeB.start()
         

@@ -50,7 +50,8 @@ class Filesystem:
         "garbageOnImport":True,
         "garbageMinKn":0,
         "maxMissedReports":3,
-        "downloadTimeout":3600
+        "downloadTimeout":3600,
+        "resetFileDbOnStart":False #for tests
     }
     
     def __init__(self, config):
@@ -204,6 +205,7 @@ class Filesystem:
                     return False
                 
             
+        self.debug("importing %s" % filepath)
         
         self.filedb.update(filepath, {
             "nodes": set([self.host]).union(self.filedb.getNodes(filepath)),
@@ -237,6 +239,9 @@ class Filesystem:
                 filedb_backend=filedb_options["backend"]
         
             self.filedb = loadFileDb(filedb_backend, self, filedb_options)
+        
+        if self.config["resetFileDbOnStart"]:
+            self.filedb.reset()
         
         self.httpinterface = HTTPInterface(self)
         self.httpinterface.start()

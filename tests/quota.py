@@ -23,7 +23,12 @@ class TestFS(Filesystem):
     
    
 class quotaTests(unittest.TestCase):
-    filedb = "sqlite"
+    filedb = {
+        "backend":"mongodb",
+        "host":"localhost",
+        "db":"fsdfs_test",
+        "port":27017
+    }
     
     def setUp(self):
 		
@@ -41,6 +46,7 @@ class quotaTests(unittest.TestCase):
             "host":"localhost:52342",
             "datadir":"./tests/datadirs/A",
             "secret":secret,
+            "resetFileDbOnStart":True,
             "master":"localhost:52342",
             "maxstorage":10,
             "filedb":self.filedb,
@@ -51,6 +57,7 @@ class quotaTests(unittest.TestCase):
             "host":"localhost:52352",
             "datadir":"./tests/datadirs/B",
             "secret":secret,
+            "resetFileDbOnStart":True,
             "master":"localhost:52342",
             "maxstorage":10,
             "filedb":self.filedb
@@ -60,6 +67,7 @@ class quotaTests(unittest.TestCase):
             "host":"localhost:52362",
             "datadir":"./tests/datadirs/C",
             "secret":secret,
+            "resetFileDbOnStart":True,
             "master":"localhost:52342",
             "maxstorage":10,
             "filedb":self.filedb
@@ -69,10 +77,13 @@ class quotaTests(unittest.TestCase):
             "host":"localhost:52372",
             "datadir":"./tests/datadirs/D",
             "secret":secret,
+            "resetFileDbOnStart":True,
             "master":"localhost:52342",
             "maxstorage":10,
             "filedb":self.filedb
         })
+        
+        
         
         
         
@@ -118,6 +129,7 @@ class quotaTests(unittest.TestCase):
         
         
         nodeD.start()
+        
         
         sleep(3)
         
@@ -171,7 +183,7 @@ class quotaTests(unittest.TestCase):
         nodeD.stop()
         
         
-    def _testSpaceOptimization(self):
+    def testSpaceOptimization(self):
         
         secret = "azpdoazrRR"
         
@@ -179,6 +191,7 @@ class quotaTests(unittest.TestCase):
             "host":"localhost:42342",
             "datadir":"./tests/datadirs/A",
             "secret":secret,
+            "resetFileDbOnStart":True,
             "master":"localhost:42342",
             "maxstorage":13,
             "filedb":self.filedb
@@ -188,6 +201,7 @@ class quotaTests(unittest.TestCase):
             "host":"localhost:42352",
             "datadir":"./tests/datadirs/B",
             "secret":secret,
+            "resetFileDbOnStart":True,
             "master":"localhost:42342",
             "maxstorage":100000,
             "filedb":self.filedb
@@ -197,6 +211,7 @@ class quotaTests(unittest.TestCase):
             "host":"localhost:42362",
             "datadir":"./tests/datadirs/C",
             "secret":secret,
+            "resetFileDbOnStart":True,
             "master":"localhost:42342",
             "maxstorage":12,
             "filedb":self.filedb
@@ -206,6 +221,7 @@ class quotaTests(unittest.TestCase):
             "host":"localhost:42372",
             "datadir":"./tests/datadirs/D",
             "secret":secret,
+            "resetFileDbOnStart":True,
             "master":"localhost:42342",
             "maxstorage":1,
             "filedb":self.filedb

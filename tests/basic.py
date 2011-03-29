@@ -28,7 +28,7 @@ class basicTests(unittest.TestCase):
         os.makedirs("./tests/datadirs")
         
        
-    def testFileDownloadImport(self):
+    def _testFileDownloadImport(self):
     
         secret = "azpdoazrRR"
     
@@ -36,6 +36,7 @@ class basicTests(unittest.TestCase):
             "host":"localhost:42342",
             "datadir":"./tests/datadirs/A",
             "secret":secret,
+            "resetFileDbOnStart":True,
             "master":"localhost:42342",
             "filedb":self.filedb
         })
@@ -44,15 +45,13 @@ class basicTests(unittest.TestCase):
             "host":"localhost:42352",
             "datadir":"./tests/datadirs/B",
             "secret":secret,
+            "resetFileDbOnStart":True,
             "master":"localhost:42342",
             "filedb":self.filedb
         })
     
         nodeA.start()
         nodeB.start()
-    
-        nodeA.filedb.reset()
-        nodeB.filedb.reset()
     
         nodeA.importFile("http://api.jamendo.com/get2/stream/track/redirect/?id=241","dir1/dir2/filename.ext")
     
@@ -89,6 +88,7 @@ class basicTests(unittest.TestCase):
             "host":"localhost:42342",
             "datadir":"./tests/datadirs/A",
             "secret":secret,
+            "resetFileDbOnStart":True,
             "master":"localhost:42342",
             "filedb":self.filedb
         })
@@ -97,18 +97,19 @@ class basicTests(unittest.TestCase):
             "host":"localhost:42352",
             "datadir":"./tests/datadirs/B",
             "secret":secret,
+            "resetFileDbOnStart":True,
             "master":"localhost:42342",
             "filedb":self.filedb
         })
         
         nodeA.start()
         nodeB.start()
-        
-        nodeA.filedb.reset()
-        nodeB.filedb.reset()
-        
 
         
+        self.assertEquals(0,nodeA.filedb.getCountInNode("localhost:42352"))
+        self.assertEquals(0,nodeA.filedb.getSizeInNode("localhost:42352"))
+        self.assertEquals(0,nodeA.filedb.getCountAll())
+        self.assertEquals(0,nodeA.filedb.getSizeAll())
         
         nodeA.importFile("./tests/fixtures/test.txt","dir1/dir2/filename.ext")
         nodeA.importFile("./tests/fixtures/test2.txt","dir3/dir4/filename2.ext")
@@ -170,6 +171,7 @@ class basicTests(unittest.TestCase):
                 "port":(42362+2*i),
                 "datadir":"./tests/datadirs/node%s" % i,
                 "secret":secret,
+                "resetFileDbOnStart":True,
                 "master":"localhost:%s"%(42362+2*0),
                 "filedb":self.filedb
             }
@@ -180,7 +182,6 @@ class basicTests(unittest.TestCase):
 
             nodes.append(TestFS(opts))
             nodes[i].start()
-            nodes[i].filedb.reset()
             
         
         nodes[0].importFile("./tests/fixtures/test.txt","dir1/dir2/filename.ext")
@@ -213,6 +214,10 @@ class basicTests(unittest.TestCase):
             self.assertEquals(open(node.getLocalFilePath("dir3/dir4/filename2.ext")).read(),open("./tests/fixtures/test2.txt").read())
         
         
+
+        print "-"*80
+        print "adding dir1/dir2/filename.ext again"
+
         
         nodes[0].importFile("./tests/fixtures/test2.txt","dir1/dir2/filename.ext")
         
@@ -220,6 +225,7 @@ class basicTests(unittest.TestCase):
         sleep(numNodes*1.1*0.5)
         
         for node in nodes:
+            print node
             self.assertEquals(open(node.getLocalFilePath("dir1/dir2/filename.ext")).read(),open("./tests/fixtures/test2.txt").read())
             self.assertEquals(open(node.getLocalFilePath("dir3/dir4/filename2.ext")).read(),open("./tests/fixtures/test2.txt").read())
         

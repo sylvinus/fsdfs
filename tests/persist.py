@@ -35,14 +35,14 @@ chosenFileDb =     {
     }
     
 
-"""
-filedb = {
+
+chosenFileDb = {
     "backend":"mongodb",
     "host":"localhost",
     "db":"fsdfs_test",
     "port":27017
 }
-"""
+
 
    
 from basic import basicTests
@@ -51,7 +51,11 @@ from quota import quotaTests
 class persistBasicTests(basicTests):
     
     filedb = chosenFileDb
-    
+
+#class persistQuotaTests(quotaTests):
+
+#    filedb = chosenFileDb
+        
 #Don't run basictests again
 del basicTests
 del quotaTests
