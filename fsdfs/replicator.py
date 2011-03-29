@@ -44,15 +44,21 @@ class Replicator(threading.Thread):
 
         while not self.stopnow:
             
-            self.updateAllFileDb()
+            try:
+                
+                self.updateAllFileDb()
             
-            self.filedb.hasChanged=False
+                self.filedb.hasChanged=False
             
-            self.performNukes()
+                self.performNukes()
             
-            self.lastIterationDidSomething=False
+                self.lastIterationDidSomething=False
             
-            self.performReplication(self.fs.config["replicatorDepth"])
+                self.performReplication(self.fs.config["replicatorDepth"])
+            
+            except Exception,e:
+                
+                self.fs.error("When replicating : %s" % (e))
             
             #Sleep for one minute unless something happens..
             if not self.lastIterationDidSomething and self.fs.config["replicatorIdleTime"]>0:
