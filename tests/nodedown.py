@@ -133,7 +133,7 @@ class nodedownTests(unittest.TestCase):
         
         nodeA.start()
         
-        nodeA.reimportDirectory("./tests/datadirs/A2")
+        nodeA.reimportDirectory("./tests/datadirs/A2/")
 
         globalStatusA=nodeA.getGlobalStatus()
         self.assertEquals(2,len(globalStatusA["nodes"]))

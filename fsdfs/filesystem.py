@@ -415,13 +415,17 @@ class Filesystem:
     
         for root, dirs, files in os.walk(directory):
             
+            #print root,files
+            
             if root[-6:]==".fsdfs":
                 continue
                 
             for file in files:
-                path=root[len(directory)+1:]+"/"+self.getVirtualFilePath(file)
+                path=os.path.join(root[len(re.sub("/$","",directory))+1:],file)
                 
-                self.importFile(os.path.join(root,file),path,mode="move")
+                #print path
+                
+                self.importFile(os.path.join(root,file),self.getVirtualFilePath(path),mode="move")
 
 
 

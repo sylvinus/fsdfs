@@ -86,6 +86,14 @@ class adminTests(unittest.TestCase):
         
         self.assertEquals(2,len(nodes))
         
+        nuke = json.loads(os.popen("python bin/admin.py --json --secret=%s --master=%s nuke %s" % (secret,master,"dir3/dir4/filename2.ext")).read())
+        
+        self.assertEquals("ok",nuke)
+        
+        globalStatusA = json.loads(os.popen("python bin/admin.py --json --secret=%s --master=%s globalstatus" % (secret,master)).read())
+        self.assertEquals(1,globalStatusA["countGlobal"])
+        
+        
         nodeA.stop()
         nodeB.stop()
         

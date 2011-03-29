@@ -20,7 +20,12 @@ class mongodbFileDb(FileDbBase):
         
         self.connection = pymongo.Connection(self.options["host"],self.options["port"])
         self.db = self.connection[self.options["db"]]
-    
+        
+        try:
+            self.db.create_collection(self.t_files)
+        except:
+            pass
+            
         self.files = self.db[self.t_files]
         
         #nodes only in memory for now

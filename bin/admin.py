@@ -28,29 +28,26 @@ def main():
     
     (optionsattr,args) = getOptionsParser().parse_args()
     
+    
+    from fsdfs.filesystem import Filesystem
+    
+    node = Filesystem({
+        "host":"no-host",
+        "secret":optionsattr.secret,
+        "master":optionsattr.master
+    })
+    
     if args[0]=="globalstatus":
         
-        from fsdfs.filesystem import Filesystem
-        
-        node = Filesystem({
-            "host":"no-host",
-            "secret":optionsattr.secret,
-            "master":optionsattr.master
-        })
-
         ret = node.getGlobalStatus()
 
     elif args[0]=="search":
         
-        from fsdfs.filesystem import Filesystem
-        
-        node = Filesystem({
-            "host":"no-host",
-            "secret":optionsattr.secret,
-            "master":optionsattr.master
-        })
-
         ret = node.searchFile(args[1])
+        
+    elif args[0]=="nuke":
+        
+        ret = node.nodeRPC(node.config["master"],"NUKE",{"filepath":args[1]})
 
     if optionsattr.json:
         print json.dumps(ret, indent=4)
