@@ -52,9 +52,9 @@ class persistBasicTests(basicTests):
     
     filedb = chosenFileDb
 
-#class persistQuotaTests(quotaTests):
+class persistQuotaTests(quotaTests):
 
-#    filedb = chosenFileDb
+    filedb = chosenFileDb
         
 #Don't run basictests again
 del basicTests

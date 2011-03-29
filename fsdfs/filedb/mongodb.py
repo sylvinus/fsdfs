@@ -4,7 +4,7 @@ import time
 from bson.code import Code
 
 SIZE_MAP = Code("function () {emit('size',this.size);}")
-SIZE_REDUCE = Code("function (key,values)"
+SIZE_REDUCE = Code("function (key,values) {"
             "var total = 0;"
             "  for (var i = 0; i < values.length; i++) {"
             "    total += values[i];"
@@ -36,7 +36,8 @@ class mongodbFileDb(FileDbBase):
         
         self.options = options
         
-        self.t_files = self.options.get("prefix","fsdfs_"+fs.config["host"].replace(":","_").replace(".","_"))+"_files"
+        self.prefix = self.options.get("prefix","fsdfs_"+fs.config["host"].replace(":","_").replace(".","_"))
+        self.t_files = self.prefix+"_files"
         #self.t_nodes = prefix+"_nodes"
         #self.t_files_nodes = prefix+"_files_nodes"
 
@@ -73,6 +74,8 @@ class mongodbFileDb(FileDbBase):
         
         #print toupdate
         self.files.update({"_id":file},toupdate,upsert=True,safe=True,multi=False)
+        
+        self.files.ensure_index([("kn",pymongo.ASCENDING)])
         
         if updatekn:
             self.files.update({"_id":file},{"$set":{"kn":self.getKn(file)}},safe=True,multi=False)
@@ -181,10 +184,8 @@ class mongodbFileDb(FileDbBase):
 
 
     def getSizeAll(self):
-        
-        
                     
-        size = self.files.map_reduce(SIZE_MAP,SIZE_REDUCE,query={"nuked":{ "$exists" : False}}).find_one({"_id":"size"})
+        size = self.files.map_reduce(SIZE_MAP,SIZE_REDUCE,out=self.prefix+"_mapreduce_getsizeall",query={"nuked":{ "$exists" : False}}).find_one({"_id":"size"})
         
         if size:
             return size["value"]
@@ -193,7 +194,7 @@ class mongodbFileDb(FileDbBase):
     
     def getSizeInNode(self, node):
                     
-        size = self.files.map_reduce(SIZE_MAP,SIZE_REDUCE,query={"nuked":{ "$exists" : False},"nodes":node}).find_one({"_id":"size"})
+        size = self.files.map_reduce(SIZE_MAP,SIZE_REDUCE,out=self.prefix+"_mapreduce_getsizeinnode",query={"nuked":{ "$exists" : False},"nodes":node}).find_one({"_id":"size"})
         
         if size:
             return size["value"]
