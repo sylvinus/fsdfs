@@ -114,6 +114,13 @@ class Filesystem:
         '''
         
         return os.path.join(self.config["datadir"], filepath)
+    
+    def getVirtualFilePath(self, localpath):
+        '''
+        Reverse function
+        '''
+        return localpath
+        
         
     def debug(self,msg,type="debug"):
         logging.debug("%s - %s" % (type,msg))
@@ -377,7 +384,6 @@ class Filesystem:
             #pass thru JSON to have the same exact returns as if in remote fetch
             return json.loads(json.dumps(status))
 
-    
     def getStatus(self,with_files=False):
         '''
         Return the status of a Filesystem server.
@@ -403,6 +409,22 @@ class Filesystem:
             ret["files"] = self.filedb.listAll()
             
         return ret
+
+
+    def reimportDirectory(self,directory):
+    
+        for root, dirs, files in os.walk(directory):
+            
+            if root[-6:]==".fsdfs":
+                continue
+                
+            for file in files:
+                path=root[len(directory)+1:]+"/"+self.getVirtualFilePath(file)
+                
+                self.importFile(os.path.join(root,file),path,mode="move")
+
+
+
     
 class HTTPInterface(threading.Thread):
     

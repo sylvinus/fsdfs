@@ -44,6 +44,8 @@ class nodedownTests(unittest.TestCase):
             "secret":secret,
             "master":"localhost:42342",
             "filedb":self.filedb,
+            
+            "resetFileDbOnStart":True,
             "reportInterval":2,
             "maxMissedReports":3
         })
@@ -52,6 +54,8 @@ class nodedownTests(unittest.TestCase):
             "host":"localhost:42352",
             "datadir":"./tests/datadirs/B",
             "secret":secret,
+            
+            "resetFileDbOnStart":True,
             "master":"localhost:42342",
             "filedb":self.filedb,
             "reportInterval":2
@@ -109,6 +113,9 @@ class nodedownTests(unittest.TestCase):
         
         
         #it's back !
+        nodeB.config["resetFileDbOnStart"] = False
+        nodeA.config["resetFileDbOnStart"] = False
+        
         nodeB.start()
         
         sleep(2)
@@ -117,6 +124,23 @@ class nodedownTests(unittest.TestCase):
         self.assertEquals(2,len(globalStatusA["nodes"]))
         self.assertEquals(-1,nodeA.filedb.getKn("dir3/dir4/filename2.ext"))
         self.assertEquals(open(nodeB.getLocalFilePath("dir1/dir2/filename.ext")).read(),open("./tests/fixtures/test.txt").read())
+        
+        
+        nodeA.stop()
+        
+        shutil.move("./tests/datadirs/A","./tests/datadirs/A2")
+        os.makedirs("./tests/datadirs/A")
+        
+        nodeA.start()
+        
+        nodeA.reimportDirectory("./tests/datadirs/A2")
+
+        globalStatusA=nodeA.getGlobalStatus()
+        self.assertEquals(2,len(globalStatusA["nodes"]))
+        self.assertEquals(-1,nodeA.filedb.getKn("dir3/dir4/filename2.ext"))
+        self.assertEquals(open(nodeA.getLocalFilePath("dir1/dir2/filename.ext")).read(),open("./tests/fixtures/test.txt").read())
+        self.assertEquals(open(nodeA.getLocalFilePath("dir3/dir4/filename2.ext")).read(),open("./tests/fixtures/test2.txt").read())
+        
         
         
 if __name__ == '__main__':
