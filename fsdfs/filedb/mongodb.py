@@ -3,6 +3,7 @@ import pymongo
 import time
 from bson.code import Code
 
+"""
 SIZE_MAP = Code("function () {emit('size',this.size);}")
 SIZE_REDUCE = Code("function (key,values) {"
             "var total = 0;"
@@ -11,7 +12,9 @@ SIZE_REDUCE = Code("function (key,values) {"
             "  }"
             "  return total;"
             "}")
+"""
 
+GROUP_SIZE_REDUCE=Code("function(obj,prev) { prev.sumsize += obj.size; }")
 
 class mongodbFileDb(FileDbBase):
 
@@ -184,22 +187,27 @@ class mongodbFileDb(FileDbBase):
 
 
     def getSizeAll(self):
-                    
-        size = self.files.map_reduce(SIZE_MAP,SIZE_REDUCE,out=self.prefix+"_mapreduce_getsizeall",query={"nuked":{ "$exists" : False}}).find_one({"_id":"size"})
+        
+        size = self.files.group({},{"nuked":{ "$exists" : False}},{"sumsize":0},GROUP_SIZE_REDUCE)
+                
+        #size = self.files.map_reduce(SIZE_MAP,SIZE_REDUCE,out=self.prefix+"_mapreduce_getsizeall",query={"nuked":{ "$exists" : False}}).find_one({"_id":"size"})
         
         if size:
-            return size["value"]
+            return size[0]["sumsize"]
         else:
             return 0
     
     def getSizeInNode(self, node):
-                    
-        size = self.files.map_reduce(SIZE_MAP,SIZE_REDUCE,out=self.prefix+"_mapreduce_getsizeinnode",query={"nuked":{ "$exists" : False},"nodes":node}).find_one({"_id":"size"})
+        
+        size = self.files.group({},{"nuked":{ "$exists" : False},"nodes":node},{"sumsize":0},GROUP_SIZE_REDUCE)
+              
+        #size = self.files.map_reduce(SIZE_MAP,SIZE_REDUCE,out=self.prefix+"_mapreduce_getsizeinnode",query={"nuked":{ "$exists" : False},"nodes":node}).find_one({"_id":"size"})
         
         if size:
-            return size["value"]
+            return size[0]["sumsize"]
         else:
             return 0
+        
 
     def getCountAll(self):
         return self.files.find({"nuked":{ "$exists" : False}}).count()

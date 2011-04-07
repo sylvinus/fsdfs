@@ -5,7 +5,6 @@ Blockers V1
 - Test crashes/disconnects/...
 - fsdfsd
 - Error catching everywhere
-- reindex command ? (listdir=>filedb)
 
 V1.1
 - nodes should send remove event when stopping
