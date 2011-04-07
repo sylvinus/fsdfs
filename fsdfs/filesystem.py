@@ -591,12 +591,13 @@ class myHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             
             self.simpleResponse(500,str(e))
             
-            self.server.fs.error("When serving %s %s : %s" % (p[1],params,e))
+            self.server.fs.error("When serving %s %s : %s" % (self.path,params,e))
             
             
     def simpleResponse(self, code, content):
         
         self.send_response(code)
+        self.send_header("Access-Control-Allow-Origin","*")
         self.end_headers()
         self.wfile.write(json.dumps(content))
         self.connection.shutdown(socket.SHUT_RDWR)
@@ -620,13 +621,25 @@ class myHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         
         qs = urlparse.parse_qs(data)
         
+        
+        if not "p" in qs:
+            self.send_response(403)
+            self.send_header("Access-Control-Allow-Origin","*")
+            self.connection.shutdown(1)
+            return False
+        
         #make sure the hash matches
         query = qs["p"][0]
         
         calcHash = self.server.fs.hashQuery(query)
         
+        
+        
         if calcHash != qs["h"][0]:
+            print "*"*200
+            print calcHash,qs["h"][0],query
             self.send_response(401)
+            self.send_header("Access-Control-Allow-Origin","*")
             self.connection.shutdown(1)
             return False
         
@@ -635,6 +648,7 @@ class myHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         #more than 1 day time diff, request is considered expired...
         if abs(int(params.get("_time",0)) - time.time()) > 3600 * 24:
             self.send_response(401)
+            self.send_header("Access-Control-Allow-Origin","*")
             self.connection.shutdown(1)
             return False
         
