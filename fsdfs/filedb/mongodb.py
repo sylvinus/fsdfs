@@ -31,6 +31,8 @@ class mongodbFileDb(FileDbBase):
             
         self.files = self.db[self.t_files]
         
+        self.cacheSizeInNode = {}
+        
         #nodes only in memory for now
         self.nodes = {} #self.db[self.t_nodes]
     
@@ -48,9 +50,11 @@ class mongodbFileDb(FileDbBase):
         
         
         
+        
     def reset(self):
         self.files.remove({},safe=True) 
         self.nodes = {self.fs.host:self.fs.getStatus()}
+        self.cacheSizeInNode = {}
         
         self.hasChanged=True
     
@@ -68,6 +72,13 @@ class mongodbFileDb(FileDbBase):
             if "n" in data:
                 updatekn=False
                 data["kn"]=len(data["nodes"])-data["n"]
+                
+            for node in data["nodes"]:
+                if node in self.cacheSizeInNode:
+                    if "size" in data:
+                        self.cacheSizeInNode[node]+=data["size"]
+                    else:
+                        del self.cacheSizeInNode[node]
         
         if data.get("nuked",False) is None:
             toupdate["$unset"] = {"nuked":True}
@@ -98,10 +109,16 @@ class mongodbFileDb(FileDbBase):
     def addFileToNode(self, file, node):
         self.files.update({"_id":file},{"$addToSet":{"nodes":node}},safe=True)
         self.hasChanged=True
+        
+        if node in self.cacheSizeInNode:
+            del self.cacheSizeInNode[node]
    
     def removeFileFromNode(self, file, node):
         self.files.update({"_id":file},{"$pull":{"nodes":node}},safe=True)
         self.hasChanged=True
+        
+        if node in self.cacheSizeInNode:
+            del self.cacheSizeInNode[node]
           
     def listNukes(self):
         files = self.files.find({"nuked":{"$exists":True}},fields=["nuked","nodes","_id"])
@@ -144,6 +161,9 @@ class mongodbFileDb(FileDbBase):
                 self.addFileToNode(f,node)
                 
             del data["files"]
+            
+            if node in self.cacheSizeInNode:
+                del self.cacheSizeInNode[node]
         
         self.nodes[node] = data
         self.hasChanged=True
@@ -166,6 +186,8 @@ class mongodbFileDb(FileDbBase):
             self.removeFileFromNode(f,node)
     
         self.hasChanged=True
+        if node in self.cacheSizeInNode:
+            del self.cacheSizeInNode[node]
 
 
     def getMaxKnInNode(self, node, num=1):
@@ -199,11 +221,16 @@ class mongodbFileDb(FileDbBase):
     
     def getSizeInNode(self, node):
         
+        #Cache this because it's an expensive operation that slowed down bulk imports a lot
+        if node in self.cacheSizeInNode:
+            return self.cacheSizeInNode[node]
+            
         size = self.files.group({},{"nuked":{ "$exists" : False},"nodes":node},{"sumsize":0},GROUP_SIZE_REDUCE)
               
         #size = self.files.map_reduce(SIZE_MAP,SIZE_REDUCE,out=self.prefix+"_mapreduce_getsizeinnode",query={"nuked":{ "$exists" : False},"nodes":node}).find_one({"_id":"size"})
         
         if size:
+            self.cacheSizeInNode[node]=size[0]["sumsize"]
             return size[0]["sumsize"]
         else:
             return 0

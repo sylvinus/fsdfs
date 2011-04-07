@@ -81,10 +81,11 @@ class scalingfilesTests(unittest.TestCase):
             if numFiles==statusB["count"]:
                 print "Got all files replicated after %s seconds" % (x*0.1)
                 break
-            time.sleep(0.1)
+            time.sleep(0.16)
         
         
         self.assertEquals(numFiles,statusB["count"])
+        self.assertEquals(numFiles*26,statusB["size"])
         
         
         nodeB.stop()
