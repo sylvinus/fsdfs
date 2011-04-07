@@ -12,6 +12,9 @@
 </head>
 <body style="background-color:#F0F0F0">
 	
+<div style="float:right;padding:10px">
+	Refresh interval <input type='text' size=4 id='refreshinterval' value='60'>s
+</div>
 	
 <h3>FSDFS global status</h3>
 <table>
@@ -34,6 +37,8 @@
 <table id="nodes"></table>
 
 
+<br/><br/>
+Pro tip : Did you know you can load this page with index.html?master=XXX&amp;secret=YYY to avoid the prompts?
 
 
 <script>
@@ -249,7 +254,8 @@ var query = function(verb,params) {
 		dataType:"text json",
 		cache:false,
 		success:function(data, textStatus, jqXHR) {
-			console.log(data, textStatus, jqXHR);
+
+			$('#nodes').jqGrid('clearGridData');
 			
 			var i=0;
 			$.each(data.nodes,function(i,elt) {
@@ -276,13 +282,13 @@ jQuery("#nodes").jqGrid({
 	height: 600,
    	colNames:['Node','# files', 'size','Uptime', 'Last Update','Free disk','maxKn'],
    	colModel:[
-   		{name:'node',index:'node', width:200},
+   		{name:'node',index:'node', width:230},
    		{name:'count',index:'count', width:110, sorttype:"float"},
-   		{name:'size',index:'size', width:110, sorttype:"float"},
+   		{name:'size',index:'size', width:180, sorttype:"float"},
    		{name:'uptime',index:'uptime', width:90, sorttype:"float"},
    		{name:'lastUpdate',index:'lastUpdate', width:110, sorttype:"float"},
-   		{name:'df',index:'df', width:160, sorttype:"float"},
-   		{name:'maxKn',index:'maxKn', width:500, sorttype:"float"}
+   		{name:'df',index:'df', width:180, sorttype:"float"},
+   		{name:'maxKn',index:'maxKn', width:400, sorttype:"float"}
 
    	],
    	multiselect: true,
@@ -290,8 +296,17 @@ jQuery("#nodes").jqGrid({
 });
 
 
+var globalstatus;
+globalstatus = function() {
+	
+	query("GLOBALSTATUS",{});
+	
+	setTimeout(function() {
+		globalstatus();
+	},parseInt($("#refreshinterval")[0].value)*1000);
+}
 
-query("GLOBALSTATUS",{});
+globalstatus();
 
 </script>
 </body>
