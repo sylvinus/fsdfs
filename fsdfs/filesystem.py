@@ -135,16 +135,18 @@ class Filesystem:
         '''
         
         destpath = self.getLocalFilePath(filepath)
-        
-        if not os.path.isfile(destpath):
-            return True
-        
+
         try:
-            os.unlink(destpath)
+            if os.path.isfile(destpath):
+                os.unlink(destpath)
+            else:
+                self.error("Deleting file %s, was not there..." % destpath)
+                
             self.filedb.removeFileFromNode(filepath, self.host)
             self.report()
             return True
-        except:
+        except Exception,e:
+            self.error("While deleting file %s : %s" % e)
             return False
     
     def nukeFile(self, filepath):
