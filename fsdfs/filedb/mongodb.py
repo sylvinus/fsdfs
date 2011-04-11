@@ -201,7 +201,7 @@ class mongodbFileDb(FileDbBase):
         to write
         '''
 
-        return [f["_id"] for f in self.files.find({"nuked":{ "$exists" : False}},sort=[("kn",1)],limit=num,fields=["_id"])]
+        return [f["_id"] for f in self.files.find({"nuked":{ "$exists" : False},"nodes":{"$not":{"$size":0}}},sort=[("kn",1)],limit=num,fields=["_id"])]
         
     def iterMinKnAll(self):
         for f in self.getMinKnAll(num=self.getCountAll()):

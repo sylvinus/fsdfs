@@ -166,32 +166,33 @@ class Filesystem:
         
         destpath = self.getLocalFilePath(filepath)
         
-        
-        self.locks["importFileMkdir"].acquire()
-        try:
-            if not os.path.isdir(os.path.dirname(destpath)):
-                os.makedirs(os.path.dirname(destpath))
-        finally:
-            self.locks["importFileMkdir"].release()
-        
-        if mode == "download" or ((type(src)==str or type(src)==unicode) and src.startswith("http://")):
+        if destpath!=src:
             
-            #todo do we need further checks of complete transfer with this?
-            src = urllib2.urlopen(src,None,timeout=60)
-            mode = "copyobj"
-            
-        if mode == "copy":
-            shutil.copy(src, destpath)
-        elif mode == "move":
-            shutil.move(src, destpath)
-        elif mode == "copyobj":
-            f = open(destpath, "wb")
-            shutil.copyfileobj(src, f)
+            self.locks["importFileMkdir"].acquire()
             try:
-                f.close()
-                src.close()
-            except:
-                pass
+                if not os.path.isdir(os.path.dirname(destpath)):
+                    os.makedirs(os.path.dirname(destpath))
+            finally:
+                self.locks["importFileMkdir"].release()
+        
+            if mode == "download" or ((type(src)==str or type(src)==unicode) and src.startswith("http://")):
+            
+                #todo do we need further checks of complete transfer with this?
+                src = urllib2.urlopen(src,None,timeout=60)
+                mode = "copyobj"
+            
+            if mode == "copy":
+                shutil.copy(src, destpath)
+            elif mode == "move":
+                shutil.move(src, destpath)
+            elif mode == "copyobj":
+                f = open(destpath, "wb")
+                shutil.copyfileobj(src, f)
+                try:
+                    f.close()
+                    src.close()
+                except:
+                    pass
         
         size = os.stat(destpath).st_size
         

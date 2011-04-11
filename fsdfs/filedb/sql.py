@@ -201,7 +201,7 @@ class sqlFileDb(FileDbBase):
         
         while i*step<total:
         
-            result = self.execute("""SELECT F.filename FROM """+self.t_files+""" F WHERE F.nuked=0 ORDER BY F.kn ASC LIMIT %s,%s""", (i*step,step))
+            result = self.execute("""SELECT F.filename FROM """+self.t_files+""" F WHERE F.nuked=0 AND F.kn!=-n ORDER BY F.kn ASC LIMIT %s,%s""", (i*step,step))
         
             for x in result:
                 yield x['filename']

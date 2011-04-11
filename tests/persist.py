@@ -30,11 +30,6 @@ chosenFileDb = {
     "db":"fsdfs_test"
 }
 
-chosenFileDb =     {
-        "backend":"sqlite",
-    }
-    
-
 
 chosenFileDb = {
     "backend":"mongodb",
@@ -42,6 +37,11 @@ chosenFileDb = {
     "db":"fsdfs_test",
     "port":27017
 }
+
+chosenFileDb =     {
+        "backend":"sqlite",
+    }
+    
 
 
    
