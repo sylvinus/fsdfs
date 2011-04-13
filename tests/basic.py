@@ -89,6 +89,7 @@ class basicTests(unittest.TestCase):
             "datadir":"./tests/datadirs/A",
             "secret":secret,
             "resetFileDbOnStart":True,
+            "replicatorSkipMaster":False,
             "master":"localhost:42342",
             "filedb":self.filedb
         })
@@ -97,7 +98,7 @@ class basicTests(unittest.TestCase):
             "host":"localhost:42352",
             "datadir":"./tests/datadirs/B",
             "secret":secret,
-            "resetFileDbOnStart":True,
+            "resetFileDbOnStart":False,
             "master":"localhost:42342",
             "filedb":self.filedb
         })

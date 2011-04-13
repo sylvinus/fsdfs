@@ -43,6 +43,7 @@ class Filesystem:
         "replicatorDepth":10,
         "replicatorIdleTime":60,
         "replicatorInterval":0.1,
+        "replicatorSkipMaster":False,
         "port":4242,
         "maxstorage":10 * 1024 * 1024 * 1024, #10G
         "reportInterval":60,

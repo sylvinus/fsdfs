@@ -141,7 +141,6 @@ class Replicator(threading.Thread):
         
         #print "\n".join(["%s has %s" % (n,self.filedb.listInNode(n)) for n in knownNodes])
         
-        
         random.shuffle(knownNodes)
         
         # 1. filter nodes already having the file
@@ -171,7 +170,11 @@ class Replicator(threading.Thread):
             if node not in alreadyNodes:
                 #only target nodes with enough free disk or with some files to delete to make space
                 if df(node) + self.filedb.getNode(node)["size"] >= size:
-                    newnodes.append(node)
+                    
+                    #don't target master if we were asked to skip it
+                    if not self.fs.config["replicatorSkipMaster"] or node!=self.fs.config["master"]:
+                    
+                        newnodes.append(node)
         
         #print (knownNodes,alreadyNodes,newnodes,self.fs.nodedb)
         if len(newnodes) == 0:
