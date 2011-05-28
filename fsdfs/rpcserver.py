@@ -117,15 +117,6 @@ class myHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                     self.simpleResponse(200,"ok")
         
         
-            elif p[1] == "SUGGEST":
-            
-                #local = self.server.fs.getLocalFilePath(params["filepath"])
-            
-                downloaded = self.server.fs.downloadFile(params["filepath"])
-            
-                self.simpleResponse(200,"ok" if downloaded else "nok")
-        
-        
             elif p[1] == "STATUS":
             
                 self.simpleResponse(200,self.server.fs.getStatus())
@@ -143,18 +134,8 @@ class myHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         
         
             elif p[1] == "SEARCH":
-            
-                nodes = self.server.fs.filedb.getNodes(params["filepath"])
                 
-                #randomize nodes and always put the master at the end to avoid overloading it
-                
-                nodes = list(nodes)
-                random.shuffle(nodes)
-                
-                master = self.server.fs.config["master"]
-                if master in nodes:
-                    nodes.remove(master)
-                    nodes.append(master)
+                nodes = self.server.fs.searchFile(params["filepath"])
                 
                 self.simpleResponse(200,nodes)
         

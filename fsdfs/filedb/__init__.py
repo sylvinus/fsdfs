@@ -154,6 +154,13 @@ class FileDbBase:
     def iterMinKnAll(self):
         for f in self.getMinKnAll(num=self.getCountAll()):
             yield f
+            
+    def getMinKnNotInNode(self,node):
+        for f in self.iterMinKnAll():
+            if not node in self.getNodes(f):
+                if len(self.getNodes(f))>0:
+                    return f
+        return None
     
     def getSizeAll(self):
         return sum([self.getSize(f) for f in self.listAll()])

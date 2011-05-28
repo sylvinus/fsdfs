@@ -25,6 +25,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 from filedb import loadFileDb
 from reporter import Reporter
 from rpcserver import RPCServer
+from nodewatcher import NodeWatcher
 
 class Filesystem:
     '''
@@ -160,8 +161,32 @@ class Filesystem:
             return False
         else:
             self.filedb.update(filepath,{"nuked": time.time()})
-            
+            self.performNules()
             return True
+    
+    
+    def performNukes(self):
+    	'''
+    	to write.
+    	'''
+
+        if not self.ismaster:
+            return False
+        else:
+            
+            nukes = self.filedb.listNukes()
+
+            for file in nukes:
+                #do a set() because list may change while looping
+                nodes = set(self.filedb.getNodes(file))
+                for node in nodes:
+                    deleted = ("ok"==self.nodeRPC(node,"DELETE",{"filepath":file}))
+
+                    if deleted:
+                        self.filedb.removeFileFromNode(file,node)
+
+
+    
     
     def importFile(self, src, filepath, mode="copy"):
         '''
@@ -262,8 +287,11 @@ class Filesystem:
         self.reporter.start()
         
         if self.ismaster:
-            self.replicator = Replicator(self)
-            self.replicator.start()
+            self.nodewatcher = NodeWatcher(self)
+            self.nodewatcher.start()
+
+        self.replicator = Replicator(self)
+        self.replicator.start()
         
     
     def stop(self):
@@ -281,10 +309,8 @@ class Filesystem:
         
         #self.rpcserver.join()
         
-        if self.ismaster:
-            self.replicator.shutdown()
-            
-            self.replicator.join()
+        self.replicator.shutdown()
+        self.replicator.join()
     
     
     def searchFile(self, file):
@@ -292,9 +318,23 @@ class Filesystem:
         Returns the nodes where a file is stored
         '''
         
-        nodes = self.nodeRPC(self.config["master"], "SEARCH", {"filepath": file})
+        if not self.ismaster:
+            return self.nodeRPC(self.config["master"], "SEARCH", {"filepath": file})
+        else:
+            
+            nodes = self.filedb.getNodes(file)
         
-        return nodes
+            #randomize nodes and always put the master at the end to avoid overloading it
+        
+            nodes = list(nodes)
+            random.shuffle(nodes)
+        
+            master = self.config["master"]
+            if master in nodes:
+                nodes.remove(master)
+                nodes.append(master)
+        
+            return nodes
     
     def nodeRPC(self,host,method,params={},returnfd=False,timeout=30):
         '''
@@ -325,14 +365,35 @@ class Filesystem:
         
         return sha1(sha1(query).hexdigest() + self.config["secret"]).hexdigest()
     
-    def downloadFile(self, filepath):
+    
+    def selectFileToReplicate(self,node=False):
+        
+        if not node:
+            node=self.host
+            
+        if not self.ismaster:
+            return self.nodeRPC(self.config["master"], "SELECT",{"node":node})
+        else:
+            
+            f = self.filedb.getMinKnNotInNode(node)
+            
+            return {
+                "file":f,
+                "nodes":self.searchFile(f),
+                "kn":self.filedb.getKn(f),
+                "size":self.filedb.getSize(f)
+            }
+            
+    
+    def downloadFile(self, filepath, nodes=False):
         '''
         Downloads a file from the global filesystem to the local server
         '''
         
-        hosts = self.searchFile(filepath)
+        if not nodes:
+            nodes = self.searchFile(filepath)
         
-        for host in hosts:
+        for host in nodes:
             try:
                 remote = self.nodeRPC(host, "DOWNLOAD", {"filepath": filepath},returnfd=True,timeout=self.config["downloadTimeout"])
             except Exception, err:
@@ -403,7 +464,7 @@ class Filesystem:
         
         ret =  {
             "node": self.host,
-            "df": self.maxstorage - self.filedb.getSizeInNode(self.host),
+            "df": self.getFreeDisk(),
             "uptime":int(time.time()-self.startTime),
             "load": 0,
             "count": self.filedb.getCountInNode(self.host),
@@ -414,6 +475,9 @@ class Filesystem:
             ret["files"] = self.filedb.listAll()
             
         return ret
+        
+    def getFreeDisk(self):
+        return self.maxstorage - self.filedb.getSizeInNode(self.host)
 
 
     def reimportDirectory(self,directory):
@@ -432,5 +496,11 @@ class Filesystem:
                 
                 self.importFile(os.path.join(root,file),self.getVirtualFilePath(path),mode="move")
 
-
-
+    
+    def updateAllRules(self):
+        '''
+        To be used if rules change over time (please put in a thread!)
+        '''
+        for f in self.filedb.listAll():
+            rules = self.getReplicationRules(f)
+            self.filedb.update(f, {"n": rules["n"]}) #"nodes":nodes,
