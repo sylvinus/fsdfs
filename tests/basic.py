@@ -18,9 +18,20 @@ from fsdfs.filesystem import Filesystem
 class TestFS(Filesystem):
     pass
     
+
    
 class basicTests(unittest.TestCase):
+    
+    """
     filedb = "memory"
+    """
+    filedb = {
+        "backend":"mongodb",
+        "host":"localhost",
+        "db":"fsdfs_test",
+        "port":27017
+    }
+    
     
     def setUp(self):
         if os.path.exists("./tests/datadirs"):
@@ -89,6 +100,7 @@ class basicTests(unittest.TestCase):
             "datadir":"./tests/datadirs/A",
             "secret":secret,
             "resetFileDbOnStart":True,
+            "replicatorIdleTime":2,
             "replicatorSkipMaster":False,
             "master":"localhost:42342",
             "filedb":self.filedb
@@ -99,6 +111,7 @@ class basicTests(unittest.TestCase):
             "datadir":"./tests/datadirs/B",
             "secret":secret,
             "resetFileDbOnStart":False,
+            "replicatorIdleTime":2,
             "master":"localhost:42342",
             "filedb":self.filedb
         })
@@ -106,6 +119,7 @@ class basicTests(unittest.TestCase):
         nodeA.start()
         nodeB.start()
 
+        sleep(1)
         
         self.assertEquals(0,nodeA.filedb.getCountInNode("localhost:42352"))
         self.assertEquals(0,nodeA.filedb.getSizeInNode("localhost:42352"))
@@ -117,9 +131,16 @@ class basicTests(unittest.TestCase):
         
         self.assertEquals(-2,nodeA.filedb.getKn("dir3/dir4/filename2.ext"))
         
-        sleep(5)
+        sleep(6)
         
-        self.assertEquals(2,nodeA.filedb.getCountInNode("localhost:42352"))
+        print "files : %s" % {
+            "A":nodeA.filedb.listInNode(nodeA.host),
+            "B":nodeA.filedb.listInNode(nodeB.host)
+        }
+        
+        
+        #self.assertEquals(2,nodeB.filedb.getCountInNode(nodeB.host))
+        self.assertEquals(2,nodeA.filedb.getCountInNode(nodeB.host))
         self.assertEquals(26+13,nodeA.filedb.getSizeInNode("localhost:42352"))
         self.assertEquals(2,nodeA.filedb.getCountAll())
         self.assertEquals(26+13,nodeA.filedb.getSizeAll())
@@ -132,7 +153,7 @@ class basicTests(unittest.TestCase):
         globalStatusB=nodeB.getGlobalStatus()
 
         self.assertTrue(4<=globalStatusA["uptime"])
-        self.assertTrue(6>=globalStatusA["uptime"])
+        self.assertTrue(9>=globalStatusA["uptime"])
         
         
         del globalStatusA["uptime"]
@@ -148,6 +169,8 @@ class basicTests(unittest.TestCase):
         
         nodeA.nukeFile("dir1/dir2/filename.ext")
         
+        self.assertTrue(nodeA.filedb.isNuked("dir1/dir2/filename.ext"))
+        
         sleep(2)
         
         self.assertFalse(os.path.isfile(nodeA.getLocalFilePath("dir1/dir2/filename.ext")))
@@ -159,7 +182,7 @@ class basicTests(unittest.TestCase):
         nodeB.stop()
         
     
-    def testManyNodes(self):
+    def _testManyNodes(self):
         
         secret = "azpdoazrRR"
         

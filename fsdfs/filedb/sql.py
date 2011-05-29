@@ -159,10 +159,13 @@ class sqlFileDb(FileDbBase):
 
         return set([ i['filename'] for i in result ])
     
-    def listNukes(self):
-        result = self.execute("""SELECT filename FROM """+self.t_files+""" WHERE nuked=1 """, ())
-
-        return set([ i['filename'] for i in result ])
+    def isNuked(self,file):
+        file_id = self._getFileId(file,insert=False)
+        if file_id is None:
+            return False
+        result = self.execute("""SELECT filename FROM """+self.t_files+""" WHERE nuked=1 AND filename=%s """, (file,))
+        
+        return len(result)==1
         
     def listInNode(self, node):
         

@@ -29,7 +29,14 @@ class mongodbFileDb(FileDbBase):
         except:
             pass
             
+        try:
+            self.db.create_collection(self.t_nukes)
+        except:
+            pass
+            
         self.files = self.db[self.t_files]
+        self.nukes = self.db[self.t_nukes]
+        
         
         self.cacheSizeInNode = {}
         
@@ -43,6 +50,8 @@ class mongodbFileDb(FileDbBase):
         
         self.prefix = self.options.get("prefix","fsdfs_"+fs.config["host"].replace(":","_").replace(".","_"))
         self.t_files = self.prefix+"_files"
+        self.t_nukes = self.prefix+"_nukes"
+        
         #self.t_nodes = prefix+"_nodes"
         #self.t_files_nodes = prefix+"_files_nodes"
 
@@ -53,6 +62,7 @@ class mongodbFileDb(FileDbBase):
         
     def reset(self):
         self.files.remove({},safe=True) 
+        self.nukes.remove({},safe=True) 
         self.nodes = {self.fs.host:self.fs.getStatus()}
         self.cacheSizeInNode = {}
         
@@ -80,8 +90,11 @@ class mongodbFileDb(FileDbBase):
                     else:
                         del self.cacheSizeInNode[node]
         
-        if data.get("nuked",False) is None:
-            toupdate["$unset"] = {"nuked":True}
+        if "nuked" in data:
+            if data["nuked"]:
+                self.files.remove({"_id":file})
+                self.nukes.update({"_id":file},{"$set":{"t":time.time()}},upsert=True,safe=True,multi=False)
+                return
             del data["nuked"]
             
         toupdate["$set"]=data
@@ -89,9 +102,9 @@ class mongodbFileDb(FileDbBase):
         #print toupdate
         self.files.update({"_id":file},toupdate,upsert=True,safe=True,multi=False)
         
-        self.files.ensure_index([("kn",pymongo.ASCENDING),("nuked",pymongo.ASCENDING)])
+        self.files.ensure_index([("kn",pymongo.ASCENDING)])
         
-        self.files.ensure_index([("nodes",pymongo.ASCENDING),("nuked",pymongo.ASCENDING)])
+        self.files.ensure_index([("nodes",pymongo.ASCENDING)])
         
         
         if updatekn:
@@ -110,9 +123,10 @@ class mongodbFileDb(FileDbBase):
             return len(f["nodes"])-f["n"]
     
     def addFileToNode(self, file, node):
+        
         self.files.update({"_id":file},{"$addToSet":{"nodes":node}},safe=True)
         self.hasChanged=True
-        
+    
         if node in self.cacheSizeInNode:
             del self.cacheSizeInNode[node]
    
@@ -123,13 +137,16 @@ class mongodbFileDb(FileDbBase):
         if node in self.cacheSizeInNode:
             del self.cacheSizeInNode[node]
           
-    def listNukes(self):
-        files = self.files.find({"nuked":{"$exists":True}},fields=["nuked","nodes","_id"])
+    def isNuked(self,file):
+        return 1==self.nukes.find({"_id":file},fields=["_id"]).count()
+        
+        """
         n = set()
         for f in files:
             if len(f["nodes"])>0 and f["nuked"]:
                 n.add(f["_id"])
         return n
+        """
           
     def getNodes(self, file):
         f = self.files.find_one({"_id":file},fields=["nodes"])
@@ -147,7 +164,7 @@ class mongodbFileDb(FileDbBase):
             return f["size"]
     
     def listAll(self):
-        return set([f["_id"] for f in self.files.find({"nuked":{ "$exists" : False }},fields=["_id"])])
+        return set([f["_id"] for f in self.files.find({},fields=["_id"])])
     
     def listInNode(self,node):
         
@@ -194,14 +211,14 @@ class mongodbFileDb(FileDbBase):
         '''
         to write
         '''
-        return [f["_id"] for f in self.files.find({"nuked":{ "$exists" : False}, "nodes":node },sort=[("kn",-1)],limit=num,fields=["_id"])]
+        return [f["_id"] for f in self.files.find({"nodes":node },sort=[("kn",-1)],limit=num,fields=["_id"])]
         
     def getMinKnAll(self, num=1):
         '''
         to write
         '''
 
-        return [f["_id"] for f in self.files.find({"nuked":{ "$exists" : False},"nodes":{"$not":{"$size":0}}},sort=[("kn",1)],limit=num,fields=["_id"])]
+        return [f["_id"] for f in self.files.find({"nodes":{"$not":{"$size":0}}},sort=[("kn",1)],limit=num,fields=["_id"])]
         
     def iterMinKnAll(self):
         for f in self.getMinKnAll(num=self.getCountAll()):
@@ -210,7 +227,7 @@ class mongodbFileDb(FileDbBase):
 
     def getSizeAll(self):
         
-        size = self.files.group({},{"nuked":{ "$exists" : False}},{"sumsize":0},GROUP_SIZE_REDUCE)
+        size = self.files.group({},{},{"sumsize":0},GROUP_SIZE_REDUCE)
                 
         #size = self.files.map_reduce(SIZE_MAP,SIZE_REDUCE,out=self.prefix+"_mapreduce_getsizeall",query={"nuked":{ "$exists" : False}}).find_one({"_id":"size"})
         
@@ -225,7 +242,7 @@ class mongodbFileDb(FileDbBase):
         if node in self.cacheSizeInNode:
             return self.cacheSizeInNode[node]
             
-        size = self.files.group({},{"nuked":{ "$exists" : False},"nodes":node},{"sumsize":0},GROUP_SIZE_REDUCE)
+        size = self.files.group({},{"nodes":node},{"sumsize":0},GROUP_SIZE_REDUCE)
               
         #size = self.files.map_reduce(SIZE_MAP,SIZE_REDUCE,out=self.prefix+"_mapreduce_getsizeinnode",query={"nuked":{ "$exists" : False},"nodes":node}).find_one({"_id":"size"})
         
@@ -237,11 +254,12 @@ class mongodbFileDb(FileDbBase):
         
 
     def getCountAll(self):
-        return self.files.find({"nuked":{ "$exists" : False}}).count()
+        return self.files.find({}).count()
 
     def getCountInNode(self, node):
         '''
         to write
         '''
-
-        return self.files.find({"nuked":{ "$exists" : False},"nodes":node}).count()
+        print list(self.files.find())
+        print "count in %s : %s" % (node,self.files.find({"nodes":node}).count())
+        return self.files.find({"nodes":node}).count()

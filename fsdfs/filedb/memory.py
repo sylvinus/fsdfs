@@ -48,12 +48,10 @@ class memoryFileDb(FileDbBase):
         self.files[file]["nodes"].discard(node)
         self.hasChanged=True
           
-    def listNukes(self):
-        n = set()
-        for f in self.files:
-            if self.files[f].get("nuked", False) and len(self.files[f]["nodes"])>0:
-                n.add(f)
-        return n
+    def isNuked(self,file):
+        if file not in self.files:
+            return False
+        return self.files[file].get("nuked", False)
           
     def getNodes(self, file):
         if not file in self.files:

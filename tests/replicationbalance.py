@@ -53,7 +53,7 @@ class replicatiobalanceTests(unittest.TestCase):
             "garbageMinKn":-1,
             "replicatorConcurrency":4,
             "replicatorDepth":4,
-            "replicatorInterval":0
+            "replicatorInterval":1
         }
         
         nodeA = TestFS(masteropts)
@@ -66,7 +66,8 @@ class replicatiobalanceTests(unittest.TestCase):
             "master":"localhost:52342",
             "maxstorage":10,
             "filedb":self.filedb,
-            "reportInterval":4
+            "reportInterval":4,
+            "replicatorInterval":1
         })
         
         nodeC = TestFS({
@@ -77,7 +78,8 @@ class replicatiobalanceTests(unittest.TestCase):
             "master":"localhost:52342",
             "maxstorage":10,
             "filedb":self.filedb,
-            "reportInterval":4
+            "reportInterval":4,
+            "replicatorInterval":1
         })
         
         

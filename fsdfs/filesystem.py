@@ -160,11 +160,24 @@ class Filesystem:
         if not self.ismaster:
             return False
         else:
+            self.performNuke(filepath)
             self.filedb.update(filepath,{"nuked": time.time()})
-            self.performNukes()
+            
+            
             return True
     
+    def performNuke(self,file,nodes=False):
+        
+        if not nodes:
+            nodes = set(self.filedb.getNodes(file))
+            
+        for node in nodes:
+            deleted = ("ok"==self.nodeRPC(node,"DELETE",{"filepath":file}))
+
+            if deleted:
+                self.filedb.removeFileFromNode(file,node)
     
+    """
     def performNukes(self):
     	'''
     	to write.
@@ -178,13 +191,8 @@ class Filesystem:
 
             for file in nukes:
                 #do a set() because list may change while looping
-                nodes = set(self.filedb.getNodes(file))
-                for node in nodes:
-                    deleted = ("ok"==self.nodeRPC(node,"DELETE",{"filepath":file}))
-
-                    if deleted:
-                        self.filedb.removeFileFromNode(file,node)
-
+                
+    """
 
     
     

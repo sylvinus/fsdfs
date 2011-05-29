@@ -102,7 +102,10 @@ class FileDbBase:
             data["deleted"].update(supposed.difference(data["all"]))
             
         for f in data["imported"]:
-            self.addFileToNode(f,node)
+            if self.isNuked(f):
+                self.fs.performNuke(f,[node])
+            else:
+                self.addFileToNode(f,node)
             
         for f in data["deleted"]:
             self.removeFileFromNode(f,node)
@@ -140,12 +143,12 @@ class FileDbBase:
         
         pass
     
-    def listNukes(self):
+    def isNuked(self,file):
         '''
         to write
         '''
         
-        return []
+        return False
     
     def getMaxKnInNode(self, node, num=1):
         '''
