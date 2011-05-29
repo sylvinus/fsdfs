@@ -82,11 +82,35 @@ class FileDbBase:
         Get data about a node
         '''
         
+        
+    def processFilesData(self,node,data):
+        
+        data.setdefault("imported",[])
+        data["imported"] = set(data["imported"])
+        
+        data.setdefault("deleted",[])
+        data["deleted"] = set(data["deleted"])
+        
+        if "all" in data:
+            data["all"] = set(data["all"])
+            supposed = self.listInNode(node)
+            
+            #add files we didn't know about
+            data["imported"].update(data["all"].difference(supposed))
+            
+            #delete missing files
+            data["deleted"].update(supposed.difference(data["all"]))
+            
+        for f in data["imported"]:
+            self.addFileToNode(f,node)
+            
+        for f in data["deleted"]:
+            self.removeFileFromNode(f,node)
+        
     def addNode(self,node,data):
         '''
-        Add a known nodes
+        Add a known node
         '''
-        pass
     
     def removeNode(self,node):
         '''
@@ -128,7 +152,7 @@ class FileDbBase:
         to write
         '''
         
-        files = self.listInNode(node)
+        files = list(self.listInNode(node))
         
         if len(files) == 0:
             return []
@@ -142,7 +166,7 @@ class FileDbBase:
         to write
         '''
         
-        files = self.listAll()
+        files = list(self.listAll())
         
         if len(files) == 0:
             return []

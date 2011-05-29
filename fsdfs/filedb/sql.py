@@ -157,19 +157,19 @@ class sqlFileDb(FileDbBase):
     def listAll(self):
         result = self.execute("""SELECT filename FROM """+self.t_files+""" WHERE nuked=0 """, ())
 
-        return [ i['filename'] for i in result ]
+        return set([ i['filename'] for i in result ])
     
     def listNukes(self):
         result = self.execute("""SELECT filename FROM """+self.t_files+""" WHERE nuked=1 """, ())
 
-        return [ i['filename'] for i in result ]
+        return set([ i['filename'] for i in result ])
         
     def listInNode(self, node):
         
         node_id = self._getNodeId(node)
         result = self.execute("""SELECT """+self.t_files+""".filename FROM """+self.t_files_nodes+""","""+self.t_files+""" WHERE """+self.t_files_nodes+""".file_id="""+self.t_files+""".id AND """+self.t_files_nodes+""".node_id=%s""", (node_id,))
         
-        return [ i['filename'] for i in result ]
+        return set([ i['filename'] for i in result ])
 
 
     def getMaxKnInNode(self, node, num=1):
@@ -257,7 +257,7 @@ class sqlFileDb(FileDbBase):
     
         result = self.execute("""SELECT N.address FROM """+self.t_nodes+""" N""")
     
-        return [ i['address'] for i in result if i['address'] in self.nodes ]
+        return set([ i['address'] for i in result if i['address'] in self.nodes ])
     
     def addNode(self,node,data):
         
@@ -266,9 +266,7 @@ class sqlFileDb(FileDbBase):
         data["lastUpdate"] = time.time()
         
         if "files" in data:
-            for f in data["files"]:
-                self.addFileToNode(f,node)
-                
+            self.processFilesData(node,data["files"])
             del data["files"]
         
         if not node in self.nodes:

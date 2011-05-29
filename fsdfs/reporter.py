@@ -13,7 +13,10 @@ class Reporter(threading.Thread):
 
         while not self.stopnow:
             try:
-                self.fs.report(with_files=(first and not self.fs.ismaster))
+                if first and not self.fs.ismaster:
+                    self.fs.report({"all":list(self.fs.filedb.listInNode(self.fs.host))})
+                else:
+                    self.fs.report()
                 first=False
             except Exception,e:
                 self.fs.error("While reporting : %s" % e)

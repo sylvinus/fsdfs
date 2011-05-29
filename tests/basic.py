@@ -163,7 +163,7 @@ class basicTests(unittest.TestCase):
         
         secret = "azpdoazrRR"
         
-        numNodes = 20
+        numNodes = 100
         
         nodes = []
         for i in range(numNodes):
@@ -174,6 +174,7 @@ class basicTests(unittest.TestCase):
                 "secret":secret,
                 "resetFileDbOnStart":True,
                 "master":"localhost:%s"%(42362+2*0),
+                "replicatorIdleTime":2,
                 "filedb":self.filedb
             }
             
@@ -187,9 +188,9 @@ class basicTests(unittest.TestCase):
         
         nodes[0].importFile("./tests/fixtures/test.txt","dir1/dir2/filename.ext")
         nodes[0].importFile("./tests/fixtures/test2.txt","dir3/dir4/filename2.ext")
+
         
-        #max repl/sec = 1 new node per file
-        sleep(numNodes*1.1*0.5)
+        sleep(4+numNodes*0.1)
         
         
         for node in nodes:
@@ -222,8 +223,7 @@ class basicTests(unittest.TestCase):
         
         nodes[0].importFile("./tests/fixtures/test2.txt","dir1/dir2/filename.ext")
         
-        #max repl/sec = 1 new node per file
-        sleep(numNodes*1.1*0.5)
+        sleep(4+numNodes*0.05)
         
         for node in nodes:
             print node
@@ -232,9 +232,11 @@ class basicTests(unittest.TestCase):
         
         
         print "Stopping %s nodes... takes a few seconds" % numNodes
+        nodes.reverse()
         for node in nodes:
-            node.stop()
+            node.stop(False)
             
+        time.sleep(3)
         
         
         

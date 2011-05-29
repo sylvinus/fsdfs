@@ -147,11 +147,11 @@ class mongodbFileDb(FileDbBase):
             return f["size"]
     
     def listAll(self):
-        return [f["_id"] for f in self.files.find({"nuked":{ "$exists" : False }},fields=["_id"])]
+        return set([f["_id"] for f in self.files.find({"nuked":{ "$exists" : False }},fields=["_id"])])
     
     def listInNode(self,node):
         
-        return [f["_id"] for f in self.files.find({"nodes":node},fields=["_id"])]
+        return set([f["_id"] for f in self.files.find({"nodes":node},fields=["_id"])])
         
     def addNode(self,node,data):
         data["lastUpdate"] = time.time()
@@ -159,10 +159,7 @@ class mongodbFileDb(FileDbBase):
         #print "node added %s : %s" % (node,data)
         
         if "files" in data:
-            
-            for f in data["files"]:
-                self.addFileToNode(f,node)
-                
+            self.processFilesData(node,data["files"])
             del data["files"]
             
             if node in self.cacheSizeInNode:
@@ -172,7 +169,7 @@ class mongodbFileDb(FileDbBase):
         self.hasChanged=True
         
     def listNodes(self):
-        return self.nodes.keys()
+        return set(self.nodes.keys())
         
     def getNode(self,node):
         if not node in self.nodes:

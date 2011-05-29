@@ -146,7 +146,7 @@ class Filesystem:
                 self.error("Deleting file %s, was not there..." % destpath)
                 
             self.filedb.removeFileFromNode(filepath, self.host)
-            self.report()
+            self.report({"deleted":[filepath]})
             return True
         except Exception,e:
             self.error("While deleting file %s : %s" % e)
@@ -161,7 +161,7 @@ class Filesystem:
             return False
         else:
             self.filedb.update(filepath,{"nuked": time.time()})
-            self.performNules()
+            self.performNukes()
             return True
     
     
@@ -255,7 +255,7 @@ class Filesystem:
             "kn":1-self.getReplicationRules(filepath)["n"] 
             })
         
-        self.report()
+        self.report({"imported":[filepath]})
         
         return True
 
@@ -294,7 +294,7 @@ class Filesystem:
         self.replicator.start()
         
     
-    def stop(self):
+    def stop(self,wait=True):
         '''
         Stops the filesystem
         '''
@@ -305,12 +305,14 @@ class Filesystem:
         self.rpcserver.server.server_close()
         
         self.reporter.shutdown()
-        self.reporter.join()
+        if wait:
+            self.reporter.join()
         
         #self.rpcserver.join()
         
         self.replicator.shutdown()
-        self.replicator.join()
+        if wait:
+            self.replicator.join()
     
     
     def searchFile(self, file):
@@ -376,6 +378,9 @@ class Filesystem:
         else:
             
             f = self.filedb.getMinKnNotInNode(node)
+            
+            if f is None:
+                return False
             
             return {
                 "file":f,
@@ -472,7 +477,7 @@ class Filesystem:
         }
         
         if with_files:
-            ret["files"] = self.filedb.listAll()
+            ret["files"] = with_files
             
         return ret
         

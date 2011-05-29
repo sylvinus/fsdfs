@@ -65,7 +65,7 @@ class Replicator(threading.Thread):
         
         self.fs.debug("File %s" % (data),"repl")
         
-        if data is None:
+        if not data:
             return None
     
         #do we have enough space to download the file ?

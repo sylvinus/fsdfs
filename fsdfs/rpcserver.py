@@ -98,7 +98,13 @@ class myHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             
                 self.simpleResponse(200, "ok" if deleted else "nok")
         
+            elif p[1] == "SELECT":
+            
+                selected = self.server.fs.selectFileToReplicate(params["node"])
+            
+                self.simpleResponse(200,selected)
         
+            
             elif p[1] == "IMPORT":
 
                 if self.server.fs.importFile(params["url"],params["filepath"]):

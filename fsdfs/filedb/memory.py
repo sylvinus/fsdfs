@@ -64,15 +64,15 @@ class memoryFileDb(FileDbBase):
         return self.files[file]["size"]
     
     def listAll(self):
-        return [f for f in self.files if not self.files[f].get("nuked",False)]
+        return set([f for f in self.files if not self.files[f].get("nuked",False)])
     
     def listInNode(self,node):
         
-        innode = []
+        innode = set()
 
         for f in self.files:
             if node in self.getNodes(f):
-                innode.append(f)
+                innode.add(f)
 
         return innode
         
@@ -80,16 +80,14 @@ class memoryFileDb(FileDbBase):
         data["lastUpdate"] = time.time()
         
         if "files" in data:
-            for f in data["files"]:
-                self.addFileToNode(f,node)
-                
+            self.processFilesData(node,data["files"])
             del data["files"]
         
         self.nodes[node] = data
         self.hasChanged=True
         
     def listNodes(self):
-        return self.nodes.keys()
+        return set(self.nodes.keys())
         
     def getNode(self,node):
         if not node in self.nodes:
