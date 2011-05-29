@@ -26,8 +26,9 @@ class TestFS(Filesystem):
             return Filesystem.downloadFile(self,filepath,nodes)
 
 class nodedownTests(unittest.TestCase):
+    
     """
-    filedb = "memory"
+    filedb = "sqlite"
     """
     filedb = {
         "backend":"mongodb",
@@ -35,6 +36,7 @@ class nodedownTests(unittest.TestCase):
         "db":"fsdfs_test",
         "port":27017
     }
+    
     
     def setUp(self):
         if os.path.exists("./tests/datadirs"):
@@ -138,20 +140,22 @@ class nodedownTests(unittest.TestCase):
         
         
         #try reimporting a whole directory
-        nodeA.stop()
+        if self.filedb!="sqlite":
+            
+            nodeA.stop()
         
-        shutil.move("./tests/datadirs/A","./tests/datadirs/A2")
-        os.makedirs("./tests/datadirs/A")
+            shutil.move("./tests/datadirs/A","./tests/datadirs/A2")
+            os.makedirs("./tests/datadirs/A")
         
-        nodeA.start()
+            nodeA.start()
         
-        nodeA.reimportDirectory("./tests/datadirs/A2/")
+            nodeA.reimportDirectory("./tests/datadirs/A2/")
 
-        globalStatusA=nodeA.getGlobalStatus()
-        self.assertEquals(2,len(globalStatusA["nodes"]))
-        self.assertEquals(-1,nodeA.filedb.getKn("dir3/dir4/filename2.ext"))
-        self.assertEquals(open(nodeA.getLocalFilePath("dir1/dir2/filename.ext")).read(),open("./tests/fixtures/test.txt").read())
-        self.assertEquals(open(nodeA.getLocalFilePath("dir3/dir4/filename2.ext")).read(),open("./tests/fixtures/test2.txt").read())
+            globalStatusA=nodeA.getGlobalStatus()
+            self.assertEquals(2,len(globalStatusA["nodes"]))
+            self.assertEquals(-1,nodeA.filedb.getKn("dir3/dir4/filename2.ext"))
+            self.assertEquals(open(nodeA.getLocalFilePath("dir1/dir2/filename.ext")).read(),open("./tests/fixtures/test.txt").read())
+            self.assertEquals(open(nodeA.getLocalFilePath("dir3/dir4/filename2.ext")).read(),open("./tests/fixtures/test2.txt").read())
         
         
         

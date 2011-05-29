@@ -92,5 +92,5 @@ class Replicator(threading.Thread):
         
         
         downloaded = self.fs.downloadFile(data["file"],data["nodes"])
-        
+
         return downloaded

@@ -17,21 +17,25 @@ from fsdfs.filesystem import Filesystem
 
 
 class TestFS(Filesystem):
-    def downloadFile(self, filepath):
+    def downloadFile(self, filepath,nodes):
         
         #sleep for 0 to 1.5 seconds
-        sleep(random.random()*1.5)
+        #sleep(random.random()*1.5)
         
-        return Filesystem.downloadFile(self,filepath)
+        return Filesystem.downloadFile(self,filepath,nodes)
     
    
 class scalingfilesTests(unittest.TestCase):
+    """
+    filedb="memory"
+    """
     filedb = {
         "backend":"mongodb",
         "host":"localhost",
         "db":"fsdfs_test",
         "port":27017
     }
+    
     
     def setUp(self):
         if os.path.exists("./tests/datadirs"):
@@ -50,10 +54,9 @@ class scalingfilesTests(unittest.TestCase):
             "secret":secret,
             "resetFileDbOnStart":True,
             "master":"localhost:42342",
-            "replicationInterval":0,
+            "replicatorInterval":0,
+            "replicatorIdleTime":10,
             "filedb":self.filedb,
-            "replicatorDepth":50,
-            "replicatorConcurrency":10,
             "reportInterval":2,
             "maxMissedReports":3
         })
@@ -65,6 +68,8 @@ class scalingfilesTests(unittest.TestCase):
             "resetFileDbOnStart":True,
             "master":"localhost:42342",
             "filedb":self.filedb,
+            "replicatorInterval":0,
+            "replicatorIdleTime":1,
             "reportInterval":2,
             "maxMissedReports":3
         })
@@ -82,8 +87,11 @@ class scalingfilesTests(unittest.TestCase):
                 print "Got all files replicated after %s seconds" % (x*0.1)
                 break
             time.sleep(0.16)
+            
+        time.sleep(1)
+        statusB = nodeB.getStatus()
         
-        
+        print statusB
         self.assertEquals(numFiles,statusB["count"])
         self.assertEquals(numFiles*26,statusB["size"])
         

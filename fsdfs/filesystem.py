@@ -386,7 +386,7 @@ class Filesystem:
         else:
             
             f = self.filedb.getMinKnNotInNode(node)
-            
+
             if f is None:
                 return False
             
@@ -405,7 +405,7 @@ class Filesystem:
         
         if not nodes:
             nodes = self.searchFile(filepath)
-        
+            
         for host in nodes:
             try:
                 remote = self.nodeRPC(host, "DOWNLOAD", {"filepath": filepath},returnfd=True,timeout=self.config["downloadTimeout"])
@@ -415,9 +415,8 @@ class Filesystem:
             
             #We don't need checksumming here... we're using TCP
             self.importFile(remote, filepath, mode="copyobj")
-            
+
             remote.close()
-            
             return True
         
         

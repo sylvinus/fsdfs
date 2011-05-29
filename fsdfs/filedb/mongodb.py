@@ -224,6 +224,15 @@ class mongodbFileDb(FileDbBase):
         for f in self.getMinKnAll(num=self.getCountAll()):
             yield f
 
+    
+    def getMinKnNotInNode(self,node):
+        file = list(self.files.find({"$nor":[{"nodes":{"$size":0}},{"nodes":node}]},limit=1,fields=["_id"]))
+        
+        if len(file):
+            return file[0]["_id"]
+        else:
+            return None
+    
 
     def getSizeAll(self):
         
@@ -260,6 +269,4 @@ class mongodbFileDb(FileDbBase):
         '''
         to write
         '''
-        print list(self.files.find())
-        print "count in %s : %s" % (node,self.files.find({"nodes":node}).count())
         return self.files.find({"nodes":node}).count()

@@ -184,9 +184,10 @@ class FileDbBase:
             
     def getMinKnNotInNode(self,node):
         for f in self.iterMinKnAll():
-            if not node in self.getNodes(f):
-                if len(self.getNodes(f))>0:
-                    return f
+            nodes = self.getNodes(f)
+            #print "considering %s for %s (nodes=%s)" % (f,node,nodes)
+            if node not in nodes and len(nodes)>0:
+                return f
         return None
     
     def getSizeAll(self):
