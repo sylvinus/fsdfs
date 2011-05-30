@@ -114,6 +114,11 @@ class mongodbFileDb(FileDbBase):
         
         self.hasChanged=True
         
+    
+    #todo
+    def temporaryIncrementKn(self,file):
+        self.files.update({"_id":file},{"$set":{"kn":self.getKn(file)+1}},safe=True,multi=False)
+        
     def getKn(self,file):
         f = self.files.find_one({"_id":file},fields=["n","nodes"])
         #print f
